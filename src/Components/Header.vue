@@ -98,7 +98,7 @@ const toolList: ToolItem[] = [
 
     .header-img {
         position: absolute;
-        object-position: 4rem -18rem;
+        object-position: -51rem -39rem;
         object-fit: cover;
     }
 
