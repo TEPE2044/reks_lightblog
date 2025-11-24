@@ -26,9 +26,10 @@ const toolList: ToolItem[] = [
 
 <template>
     <div class="header">
-        <!--    图片层-->
-        <BImg class="header-img" src="/melo.webp"></BImg>
-
+        <!-- 图片层 -->
+        <div class="header-img-wrapper">
+            <BImg class="header-img" src="/melo.webp"></BImg>
+        </div>
 
         <!--    内容层-->
         <BContainer class="header-content d-flex flex-row gap-5 align-items-center">
@@ -80,21 +81,25 @@ const toolList: ToolItem[] = [
 </template>
 
 <style scoped lang="scss">
-a {
-    text-decoration: none;
-    color: inherit;
-}
-
 .header {
     padding: 0;
     margin: 0;
     position: relative;
     height: 70px;
-    overflow: hidden;
+    overflow: visible; // 保持visible，防止dropdown被裁剪
+    // fix：剪裁图片
+    .header-img-wrapper {
+        position: absolute;
+        width: 100%;
+        height: 70px; 
+        overflow: hidden; // 只裁剪图片
+        z-index: 1;
+    }
 
     .header-img {
         position: absolute;
-        object-position: -52rem -40rem;
+        object-position: 4rem -18rem;
+        object-fit: cover;
     }
 
     .header-content {
@@ -127,5 +132,10 @@ a {
     background: #f9ebd1;
     opacity: 0.8;
     z-index: 3;
+}
+
+.dropdown-menu,
+.b-dropdown .dropdown-menu {
+    z-index: 2000;
 }
 </style>
