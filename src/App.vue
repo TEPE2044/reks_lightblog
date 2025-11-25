@@ -23,4 +23,8 @@ import Footer from "./Components/Footer.vue";
 </script>
 
 <style lang="scss" scoped>
+main {
+  background-color: rgb(254, 249, 239);
+  background-image: linear-gradient(62deg, rgba(245, 222, 179, 0.43) 0%, rgba(245, 222, 179, 0.31) 100%)
+}
 </style>

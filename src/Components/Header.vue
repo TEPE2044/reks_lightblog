@@ -90,7 +90,7 @@ const toolList: ToolItem[] = [
     .bg-color-layer {
         width: 100%;
         height: 100%;
-        background-color: rgba(245, 222, 179, 0.788); 
+        background-color: rgba(240, 216, 171, 0.84); 
     }
 
     .header-content {
