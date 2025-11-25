@@ -83,7 +83,7 @@ const toolList: ToolItem[] = [
     border: 1px soild #000;
 
     /* bg-image-layer */
-    background-image: url("/public/melo.webp");
+    background-image: url("/melo.webp");
     background-size: fill;
     background-position: center;
 
