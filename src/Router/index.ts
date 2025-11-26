@@ -32,6 +32,11 @@ const router = createRouter({
             path: '/hub',
             name: 'hub',
             component: () => import('../Pages/Hub.vue')
+        },
+        {
+            path: '/search',
+            name: 'search',
+            component: () => import('../Pages/Search.vue')
         }
     ]
 })

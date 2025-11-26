@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Aside: typeof import('./src/components/Aside.vue')['default']
     BAvatar: typeof import('bootstrap-vue-next/components/BAvatar')['BAvatar']
     BButton: typeof import('bootstrap-vue-next/components/BButton')['BButton']
     BButtonGroup: typeof import('bootstrap-vue-next/components/BButton')['BButtonGroup']

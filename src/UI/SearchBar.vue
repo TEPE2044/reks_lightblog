@@ -1,22 +1,59 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+import router from '../Router';
 
+const searchContent = ref("");
+
+const handleSearch = () => {
+  // TODO:跳转到搜索结果页并且返回搜索内容，携带搜索内容，可使用标签分类
+  try{
+    router.push({ name: 'search'});
+    console.log("Searching for:", searchContent.value);
+  }catch(e){
+    console.error(e)
+  }
+};
 </script>
 
 <template>
-  <BInputGroup class="btn-search">
-    <BFormInput autofocus class="search-input" placeholder="索引万物"/>
-    <BButton variant="outline-dark">
+  <div class="search-bar position-relative d-flex align-items-center">
+    <input type="text" class="search-input position-absolute" v-model="searchContent" placeholder="索引万物" />
+    <div class="search-icon position-absolute top-50 translate-middle" @click="handleSearch">
       <i class="bi bi-search"></i>
-    </BButton>
-  </BInputGroup>
+    </div>
+  </div>
 
 </template>
 
 <style lang="scss" scoped>
-.btn-search {
-  width: 25rem;
+//TODO: 使搜索栏宽度可变，而且需要向左延展
+$flexible-width:10rem;
+$expanded-width:$flexible-width + 0.5rem;
+.search-bar {
+  width: $flexible-width;
+  height: 30px;
+  background: white;
+  border-radius: 15px;
+  transition: width 0.3s ease;
+  // fix
+  &:focus-within {
+    width: $expanded-width;
+  }
+
   .search-input{
-    border: 1px solid rgba(0, 0, 0, 0.49);
+    top: 18%;
+    left: 8%;
+    width: 7rem;
+    border: none;
+    font-size: small;
+    background-color: rgba(0, 0, 0, 0);
+    &:focus{
+      outline: none;
+    }
+  }
+  .search-icon {
+    left: 88%;
+    cursor: pointer;
   }
 }
 </style>
