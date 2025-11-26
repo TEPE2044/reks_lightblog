@@ -30,5 +30,11 @@
 </template>
 
 <style lang="scss" scoped>
+.recommand {
+  min-height: 400px; 
+}
 
+// .b-card-body {
+//   min-height: 300px; // 保证内容区高度一致
+// }
 </style>
