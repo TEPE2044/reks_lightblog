@@ -1,0 +1,16 @@
+//测量所用的临时border
+%test-shape {
+  border: 1px solid #000000;
+}
+//reks卡片盒子
+%reks-card-box {
+  background-color: rgba(255, 255, 255, 0.86);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding-top: 0.5rem;
+}
+
+%reks-avatar {
+  user-select: none;
+  padding: 0.2rem;
+}
