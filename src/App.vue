@@ -22,9 +22,7 @@ import Footer from "./Components/Footer.vue";
 
 <style lang="scss" scoped>
 main {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  flex: 1 0 auto;
   background-color: rgb(254, 249, 239);
   background-image: linear-gradient(62deg, rgba(245, 222, 179, 0.43) 0%, rgba(245, 222, 179, 0.31) 100%)
 }

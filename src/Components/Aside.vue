@@ -4,7 +4,7 @@ const what = 'blog' // 'blog' | 'radio'
 </script>
 
 <template>
-  <div class="aside">
+  <div class="aside mt-2">
     <BButton variant="success">一键签到</BButton>
     <BButtonGroup>
       <BButton variant="outline-primary">发布博客</BButton>

@@ -6,9 +6,9 @@ import Aside from "../Components/Aside.vue";
 
 <template>
     <BContainer class="home">
-        <div class="home-main mt-5">
-            <div class="news-caro mt-3">
-                <Caro></Caro>
+        <div class="home-main mt-4">
+            <div class="news-caro">
+                <Caro/>
             </div>
 
             <div class="news-recommand mt-5">
@@ -19,8 +19,8 @@ import Aside from "../Components/Aside.vue";
             </div>
         </div>
 
-        <div class="home-aside mt-5">
-            <Aside />
+        <div class="home-aside mt-4">
+            <Aside/>
         </div>
 
 
