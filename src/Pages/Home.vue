@@ -7,7 +7,7 @@ import Aside from "../Components/Aside.vue";
 <template>
     <BContainer class="home">
         <div class="home-main mt-4">
-            <div class="news-caro">
+            <div class="news-caro mx-auto mt-4">
                 <Caro/>
             </div>
 

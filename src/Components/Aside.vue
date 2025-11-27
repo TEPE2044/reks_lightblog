@@ -5,7 +5,7 @@ import ProfileCard from '../UI/ProfileCard.vue';
 </script>
 
 <template>
-  <div class="aside mt-2">
+  <div class="aside mt-4">
     <div class="profile-card">
       <ProfileCard />
     </div>
