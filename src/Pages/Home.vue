@@ -5,40 +5,45 @@ import Aside from "../Components/Aside.vue";
 </script>
 
 <template>
-    <BContainer class="home">
-        <div class="home-main mt-4">
-            <div class="news-caro mx-auto mt-4">
-                <Caro/>
-            </div>
+  <BContainer class="home">
+    <div class="home-main mt-2">
+      <div class="home-caro mt-4">
+        <Caro/>
 
-            <div class="news-recommand mt-5">
-                <div class="mt-5">
-                    <Recommand />
-                </div>
-
-            </div>
-        </div>
-
-        <div class="home-aside mt-4">
-            <Aside/>
+         <figure class="text-center mt-3">
+          <blockquote class="blockquote">
+            <p style="color: #660909">ReKindle Everything</p>
+          </blockquote>
+        </figure>
+        <div class="d-flex gap-2 align-items-center flex-column mb-3">
+          <h2 class="text-center" style="font-family: Alibaba-PuHuiTi-Bold,sans-serif">
+            欢迎来到ReKindlers!</h2>
         </div>
 
 
-    </BContainer>
+      </div>
+
+      <div class="home-recommand mt-4">
+        <Recommand />
+      </div>
+    </div>
+
+    <div class="home-aside">
+      <Aside />
+    </div>
+
+
+  </BContainer>
 </template>
 
 <style lang="scss" scoped>
-%decoration-card {
-  background-color: #ffffffdb;
-  border-radius: .5rem;
-  box-shadow: 0 4px 10px #0000001a;
-  padding: 2rem;
-}
+@use "../Asset/CustomStyle/global.scss";
 
 .home {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 3rem;
+
   .home-main {
     //sizes
     width: 847px;
@@ -46,12 +51,19 @@ import Aside from "../Components/Aside.vue";
     display: flex;
     flex-direction: column;
     justify-content: center;
-    //decoration
-    @extend %decoration-card;
+
+    .home-caro {
+      @extend %reks-card-box;
+    }
+
+    .home-recommand {
+      @extend %reks-card-box;
+    }
+
   }
+
   .home-aside {
     width: 351px;
-    @extend %decoration-card;
   }
 }
 </style>

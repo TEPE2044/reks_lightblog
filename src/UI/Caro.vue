@@ -2,14 +2,14 @@
 import { onMounted, ref } from 'vue'
 import CaroSkeleton from '../Components/CaroSkeleton.vue'
 
-interface caroImage<Object> {
+interface caroImage {
   src: string
   alt: string
   loaded: boolean
 }
 //fix:如果activityList为空，无法显示图
 const activityList = ref<caroImage[]>([
-  { src: 'https://picsu.photos/600/300/?image=25', alt: '/hub/500', loaded: false },
+  { src: 'https://picsum.photos/600/300/?image=25', alt: '/hub/500', loaded: false },
   { src: 'https://picsu.photos/600/300/?image=26', alt: '/hub/501', loaded: false },
   { src: 'https://picsu.photos/600/300/?image=27', alt: '/hub/502', loaded: false },
 ])
@@ -19,10 +19,11 @@ const imagePlaceholder = '/imagePlaceholder.webp'
 const loading = ref<boolean>(true)
 
 // 只为第一张图显示骨架屏：预加载第一张，加载完成/失败后关闭骨架
-onMounted(() => {  
+onMounted(() => {
   const firstPaint = activityList.value[0]
-  if(activityList.value.length === 0){
-    loading.value = true
+  if (activityList.value?.length === 0) {
+    loading.value = false
+    return
   }
   if (firstPaint) {
     const img = new Image()
@@ -43,6 +44,7 @@ onMounted(() => {
   // 后台异步预加载其余图片，但不阻塞第一次渲染；失败用占位图
   for (let i = 1; i < activityList.value.length; i++) {
     const item = activityList.value[i]
+    if (!item) continue
     const img = new Image()
     img.onload = () => {
       item.loaded = true
@@ -59,22 +61,22 @@ onMounted(() => {
 
 <template>
   <BContainer>
-    <div class="caro mx-auto mt-2">
+    <div class="caro mt-4">
       <BPlaceholderWrapper :loading="loading">
         <template #loading>
-          <CaroSkeleton />
+          <div class="caroSize d-flex align-items-center justify-content-center">
+            <CaroSkeleton />
+          </div>
         </template>
 
         <template #default>
-          <BCarousel controls class="caroSize">
-            <BCarouselSlide
-              class="caroSlide"
-              v-for="(img, idx) in activityList"
-              :key="`act${img.alt}${idx}`"
-              :img-src="img.src"
-              :img-alt="img.alt + idx"
-            />
+          <BCarousel fade controls class="caroSize" v-if="activityList.length > 0">
+            <BCarouselSlide class="caroSlide" v-for="(img, idx) in activityList" :key="`act${img.alt}${idx}`"
+              :img-src="img.src" :img-alt="img.alt + idx" />
           </BCarousel>
+          <div v-else class="caroSize d-flex align-items-center justify-content-center">
+            <BImg :src="imagePlaceholder" alt="No activities available" class="w-100 h-100" />
+          </div>
         </template>
       </BPlaceholderWrapper>
     </div>
@@ -82,41 +84,19 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
-//fix:caro 轮播图切换时图片大小跳动问题
+@use "../Asset/CustomStyle/global.scss";
+
 .caro {
   overflow: hidden;
   border-radius: 10px;
-  margin: 0;
-  .caroSize {
-    width: 480px;
-    height: 240px;
-    object-fit: fill;
-  }
-  .caroSlide {
-    object-fit: contain;
-    &:hover {
-      transition: all 0.8s ease-in-out;
-      filter: brightness(0.8);
-      cursor: pointer;
-    }
-  }
 }
 
-
-:deep(.carousel-inner),
-:deep(.carousel-item) {
-  width: 100%;
-  height: 100%;
-}
-
-:deep(.carousel-item img) {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-:deep(.carousel-indicators) {
-  bottom: 8px;
+.caroSize {
+  width: 600px;
+  height: 300px;
+  margin:auto;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f8f8f8;
 }
 </style>

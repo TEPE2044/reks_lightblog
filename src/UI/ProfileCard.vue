@@ -10,7 +10,7 @@ const metricsData = ref([
 
 
 <template>
-  <div class="profileCard d-flex flex-column align-items-center justify-content-center gap-3">
+  <div class="profileCard d-flex flex-column align-items-center justify-content-center gap-3 mt-4">
     <div class="userInfo d-flex flex-row gap-4 justify-content-center align-items-center mt-3 pb-3">
       <div class="avatar">
         <BAvatar size="3rem" class="avatar" variant="secondary" />
