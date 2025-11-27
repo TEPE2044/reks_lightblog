@@ -26,42 +26,21 @@ import SignIn from "../UI/SignIn.vue";
 <template>
   <div class="header bg-image-layer">
     <div class="bg-color-layer">
-      <BContainer
-        class="header-content d-flex flex-row align-items-center gap-5"
-      >
+      <BContainer class="header-content d-flex flex-row align-items-center gap-5">
         <!--      左侧Header-->
         <div class="header-left d-flex flex-row align-items-center gap-4">
           <!--        Logo部分-->
           <div class="label d-flex flex-row align-items-center gap-2">
             <div class="icon">
-              <img
-                src="/reks.svg"
-                alt="profile"
-                class="rounded-circle"
-                width="38"
-                height="38"
-              />
+              <img src="/reks.svg" alt="profile" class="rounded-circle" width="38" height="38" />
             </div>
             <h4 class="logo mt-2">
               <router-link to="/home">ReKindlers</router-link>
             </h4>
           </div>
-          <!--        主导航栏-->
-          <BNavbarNav class="main-nav mt-1 flex-row gap-4 align-items-center">
-            <BNavItem id="home-item">
-              <router-link to="/home">首页</router-link>
-            </BNavItem>
-            <BNavItem id="community-item">
-              <router-link to="/hub">社区</router-link>
-            </BNavItem>
-            <BNavItemDropdown id="more-dropdown" no-caret>
-              <template #button-content> 更多 </template>
-              <BDropdownItem>熵减阁</BDropdownItem>
-              <BDropdownItem>敬请期待！</BDropdownItem>
-            </BNavItemDropdown>
-          </BNavbarNav>
+
         </div>
- <!--      右侧Header-->
+        <!--      右侧Header-->
         <div class="header-right d-flex flex-row align-items-center gap-4">
           <div class="search-bar offset-1">
             <SearchBar />
@@ -70,17 +49,13 @@ import SignIn from "../UI/SignIn.vue";
             <SignIn />
           </div>
         </div>
-
-        <!--      右边部分-->
-        <!-- <BNavbarNav class="tool-lists flex-row gap-4 align-items-center">
-                    <BNavItem :class="item.classname" class="d-flex flex-column tool-item align-items-center"
-                        v-for="item in toolList" :key="item.classname">
-                        <div class="content">{{ item.content }}</div>
-                    </BNavItem>
-                </BNavbarNav> -->
       </BContainer>
     </div>
   </div>
+
+   <div class="home-navbar">
+      <Navbar></Navbar>
+    </div>
 </template>
 
 <style scoped lang="scss">
@@ -105,11 +80,11 @@ import SignIn from "../UI/SignIn.vue";
     display: flex;
     align-items: center;
 
-    .header-right{
-        //float在flex中无效，使用margin-left自动撑开
-        margin-left: auto ;
-        //微调方式
-        margin-right: 4rem;
+    .header-right {
+      //float在flex中无效，使用margin-left自动撑开
+      margin-left: auto;
+      //微调方式
+      margin-right: 4rem;
     }
 
     .nav-item {

@@ -3,9 +3,9 @@
 </script>
 
 <template>
-  <BContainer class="main-layout">
+  <div class="main-layout">
     <router-view/>
-  </BContainer>
+  </div>
 </template>
 
 <style scoped>
