@@ -10,13 +10,7 @@
                     <BLink to="/home">首页</BLink>
                 </BNavItem>
                 <BNavItem class="section" id="community-item">
-                    <router-link to="/hub">社区</router-link>
-                </BNavItem>
-                <BNavItem class="section" id="community-item">
-                    <router-link to="/hub">社区</router-link>
-                </BNavItem>
-                <BNavItem class="section" id="community-item">
-                    <router-link to="/hub">社区</router-link>
+                    <BLink to="/hub">社区</BLink>
                 </BNavItem>
             </BNavbarNav>
         </BContainer>
