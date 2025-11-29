@@ -23,7 +23,7 @@ const choose = (index: number) => {
         <div class="caro-full">
             <div class="main-img-container w-100 h-100">
                 <Transition name="fade" mode="out-in">
-                    <BImg :src="displayImage" class="main-img w-100 h-100" alt="main" />
+                    <BImg :key="displayImage"  :src="displayImage" class="main-img w-100 h-100" alt="main" />
                 </Transition>
             </div>
         </div>
@@ -102,7 +102,7 @@ const choose = (index: number) => {
 
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.4s;
+    transition: opacity 0.5s;
 }
 
 .fade-enter-from,
