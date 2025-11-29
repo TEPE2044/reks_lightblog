@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Caro from '../UI/Caro.vue';
+
 
 
 </script>
@@ -6,7 +8,7 @@
 <template>
   <div class="home">
     <BContainer>
-
+      <Caro/>
     </BContainer>
   </div>
 </template>

@@ -65,12 +65,12 @@ import SignIn from "../UI/SignIn.vue";
   /* bg-image-layer */
   background-image: url("/melo.webp");
   background-size: fill;
-  background-position: center;
+  background-position: center 115rem;
 
   .bg-color-layer {
     width: 100%;
     height: 100%;
-    background-color: rgba(240, 216, 171, 0.84);
+    background-color: #f9ebd1c5;
   }
 
   .header-content {
