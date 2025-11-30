@@ -6,6 +6,5 @@
   <div class="hub-page"></div>
 </template>
 
-<style scoped>
-
+<style lang="scss" scoped>
 </style>

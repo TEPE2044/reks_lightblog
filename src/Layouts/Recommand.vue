@@ -4,7 +4,13 @@
 
 <template>
   <BContainer class="recommand">
-    <BCard no-body>
+     <figure class="mt-3">
+          <blockquote class="blockquote">
+            <p style="color: #660909">ReKindle Everything</p>
+          </blockquote>
+      </figure>
+
+    <BCard class="news-content mt-2" no-body>
       <BCardHeader header-tag="nav">
         <BNav card-header tabs>
           <BNavItem
@@ -30,11 +36,14 @@
 </template>
 
 <style lang="scss" scoped>
+@use "../Asset/CustomStyle/global.scss";
 .recommand {
-  min-height: 400px; 
+  min-height: 400px;
+  @extend %reks-card-box; 
 }
 
-// .b-card-body {
-//   min-height: 300px; // 保证内容区高度一致
-// }
+
+.b-card-body {
+  min-height: 300px; // 保证内容区高度一致
+}
 </style>

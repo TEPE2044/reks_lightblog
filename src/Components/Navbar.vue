@@ -19,7 +19,7 @@
 
 <style lang="scss" scoped>
 .navbar {
-    background: rgba(255, 254, 254, 0.779);
+    background: rgba(245, 222, 179, 0.3);
 
     .main-nav {
         .section {

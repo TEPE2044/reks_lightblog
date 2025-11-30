@@ -5,6 +5,7 @@ const imageList = ref<string[]>([
     '/melo.webp',
     '/mod.webp',
     '/melo.webp',
+    'mod.webp'
 ]);
 
 
@@ -19,8 +20,8 @@ const choose = (index: number) => {
 </script>
 
 <template>
-    <div class="caro mt-3">
-        <div class="caro-full">
+    <div class="caro mt-4">
+        <div class="caro-full p-3">
             <div class="main-img-container w-100 h-100">
                 <Transition name="fade" mode="out-in">
                     <BImg :key="displayImage"  :src="displayImage" class="main-img w-100 h-100" alt="main" />
@@ -39,9 +40,9 @@ const choose = (index: number) => {
 <style scoped lang="scss">
 .caro {
     //size
-    width: 650px;
+     width: 100%;
     height: 360px;
-
+    box-sizing: border-box;
     //layout
     display: grid;
     grid-template-areas: "main thumbail";
@@ -63,7 +64,7 @@ const choose = (index: number) => {
 
             .main-img {
                 object-fit: cover;
-                object-position: center;
+                object-position: top center;
                 border-radius: 12px;
             }
         }
@@ -102,7 +103,7 @@ const choose = (index: number) => {
 
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.5s;
+    transition: opacity 0.3s;
 }
 
 .fade-enter-from,
