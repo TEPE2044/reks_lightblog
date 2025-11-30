@@ -32,19 +32,16 @@ import ProfileCard from '../UI/ProfileCard.vue';
   .home-header {
     display: grid;
     grid-template-areas:
-      "caro profilecard aside";
+      "caro profilecard";
     grid-template-columns: 2fr 1fr;
     gap: 20px;
-    padding: 0;
 
     .activities-caro {
       grid-area: caro;
-       height: 100%;
     }
 
     .profilecard {
       grid-area: profilecard;
-       height: 100%;
     }
   }
 }
