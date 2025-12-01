@@ -6,11 +6,11 @@
     <div class="navbar">
         <BContainer>
             <BNavbarNav class="main-nav flex-row gap-4 align-items-center">
-                <BNavItem class="section" id="home-item">
+                <BNavItem class="section" id="home-item" to="/home">
                     <BLink to="/home">首页</BLink>
                 </BNavItem>
-                <BNavItem class="section" id="community-item">
-                    <BLink to="/hub">社区</BLink>
+                <BNavItem class="section" id="community-item" to="/hub">
+                      <BLink to="/hub">社区</BLink>
                 </BNavItem>
             </BNavbarNav>
         </BContainer>
@@ -23,8 +23,8 @@
 
     .main-nav {
         .section {
-            // 默认样式
-            border-bottom: 2px solid transparent;
+            // 保持与激活态相同的宽度，使用 transparent 避免布局抖动
+            border-bottom: 2.5px solid transparent;
             transition: border-color 0.2s;
 
             .router-link-active {

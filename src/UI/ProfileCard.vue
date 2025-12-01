@@ -31,7 +31,9 @@ const handleLogin = () => {
 
     <!-- 用户登陆后才出现该选项 -->
     <div v-if="userLoggedIn === true"
-      class="user-login d-flex flex-column gap-4 justify-content-center align-items-center mt-3 pb-3">
+      class="user-login d-flex flex-column gap-4 justify-content-center align-items-center mt-3 pb-3 position-relative">
+
+      
       <div class="avatar">
         <BAvatar size="3rem" class="avatar" variant="secondary" />
       </div>
@@ -65,6 +67,8 @@ const handleLogin = () => {
 .avatar {
   @extend %reks-avatar;
 }
+
+
 
 .label {
   //只有 white-space: nowrap; 能保证一行显示。

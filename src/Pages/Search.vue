@@ -11,7 +11,7 @@ const lazyText = ref("");
     <div class="search-input mt-5 w-50">
       <BInputGroup>
         <BFormInput type="text" v-model="lazyText" />
-        <BButton variant="outline-success">Button</BButton>
+        <BButton variant="outline-success">搜索</BButton>
       </BInputGroup>
     </div>
 

@@ -4,9 +4,9 @@
 }
 //reks卡片盒子
 %reks-card-box {
-  background-color: rgba(255, 255, 255, 0.86);
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  background-color: #fafafa;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
   padding-top: 0.5rem;
 }
 
@@ -15,7 +15,7 @@
   padding: 0.2rem;
 }
 
-@mixin rks_anime {
+@mixin rks_fadeIn {
   opacity: 0;
   will-change: opacity;
   animation: fadeIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;

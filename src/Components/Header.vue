@@ -66,7 +66,6 @@ import SignIn from "../UI/SignIn.vue";
   background-image: url("/melo.webp");
   background-size: fill;
   background-position: center 115rem;
-
   .bg-color-layer {
     width: 100%;
     height: 100%;

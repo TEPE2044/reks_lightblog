@@ -6,7 +6,7 @@
   <p>TODO News</p>
   <div class="news">
     <BCard
-      v-for="n in 6"
+      v-for="n in 60"
       :img-src="`https://picsum.photos/1000/300?random=${n}`"
       img-alt="Card image"
       img-top
