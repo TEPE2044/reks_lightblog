@@ -1,78 +1,106 @@
 <script setup lang="ts">
-import { useModal } from "bootstrap-vue-next";
-import { ref } from "vue";
-import { vBModal } from "bootstrap-vue-next/directives/BModal";
+import { ref } from 'vue';
+
 const metricsData = ref([
-  { label: "订阅", value: 0 },
-  { label: "博客", value: 0 },
-  { label: "积分", value: 0 },
+  { label: '订阅', value: 0 },
+  { label: '博客', value: 0 },
+  { label: '积分', value: 0 },
 ]);
 
 const userLoggedIn = ref(false);
 
-const { create } = useModal();
+// 控制与标记
+const modalRef = ref<any | null>(null); // BModal 实例 ref
+const pendingLogin = ref(false);
 
-const easyLogin = () => {
-  // userLoggedIn.value = true;
+// 表单模型（模态内）
+const loginName = ref('');
+const password = ref('');
+
+const openEasyLogin = () => {
+  // 清空上次输入
+  loginName.value = '';
+  password.value = '';
+  pendingLogin.value = false;
+  modalRef.value?.show?.();
+};
+
+const onModalOk = () => {
+  // 标记等待模态关闭后生效
+  pendingLogin.value = true;
+};
+
+const onModalHidden = () => {
+  if (pendingLogin.value) {
+    userLoggedIn.value = true;
+    pendingLogin.value = false;
+  } else {
+    pendingLogin.value = false;
+  }
+};
+
+const doLogout = () => {
+  userLoggedIn.value = false;
+  pendingLogin.value = false;
+  // 清理表单，避免残影
+  loginName.value = '';
+  password.value = '';
 };
 </script>
 
 <template>
-  <div
-    class="profileCard d-flex flex-column align-items-center justify-content-center gap-3 mt-4"
-  >
-    <div v-if="userLoggedIn === false" class="user-no-login mt-3 pb-3">
-      <div
-        class="easy-login d-flex flex-row gap-4 justify-content-center align-items-center"
-      >
-        <div class="avatar">
-          <BAvatar size="3rem" class="avatar" variant="secondary" />
-        </div>
-        <BButton v-b-modal.modal-scrollable variant="primary">登录</BButton>
-        <BModal id="modal-scrollable" title="便捷登录">
-          <BInputGroup>
-            <BFormInput placeholder="用户名/邮箱" />
+  <div class="profileCard d-flex flex-column align-items-center justify-content-center gap-3 mt-4">
+    <transition name="fadeIn" mode="out-in">
+      <!-- 把两个状态作为 transition 的直接子元素并加 key，保证 out-in 正确工作 -->
+      <div v-if="!userLoggedIn" key="logged-out" class="user-no-login mt-3 pb-3">
+        <div class="easy-login d-flex flex-row gap-4 justify-content-center align-items-center">
+          <div class="avatar">
+            <BAvatar size="3rem" class="avatar" variant="secondary" />
+          </div>
 
-            <BFormSelect>
-              <option value="bot">你不是人机</option>
-              <option value="isbot">是的我是傻逼</option>
-            </BFormSelect>
-          </BInputGroup>
-          <template #footer>
-            <BButton variant="success" @click="easyLogin">登录</BButton>
-          </template>
-        </BModal>
+          <BButton @click="openEasyLogin" variant="primary">登录</BButton>
+
+          <BModal
+            ref="modalRef"
+            id="easy-login-box"
+            title="便捷登录"
+            ok-title="登录"
+            ok-variant="success"
+            @ok="onModalOk"
+            @hidden="onModalHidden"
+          >
+            <BInputGroup>
+              <BFormInput v-model="loginName" placeholder="用户名/邮箱" />
+              <BFormInput v-model="password" placeholder="密码" type="password" />
+            </BInputGroup>
+          </BModal>
+        </div>
       </div>
-    </div>
 
-    <!-- 用户登陆后才出现该选项 -->
-    <Transition name="fadeIn" mode="out-in">
-      <div
-        v-if="userLoggedIn === true"
-        class="user-login d-flex flex-column gap-4 justify-content-center align-items-center mt-3 pb-3 position-relative"
-      >
+      <div v-else key="logged-in" class="user-login d-flex flex-column gap-4 justify-content-center align-items-center mt-3 pb-3 position-relative">
         <div class="avatar">
           <BAvatar size="3rem" class="avatar" variant="secondary" />
         </div>
-        <BButton variant="success">一键签到</BButton>
 
-        <div class="metrics-bar d-flex flex-row gap-5">
+        <BButton variant="success">一键签到</BButton>
+        <BButton variant="outline-danger" @click="doLogout">退出登录</BButton>
+
+        <div class="metrics-bar d-flex flex-row gap-5 mt-2">
           <div
-            class="metrics-content d-flex flex-column align-items-center mt-2 mb-4"
-            :key="metrics.label"
+            class="metrics-content d-flex flex-column align-items-center"
             v-for="metrics in metricsData"
+            :key="metrics.label"
           >
             <div class="value">{{ metrics.value }}</div>
             <div class="label">{{ metrics.label }}</div>
           </div>
         </div>
       </div>
-    </Transition>
+    </transition>
   </div>
 </template>
 
 <style scoped lang="scss">
-//用新语法@use代替旧语法@import
 @use "../Asset/CustomStyle/global.scss";
 
 .profileCard {
@@ -81,36 +109,54 @@ const easyLogin = () => {
   width: 100%;
   box-sizing: border-box;
   border: 1px solid #e0e0e0;
-  .easy-login-box {
-    display: none;
-  }
 }
 
 .avatar {
   @extend %reks-avatar;
   &:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
   }
 }
 
-.label {
-  //只有 white-space: nowrap; 能保证一行显示。
-  font-size: small;
-  white-space: nowrap;
-}
-
+/* 完整的“迷雾出现/消失”过渡（enter + leave 都定义）*/
 .fadeIn-enter-active,
 .fadeIn-leave-active {
-  transition: opacity 400ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    filter 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition:
+    opacity 320ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
   will-change: opacity, transform, filter;
 }
 
-/* 透明、向下偏移并模糊 */
+/* 进入：从透明、下移、模糊 到 可见、原位、清晰 */
 .fadeIn-enter-from {
   opacity: 0;
   transform: translateY(10px);
   filter: blur(10px);
+}
+.fadeIn-enter-to {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* 离开：从可见 到 透明、上移、模糊（与 enter 方向相反）*/
+.fadeIn-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+.fadeIn-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
+  filter: blur(8px);
+}
+
+/* reduced motion 支持 */
+@media (prefers-reduced-motion: reduce) {
+  .fadeIn-enter-active,
+  .fadeIn-leave-active {
+    transition: none !important;
+  }
 }
 </style>

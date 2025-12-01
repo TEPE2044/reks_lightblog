@@ -13,6 +13,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     BAvatar: typeof import('bootstrap-vue-next/components/BAvatar')['BAvatar']
     BButton: typeof import('bootstrap-vue-next/components/BButton')['BButton']
+    BButtonGroup: typeof import('bootstrap-vue-next/components/BButton')['BButtonGroup']
     BCard: typeof import('bootstrap-vue-next/components/BCard')['BCard']
     BCardBody: typeof import('bootstrap-vue-next/components/BCard')['BCardBody']
     BCardHeader: typeof import('bootstrap-vue-next/components/BCard')['BCardHeader']
