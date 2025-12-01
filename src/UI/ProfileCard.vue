@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const metricsData = ref([
-  { label: '订阅', value: 0 },
-  { label: '博客', value: 0 },
-  { label: '积分', value: 0 },
+  { label: "订阅", value: 0 },
+  { label: "博客", value: 0 },
+  { label: "积分", value: 0 },
 ]);
 
 const userLoggedIn = ref(false);
@@ -14,13 +14,13 @@ const modalRef = ref<any | null>(null); // BModal 实例 ref
 const pendingLogin = ref(false);
 
 // 表单模型（模态内）
-const loginName = ref('');
-const password = ref('');
+const loginName = ref("");
+const password = ref("");
 
 const openEasyLogin = () => {
   // 清空上次输入
-  loginName.value = '';
-  password.value = '';
+  loginName.value = "";
+  password.value = "";
   pendingLogin.value = false;
   modalRef.value?.show?.();
 };
@@ -43,17 +43,25 @@ const doLogout = () => {
   userLoggedIn.value = false;
   pendingLogin.value = false;
   // 清理表单，避免残影
-  loginName.value = '';
-  password.value = '';
+  loginName.value = "";
+  password.value = "";
 };
 </script>
 
 <template>
-  <div class="profileCard d-flex flex-column align-items-center justify-content-center gap-3 mt-4">
+  <div
+    class="profileCard d-flex flex-column align-items-center justify-content-center gap-3 mt-4"
+  >
     <transition name="fadeIn" mode="out-in">
       <!-- 把两个状态作为 transition 的直接子元素并加 key，保证 out-in 正确工作 -->
-      <div v-if="!userLoggedIn" key="logged-out" class="user-no-login mt-3 pb-3">
-        <div class="easy-login d-flex flex-row gap-4 justify-content-center align-items-center">
+      <div
+        v-if="!userLoggedIn"
+        key="logged-out"
+        class="user-no-login mt-3 pb-3"
+      >
+        <div
+          class="easy-login d-flex flex-row gap-4 justify-content-center align-items-center"
+        >
           <div class="avatar">
             <BAvatar size="3rem" class="avatar" variant="secondary" />
           </div>
@@ -71,17 +79,26 @@ const doLogout = () => {
           >
             <BInputGroup>
               <BFormInput v-model="loginName" placeholder="用户名/邮箱" />
-              <BFormInput v-model="password" placeholder="密码" type="password" />
+              <BFormInput
+                v-model="password"
+                placeholder="密码"
+                type="password"
+              />
             </BInputGroup>
           </BModal>
         </div>
       </div>
 
-      <div v-else key="logged-in" class="user-login d-flex flex-column gap-4 justify-content-center align-items-center mt-3 pb-3 position-relative">
+      <div
+        v-else
+        key="logged-in"
+        class="user-login d-flex flex-column gap-4 justify-content-center align-items-center mt-3 pb-3 position-relative"
+      >
         <div class="avatar">
-          <BAvatar size="3rem" class="avatar" variant="secondary" />
+          <!-- 如果头像加载失败或没有头像，使用默认头像 -->
+          <BAvatar size="5rem" src="/ai.webp" class="avatar mb-2" variant="secondary" />
         </div>
-
+        
         <BButton variant="success">一键签到</BButton>
         <BButton variant="outline-danger" @click="doLogout">退出登录</BButton>
 
@@ -121,8 +138,7 @@ const doLogout = () => {
 /* 完整的“迷雾出现/消失”过渡（enter + leave 都定义）*/
 .fadeIn-enter-active,
 .fadeIn-leave-active {
-  transition:
-    opacity 320ms cubic-bezier(0.2, 0.8, 0.2, 1),
+  transition: opacity 320ms cubic-bezier(0.2, 0.8, 0.2, 1),
     transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1),
     filter 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
   will-change: opacity, transform, filter;
