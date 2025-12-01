@@ -30,13 +30,13 @@ import SignIn from "../UI/SignIn.vue";
         <!--      左侧Header-->
         <div class="header-left d-flex flex-row align-items-center gap-4">
           <!--        Logo部分-->
-          <div class="label d-flex flex-row align-items-center gap-2">
+          <div class="label d-flex flex-row align-items-center">
             <div class="icon">
-              <img src="/reks.svg" alt="profile" class="rounded-circle" width="38" height="38" />
+              <img src="/reks.svg" alt="profile" class="rounded-circle" width="35" height="auto" />
             </div>
-            <h4 class="logo mt-2">
-              <router-link to="/home">ReKindlers</router-link>
-            </h4>
+            <div class="logo">
+              <router-link class="logo-font" to="/home">ReKindlers</router-link>
+            </div>
           </div>
 
         </div>
@@ -53,18 +53,27 @@ import SignIn from "../UI/SignIn.vue";
     </div>
   </div>
 
-   <div class="home-navbar">
-      <Navbar></Navbar>
-    </div>
+  <div class="home-navbar">
+    <Navbar></Navbar>
+  </div>
 </template>
 
 <style scoped lang="scss">
+@import "../Asset/CustomStyle/open-font.scss";
+.logo-font {
+  font-family:'Alibaba-PuHuiTi-Medium', sans-serif;
+  font-style: oblique;
+  font-size: x-large;
+  display: inline-block;
+}
+
 .header {
   width: 100%;
   height: 60px;
   /* bg-image-layer */
   background-image: url("/melo.webp");
   background-position: center 115rem;
+
   .bg-color-layer {
     width: 100%;
     height: 100%;
