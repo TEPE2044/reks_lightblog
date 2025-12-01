@@ -19,8 +19,10 @@
 
 <style lang="scss" scoped>
 .navbar {
-    background: rgba(245, 222, 179, 0.3);
-
+    background: rgba(254, 240, 215, 0.85);
+    a{
+        font-weight: bold;
+    }
     .main-nav {
         .section {
             // 保持与激活态相同的宽度，使用 transparent 避免布局抖动

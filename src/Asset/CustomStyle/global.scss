@@ -16,6 +16,13 @@
   
 }
 
+%reks-section-title{
+  border-left: 2px solid firebrick;
+  padding-left: 8px;
+  
+}
+
+
 @mixin rks_fadeIn {
   opacity: 0;
   will-change: opacity;

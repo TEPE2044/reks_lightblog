@@ -20,7 +20,7 @@ const choose = (index: number) => {
 </script>
 
 <template>
-    <div class="caro mt-4">
+    <div class="caro mt-2">
         <div class="caro-full p-3">
             <div class="main-img-container w-100 h-100">
                 <Transition name="fade" mode="out-in">
@@ -38,7 +38,7 @@ const choose = (index: number) => {
 </template>
 
 <style scoped lang="scss">
-$caro-height: 400px;
+$caro-height: 380px;
 
 .caro {
     //size
@@ -67,7 +67,7 @@ $caro-height: 400px;
             .main-img {
                 object-fit: cover;
                 object-position: top center;
-                border-radius: 12px;
+                border-radius: 12px;         
             }
         }
     }
