@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref } from 'vue';
+import { ref } from 'vue';
 
 const imageList = ref<string[]>([
     '/melo.webp',

@@ -23,7 +23,8 @@ import Footer from "./Components/Footer.vue";
 <style lang="scss" scoped>
 header {
   /* layout */
-  position: sticky;
+  position: fixed;
+  width: 100%;
   top: 0;
   z-index: 1000;
 }

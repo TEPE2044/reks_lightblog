@@ -9,7 +9,7 @@ import ProfileCard from '../UI/ProfileCard.vue';
 
 <template>
   <div class="home">
-    <BContainer class="home-header mt-2">
+    <BContainer class="home-header">
       <div class="activities-caro">
         <Caro />
       </div>
@@ -30,6 +30,7 @@ import ProfileCard from '../UI/ProfileCard.vue';
 
 .home {
   .home-header {
+    margin-top: 7.3rem;
     display: grid;
     grid-template-areas:
       "caro profilecard";
