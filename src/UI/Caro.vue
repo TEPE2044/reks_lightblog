@@ -4,8 +4,8 @@ import { ref } from 'vue';
 const imageList = ref<string[]>([
     '/melo.webp',
     '/mod.webp',
-    '/melo.webp',
-    'mod.webp'
+    '/fufu.webp',
+    '/mod.webp'
 ]);
 
 
@@ -28,7 +28,7 @@ const choose = (index: number) => {
                 </Transition>
             </div>
         </div>
-        <div class="caro-thumbail d-flex align-items-center justify-content-center">
+        <div class="caro-thumbail d-flex align-items-center">
             <div class="thumbail-img-container d-flex flex-column gap-2">
                 <BImg lazy v-for="(i, index) in imageList" :key="index" :src="i" alt="reks-caro" class="thumbail-img"
                     :class="{ active: index === currentIndex }" @click="choose(index)" />
@@ -38,10 +38,12 @@ const choose = (index: number) => {
 </template>
 
 <style scoped lang="scss">
+$caro-height: 400px;
+
 .caro {
     //size
-     width: 100%;
-    height: 360px;
+    width: 100%;
+    height: $caro-height;
     box-sizing: border-box;
     //layout
     display: grid;
@@ -55,7 +57,7 @@ const choose = (index: number) => {
     .caro-full {
         grid-area: main;
         height: 100%;
-        max-height: 360px;
+        max-height: $caro-height;
         border-radius: 12px 0 0 12px;
 
         .main-img-container {
@@ -79,9 +81,10 @@ const choose = (index: number) => {
         .thumbail-img-container {
             width: 90%;
 
+
             .thumbail-img {
                 width: 100%;
-                height: 70px;
+                max-height: 80px;
                 object-fit: cover;
                 object-position: top;
                 border-radius: 6px;

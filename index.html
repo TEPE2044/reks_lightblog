@@ -16,6 +16,10 @@
       margin: 0;
       display: flex;
       flex-direction: column;
+
+      overflow-y: scroll; /* 始终显示滚动槽位（可见或不可见的滚动条占位） */
+      /* 现代浏览器更优的写法（支持时） */
+      /* scrollbar-gutter: stable both-edges; */
     }
   </style>
   <body>
