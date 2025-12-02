@@ -17,10 +17,8 @@ declare module 'vue' {
     BCard: typeof import('bootstrap-vue-next/components/BCard')['BCard']
     BCardBody: typeof import('bootstrap-vue-next/components/BCard')['BCardBody']
     BCardHeader: typeof import('bootstrap-vue-next/components/BCard')['BCardHeader']
-    BCardText: typeof import('bootstrap-vue-next/components/BCard')['BCardText']
     BContainer: typeof import('bootstrap-vue-next/components/BContainer')['BContainer']
     BFormInput: typeof import('bootstrap-vue-next/components/BFormInput')['BFormInput']
-    BFormSelect: typeof import('bootstrap-vue-next/components/BFormSelect')['BFormSelect']
     BImg: typeof import('bootstrap-vue-next/components/BImg')['BImg']
     BInputGroup: typeof import('bootstrap-vue-next/components/BInputGroup')['BInputGroup']
     BLink: typeof import('bootstrap-vue-next/components/BLink')['BLink']
@@ -33,8 +31,5 @@ declare module 'vue' {
     Navbar: typeof import('./src/components/Navbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-  }
-  export interface GlobalDirectives {
-    vBModal: typeof import('bootstrap-vue-next/directives/BModal')['vBModal']
   }
 }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from "@iconify/vue";
 import { ref } from 'vue';
 import router from '../Router';
 
@@ -18,8 +19,8 @@ const handleSearch = () => {
 <template>
   <div class="search-bar position-relative d-flex align-items-center">
     <input type="text" class="search-input position-absolute" v-model="searchContent" placeholder="索引万物" />
-    <div class="search-icon position-absolute top-50 translate-middle" @click="handleSearch">
-      <i class="bi bi-search"></i>
+    <div class="search-icon" @click="handleSearch">
+      <Icon icon="bi:search" />
     </div>
   </div>
 
@@ -52,7 +53,7 @@ $expanded-width:$flexible-width + 0.5rem;
     }
   }
   .search-icon {
-    left: 88%;
+    transform: translateX(830%) translateY(-3.5%);
     cursor: pointer;
   }
 }

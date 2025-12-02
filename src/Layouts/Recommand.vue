@@ -29,15 +29,7 @@
 
 <style lang="scss" scoped>
 @use "../Asset/CustomStyle/global.scss";
-:deep(.nav-link){
-  color: black !important;
-}
-:deep(.nav-link.active){
-  color: firebrick !important;
-}
-:deep(.card-header){
-  background-color: rgba(255, 236, 201, 0.219) !important;
-}
+
 .recommand {
   .label-word {
    color: #660909;
