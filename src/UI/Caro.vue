@@ -2,12 +2,11 @@
 import { ref } from 'vue';
 
 const imageList = ref<string[]>([
-    '/melo.webp',
-    '/mod.webp',
-    '/fufu.webp',
-    '/mod.webp'
+    '/pm.webp',
+    '/lh.webp',
+    '/pm.webp',
+    '/lh.webp',
 ]);
-
 
 const currentIndex = ref(0);
 const displayImage = ref(imageList.value[currentIndex.value]);
@@ -15,8 +14,6 @@ const choose = (index: number) => {
     currentIndex.value = index;
     displayImage.value = imageList.value[currentIndex.value];
 };
-
-
 </script>
 
 <template>
@@ -24,13 +21,13 @@ const choose = (index: number) => {
         <div class="caro-full p-3">
             <div class="main-img-container w-100 h-100">
                 <Transition name="fade" mode="out-in">
-                    <BImg :key="displayImage"  :src="displayImage" class="main-img w-100 h-100" alt="main" />
+                    <BImg :key="displayImage" :lazy="currentIndex !== 0" fetchpriority="high" :src="displayImage" class="main-img w-100 h-100" alt="main" />
                 </Transition>
             </div>
         </div>
-        <div class="caro-thumbail d-flex align-items-center">
-            <div class="thumbail-img-container d-flex flex-column gap-2">
-                <BImg lazy v-for="(i, index) in imageList" :key="index" :src="i" alt="reks-caro" class="thumbail-img"
+        <div class="caro-thumbnail d-flex align-items-center">
+            <div class="thumbnail-img-container d-flex flex-column gap-2">
+                <BImg thumbnail v-for="(i, index) in imageList" :lazy="currentIndex !== 0" :key="index" :src="i" alt="reks-caro" class="thumbnail-img"
                     :class="{ active: index === currentIndex }" @click="choose(index)" />
             </div>
         </div>
@@ -38,17 +35,17 @@ const choose = (index: number) => {
 </template>
 
 <style scoped lang="scss">
-$caro-height: 380px;
+@use "../Asset/CustomStyle/global.scss" as global;
 
 .caro {
     //size
     width: 100%;
-    height: $caro-height;
+    height: global.$caro-height;
     box-sizing: border-box;
     //layout
     display: grid;
-    grid-template-areas: "main thumbail";
-    grid-template-columns: 3fr 1fr;
+    grid-template-areas: "main thumbnail";
+    grid-template-columns: 4fr 1fr;
     //decoration
     border-radius: 12px;
     background-color: #fafafa;
@@ -57,7 +54,7 @@ $caro-height: 380px;
     .caro-full {
         grid-area: main;
         height: 100%;
-        max-height: $caro-height;
+        max-height: global.$caro-height;
         border-radius: 12px 0 0 12px;
 
         .main-img-container {
@@ -72,21 +69,21 @@ $caro-height: 380px;
         }
     }
 
-    .caro-thumbail {
-        grid-area: thumbail;
+    .caro-thumbnail {
+        grid-area: thumbnail;
         height: 100%;
         background: #faf6f2;
         border-radius: 0 12px 12px 0;
 
-        .thumbail-img-container {
+        .thumbnail-img-container {
             width: 90%;
 
 
-            .thumbail-img {
+            .thumbnail-img {
                 width: 100%;
                 max-height: 80px;
                 object-fit: cover;
-                object-position: top;
+                object-position: top center;
                 border-radius: 6px;
                 border: 2px solid transparent;
                 transition: border-color 0.2s;

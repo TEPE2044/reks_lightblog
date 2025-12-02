@@ -59,12 +59,13 @@ import SignIn from "../UI/SignIn.vue";
 </template>
 
 <style scoped lang="scss">
-@import "../Asset/CustomStyle/open-font.scss";
+@use "../Asset/CustomStyle/open-font.scss";
 .logo-font {
   font-family:'Alibaba-PuHuiTi-Medium', sans-serif;
   font-style: oblique;
   font-size: x-large;
   display: inline-block;
+  font-display: swap;
 }
 
 .header {

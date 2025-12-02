@@ -107,12 +107,12 @@ const easyLogout = () => {
 </template>
 
 <style scoped lang="scss">
-@use "../Asset/CustomStyle/global.scss";
-@import "../Asset/CustomStyle/open-font.scss";
+@use "../Asset/CustomStyle/global.scss" as global;
+@use "../Asset/CustomStyle/open-font.scss";
 
 .profileCard {
   @extend %reks-card-box;
-  height: 380px;
+  height: global.$caro-height;
   width: 100%;
   box-sizing: border-box;
   border: 1px solid #e0e0e0;

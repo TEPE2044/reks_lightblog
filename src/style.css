@@ -2,8 +2,13 @@
   box-sizing: border-box;
   user-select: none;
 }
-#app{
+#app {
   min-height: 100vh;
+  height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
 }
 a {
   text-decoration: none;

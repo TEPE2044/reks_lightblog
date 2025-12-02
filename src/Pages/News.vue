@@ -5,7 +5,7 @@
 <template>
   <div class="news">
 
-    <div class="ns news-blog">
+    <!-- <div class="ns news-blog">
       <BCard
       v-for="n in 9"
       :img-src="`https://picsum.photos/1000/300?random=${n}`"
@@ -30,7 +30,7 @@
       </BCardText>
     </BCard>
 
-    </div>
+    </div> -->
 
   </div>
 </template>
