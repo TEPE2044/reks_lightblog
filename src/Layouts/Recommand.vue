@@ -30,6 +30,17 @@
 <style lang="scss" scoped>
 @use "../Asset/CustomStyle/global.scss";
 
+:deep(.nav-link){
+  color: black !important;
+}
+:deep(.nav-link.active){
+  color: firebrick !important;
+}
+:deep(.card-header){
+  background-color: rgba(255, 236, 201, 0.219) !important;
+}
+
+
 .recommand {
   .label-word {
    color: #660909;
@@ -39,8 +50,6 @@
   @extend %reks-card-box;
 
   .recommand-tab {
-
-
     /* 保证内容区高度一致，避免切换时父容器高度跳动 */
     .content {
       min-height: 300px;

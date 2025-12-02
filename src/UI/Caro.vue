@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 
 const imageList = ref<string[]>([
-    '/pm.webp',
+    '/imagePlaceholder.webp',
     '/lh.webp',
     '/pm.webp',
     '/lh.webp',
