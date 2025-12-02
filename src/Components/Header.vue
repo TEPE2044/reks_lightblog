@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import SearchBar from "../UI/SearchBar.vue";
-import SignIn from "../UI/SignIn.vue";
 
 // interface ToolItem {
 //     content: string;
@@ -46,7 +45,7 @@ import SignIn from "../UI/SignIn.vue";
             <SearchBar />
           </div>
           <div class="signIn-btn">
-            <SignIn />
+            <BAvatar size="3rem" class="avatar" variant="light" />
           </div>
         </div>
       </BContainer>
@@ -60,8 +59,9 @@ import SignIn from "../UI/SignIn.vue";
 
 <style scoped lang="scss">
 @use "../Asset/CustomStyle/open-font.scss";
+
 .logo-font {
-  font-family:'Alibaba-PuHuiTi-Medium', sans-serif;
+  font-family: 'Alibaba-PuHuiTi-Medium', sans-serif;
   font-style: oblique;
   font-size: x-large;
   display: inline-block;
@@ -93,6 +93,10 @@ import SignIn from "../UI/SignIn.vue";
       margin-left: auto;
       //微调方式
       margin-right: 4rem;
+
+      .avatar {
+        border: 0.3px solid rgba(128, 128, 128, 0.21);
+      }
     }
 
     .nav-item {
