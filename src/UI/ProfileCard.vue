@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-
+//TODO:重构登录逻辑，加入vue-puzzle-vcode，预计加入Canvas 指纹
 //接口设计1
 // 用户使用数据（头像、用户名称、订阅、博客数量、签到积分）
 
@@ -74,8 +74,8 @@ const easyLogout = () => {
           <BModal ref="modalRef" id="easy-login-box" title="快捷登录" ok-title="登录" no-header-close cancel-title="取消"
             hide-cancel-button ok-variant="success" @ok="easyLogin" @hidden="onModalHidden">
             <BInputGroup>
-              <BFormInput v-model="loginName" placeholder="用户名/邮箱" />
-              <BFormInput v-model="password" placeholder="密码" type="password" />
+              <BFormInput v-model="loginName" placeholder="邮箱" />
+              <BFormInput type="password" v-model="password" placeholder="密码"/>
             </BInputGroup>
           </BModal>
         </div>
