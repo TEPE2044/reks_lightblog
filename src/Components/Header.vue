@@ -44,9 +44,9 @@ import SearchBar from "../UI/SearchBar.vue";
           <div class="search-bar offset-1">
             <SearchBar />
           </div>
-          <div class="signIn-btn">
+          <!-- <div class="signIn-btn">
             <BAvatar size="3rem" class="avatar" variant="light" />
-          </div>
+          </div> -->
         </div>
       </BContainer>
     </div>
