@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BAlert: typeof import('bootstrap-vue-next/components/BAlert')['BAlert']
     BAvatar: typeof import('bootstrap-vue-next/components/BAvatar')['BAvatar']
     BButton: typeof import('bootstrap-vue-next/components/BButton')['BButton']
     BButtonGroup: typeof import('bootstrap-vue-next/components/BButton')['BButtonGroup']
@@ -21,7 +22,13 @@ declare module 'vue' {
     BCardText: typeof import('bootstrap-vue-next/components/BCard')['BCardText']
     BCardTitle: typeof import('bootstrap-vue-next/components/BCard')['BCardTitle']
     BContainer: typeof import('bootstrap-vue-next/components/BContainer')['BContainer']
+    BDropdownDivider: typeof import('bootstrap-vue-next/components/BDropdown')['BDropdownDivider']
+    BForm: typeof import('bootstrap-vue-next/components/BForm')['BForm']
+    BFormFloatingLabel: typeof import('bootstrap-vue-next/components/BForm')['BFormFloatingLabel']
+    BFormGroup: typeof import('bootstrap-vue-next/components/BFormGroup')['BFormGroup']
     BFormInput: typeof import('bootstrap-vue-next/components/BFormInput')['BFormInput']
+    BFormInvalidFeedback: typeof import('bootstrap-vue-next/components/BForm')['BFormInvalidFeedback']
+    BFormValidFeedback: typeof import('bootstrap-vue-next/components/BForm')['BFormValidFeedback']
     BImg: typeof import('bootstrap-vue-next/components/BImg')['BImg']
     BInputGroup: typeof import('bootstrap-vue-next/components/BInputGroup')['BInputGroup']
     BLink: typeof import('bootstrap-vue-next/components/BLink')['BLink']
@@ -29,6 +36,9 @@ declare module 'vue' {
     BNav: typeof import('bootstrap-vue-next/components/BNav')['BNav']
     BNavbarNav: typeof import('bootstrap-vue-next/components/BNavbar')['BNavbarNav']
     BNavItem: typeof import('bootstrap-vue-next/components/BNav')['BNavItem']
+    BTab: typeof import('bootstrap-vue-next/components/BTabs')['BTab']
+    BTabs: typeof import('bootstrap-vue-next/components/BTabs')['BTabs']
+    BTh: typeof import('bootstrap-vue-next/components/BTable')['BTh']
     Footer: typeof import('./src/components/Footer.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']
