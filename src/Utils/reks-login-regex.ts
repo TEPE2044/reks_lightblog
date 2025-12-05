@@ -20,12 +20,9 @@ const accountValidation = (account: string, password: string) => {
 };
 
 // 手机号正则
-const phoneValidation = (phone: string,code:string) => {
+const phoneValidation = (phone: string) => {
   try {
     // 请求
-
-    code ? code.length === 5 : false;
-
     var phoneRegex = /^1[3-9]\d{9}$/;
 
     phoneRegex.test(phone) ? true : false;

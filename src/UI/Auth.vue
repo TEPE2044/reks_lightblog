@@ -181,6 +181,7 @@ const loginbyPhone = () => {
                 class="mt-5 freshman d-flex align-items-center justify-content-center"
               >
                 我没有账号
+                // TODO 加popover提示
               </div>
             </BForm>
           </div>
@@ -188,12 +189,13 @@ const loginbyPhone = () => {
       </BTabs>
 
       <template #footer>
-        <div
+        <BButton
+          variant="success"
           class="wechat-login"
           @click="createToast(toast, '敬请期待', '暂未开通', 'info')"
         >
-          <Icon color="black" icon="bi:wechat" /> 微信登录
-        </div>
+          <Icon color="white" icon="bi:wechat" /> 微信登录
+        </BButton>
       </template>
       <Vcode :show="isShow" @success="onSuccess" @close="onClose" />
     </BModal>
