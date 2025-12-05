@@ -4,7 +4,7 @@ import { useToast, useToggle } from "bootstrap-vue-next";
 import { createToast } from "../Utils/reks-toast";
 import { reactive, ref } from "vue";
 import Vcode from "vue3-puzzle-vcode";
-import { accountValidation,phoneValidation } from "../Utils/reks-login-regex";
+import { accountValidation, phoneValidation } from "../Utils/reks-login-regex";
 // modal打开逻辑 easy-modal
 // const {show, hide} = useToggle(id)
 const emd = useToggle("easy-login-box");
@@ -31,7 +31,7 @@ const onClose = () => {
 };
 
 const onSuccess = () => {
-  createToast(toast, "登录成功", "欢迎回来", "danger");
+  createToast(toast, "登录成功", "欢迎回来", "success");
   onClose();
 };
 
@@ -43,7 +43,7 @@ interface FormData {
 
 interface PhoneData {
   phone: string;
-  code: string ;
+  code: string;
 }
 const formData = reactive<FormData>({
   account: "",
@@ -55,39 +55,45 @@ const phoneData = reactive<PhoneData>({
   code: "",
 });
 
-
-const loginbyAccount = () =>{
-
-  const accountError = accountValidation(formData.account, formData.password) ? "" : "请输入有效的账号和密码";
+const loginbyAccount = () => {
+  const accountError = accountValidation(formData.account, formData.password)
+    ? ""
+    : "请输入有效的账号和密码";
 
   if (accountError) {
     createToast(toast, "登录失败", accountError, "warning");
     return;
   }
   onShow();
-  createToast(toast, "登录成功", "欢迎回来", "success");
+  createToast(toast, "验证成功", "你是人类", "success");
   reset();
   emd.hide();
-}
+};
 
 const loginbyPhone = () => {
-  const phoneError = phoneValidation(phoneData.phone) ? "" : "请输入有效的手机号";
+  const phoneError = phoneValidation(phoneData.phone);
   if (phoneError) {
     createToast(toast, "登录失败", phoneError, "warning");
     return;
   }
   onShow();
-  createToast(toast, "登录成功", "欢迎回来", "success");
   reset();
   emd.hide();
-}
+};
 </script>
 
 <template>
   <div class="auth">
     <BButton @click="emd.show()" variant="primary">登录</BButton>
 
-    <BModal id="easy-login-box" title="登录" ok-title="登录" no-header-close centered>
+    <BModal
+      id="easy-login-box"
+      title="登录"
+      ok-title="登录"
+      no-header-close
+      no-footer
+      centered
+    >
       <div
         class="lgo d-flex align-items-center justify-content-center gap-2 mb-4"
       >
@@ -137,7 +143,10 @@ const loginbyPhone = () => {
                 >
               </BInputGroup>
 
-              <BButton class="w-100 mt-5" variant="primary" @click="loginbyPhone"
+              <BButton
+                class="w-100 mt-5"
+                variant="primary"
+                @click="loginbyPhone"
                 >登录</BButton
               >
             </BForm>
@@ -173,30 +182,29 @@ const loginbyPhone = () => {
                 />
               </BFormFloatingLabel>
 
-              <BButton class="w-100 mt-5" variant="primary" @click="loginbyAccount"
+              <BButton
+                class="w-100 mt-5"
+                variant="primary"
+                @click="loginbyAccount"
                 >登录</BButton
               >
 
               <div
-                class="mt-5 freshman d-flex align-items-center justify-content-center"
+                class="freshman mt-3 d-flex align-items-center justify-content-center"
               >
-                我没有账号
-                // TODO 加popover提示
+                我没有账号 // TODO 加popover提示
               </div>
             </BForm>
           </div>
         </BTab>
-      </BTabs>
 
-      <template #footer>
-        <BButton
-          variant="success"
-          class="wechat-login"
-          @click="createToast(toast, '敬请期待', '暂未开通', 'info')"
-        >
-          <Icon color="white" icon="bi:wechat" /> 微信登录
-        </BButton>
-      </template>
+        <!-- <BTab id="wechat">
+          <template #title>
+            <Icon color="white" icon="bi:wechat" />微信登录
+          </template>
+        </BTab> -->
+      </BTabs>
+      
       <Vcode :show="isShow" @success="onSuccess" @close="onClose" />
     </BModal>
   </div>

@@ -23,9 +23,10 @@ const accountValidation = (account: string, password: string) => {
 const phoneValidation = (phone: string) => {
   try {
     // 请求
-    var phoneRegex = /^1[3-9]\d{9}$/;
+    var phoneRegex = /^(13[0-9]|14[5-9]|15[0-3,5-9]|16[6]|17[0-8]|18[0-9]|19[8,9])\d{8}$/;
 
     phoneRegex.test(phone) ? true : false;
+    alert(phoneRegex.test(phone));
   } catch (e) {
     console.warn("手机号验证失败:", e);
     return false;
