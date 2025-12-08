@@ -20,17 +20,15 @@ const accountValidation = (account: string, password: string) => {
 };
 
 // 手机号正则
-const phoneValidation = (phone: string) => {
+const phoneRegex = (phone: string) => {
   try {
     // 请求
-    var phoneRegex = /^(13[0-9]|14[5-9]|15[0-3,5-9]|16[6]|17[0-8]|18[0-9]|19[8,9])\d{8}$/;
-
-    phoneRegex.test(phone) ? true : false;
-    alert(phoneRegex.test(phone));
+    var phoneR = /^(13[0-9]|14[5-9]|15[0-3,5-9]|16[6]|17[0-8]|18[0-9]|19[8,9])\d{8}$/;
+    return phoneR.test(phone);
   } catch (e) {
     console.warn("手机号验证失败:", e);
     return false;
   }
 };
 
-export { accountValidation, phoneValidation };
+export { accountValidation, phoneRegex };

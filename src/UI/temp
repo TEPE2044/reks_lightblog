@@ -1,0 +1,27 @@
+// // 区分原生的FormData API和我们自己的数据结构
+// interface AccountData {
+//   account: string;
+//   password: string;
+// }
+// const accountData = reactive<AccountData>({
+//   account: "",
+//   password: "",
+// });
+
+// const loginbyAccount = () => {
+  //   const accountError = accountValidation(
+    //     accountData.account,
+    //     accountData.password
+    //   )
+//     ? ""
+//     : "请输入有效的账号和密码";
+
+//   if (accountError) {
+//     createToast(toast, "登录失败", accountError, "warning");
+//     return;
+//   }
+//   onShow();
+//   createToast(toast, "验证成功", "你是人类", "success");
+//   reset();
+//   emd.hide();
+// };
