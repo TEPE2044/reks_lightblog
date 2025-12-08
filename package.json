@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vueuse/core": "^14.1.0",
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
     "bootstrap-vue-next": "^0.40.8",

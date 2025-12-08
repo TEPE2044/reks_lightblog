@@ -7,11 +7,11 @@ const metricsData = ref([
   { label: "积分", value: 0 },
 ]);
 
-const userLoggedIn = ref(false);
+import { userStore } from "../Store/user";
+const user = userStore();
 
 const easyLogout = () => {
-  // 模拟退出登录逻辑
-  userLoggedIn.value = false;
+  user.userLogout();
 };
 </script>
 
@@ -22,7 +22,7 @@ const easyLogout = () => {
     <transition name="fadeIn" mode="out-in">
       <!-- 把两个状态作为 transition 的直接子元素并加 key，保证 out-in 正确工作 -->
       <div
-        v-if="!userLoggedIn"
+        v-if="!user.isLoggedIn"
         key="logged-out"
         class="user-no-login mt-3 pb-3"
       >

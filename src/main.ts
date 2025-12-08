@@ -4,6 +4,9 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
 import './style.css'
 import router from "./Router";
+import { createPinia } from 'pinia'
 
+const pinia = createPinia()
 const app = createApp(App)
-app.use(router).mount('#app')
+
+app.use(router).use(pinia).mount('#app')
