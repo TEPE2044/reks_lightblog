@@ -8,18 +8,60 @@ import Vcode from "vue3-puzzle-vcode";
 import reapi from "../Requests/reapi";
 import { useCountdown } from "@vueuse/core";
 import { userStore } from "../Store/user";
+import type { RNext } from "../Utils/reks-next-job";
 
-// modal打开逻辑 easy-modal
-// const {show, hide} = useToggle(id)
 const user = userStore();
+
 const emd = useToggle("easy-login-box");
 // 账号登录数据
 const toast = useToast();
+
 // 验证码锁
 const codeActive = ref(false);
-// puzzle打开逻辑
+let rnext: RNext | null = null;
+/*
+login-methods
+- phoneLogin 手机号登录（验证码登录）
+ - phoneData 手机号表单
+- accountLogin 登录
+*/
+const phoneData = reactive<PhoneData>({
+  phone: "",
+  code: "",
+  iaccept: false,
+});
+
+/*
+puzzle
+# var
+- isShow 控制puzzle显示变量
+- puzzle_isSuccess 成功时puzzle的变量,由user.ts管理
+# func
+- onShow 控制puzzle显示的函数
+- onClose 关闭puzzle触发的函数
+- onSuccess puzzle验证成功时执行的函数
+*/
 const isShow = ref(false);
 
+const onShow = () => {
+  isShow.value = true;
+};
+const openPuzzle = (job: RNext) => {
+  rnext = job;
+  isShow.value = true;
+};
+// const onClose = () => {
+//   isShow.value = false;
+// };
+const onSuccess = () => {
+  isShow.value = false;
+  if (rnext) {
+    rnext();
+    rnext = null;
+  }
+};
+
+// trigger 重置表单
 const reset = () => {
   // accountData.account = "";
   // accountData.password = "";
@@ -33,21 +75,16 @@ const countdownSeconds = shallowRef(60);
 const { remaining, start, stop } = useCountdown(countdownSeconds, {
   onComplete() {
     codeActive.value = false;
-  }
+  },
 });
 
-const phoneData = reactive<PhoneData>({
-  phone: "",
-  code: "",
-  iaccept: false,
-});
-
-// 获取短信验证码
+// request 获取短信验证码
 const getCode = async () => {
   try {
     const code_res = await reapi({
       method: "POST",
-      url: "/auth/send-sms-code",
+      // url: "/auth/send-sms-code",
+      url: "/auth/fake-sms-code",
       data: {
         phone: phoneData.phone,
         codeActive: codeActive.value,
@@ -60,7 +97,7 @@ const getCode = async () => {
   }
 };
 
-// 触发发送短信
+// trigger 触发发送短信
 const sendCode = async () => {
   try {
     // 检查是否同意用户协议
@@ -81,14 +118,15 @@ const sendCode = async () => {
     codeActive.value = true;
     start();
     // OnlyTest
-    const { code } = await getCode();
-    sessionStorage.setItem("sms_code", code);
-    createToast(
-      toast,
-      "验证码已发送",
-      `验证码已发送至${phoneData.phone}`,
-      "success"
-    );
+    const getcode_res = await getCode();
+    if (getcode_res) {
+      createToast(
+        toast,
+        "验证码已发送",
+        `验证码已发送至${phoneData.phone}`,
+        "success"
+      );
+    }
   } catch (e) {
     stop();
     console.error("发送验证码失败:", e);
@@ -96,35 +134,18 @@ const sendCode = async () => {
   }
 };
 
+// request 账号登录
 const loginbyPhone = async () => {
   const res = await reapi({
     method: "POST",
-    url: "/auth/login-by-phone",
+    url: "/auth/fake-login-by-phone",
     data: {
       phone: phoneData.phone,
       code: phoneData.code,
       iaccept: phoneData.iaccept,
     },
   });
-  return res
-}
-
-// 控制puzzle显示与隐藏
-const onShow = () => {
-  isShow.value = true;
-  emd.hide();
-};
-// puzzle成功回调
-const onSuccess = () => {
-  isShow.value = false;
-};
-// 关闭puzzle并且清空表单
-const onClose = () => {
-  isShow.value = false;
-  alert(user.isLoggedIn);
-  if (user.isLoggedIn === false) {
-    emd.show();
-  }
+  return res.data;
 };
 
 const submitPhoneData = async () => {
@@ -144,16 +165,20 @@ const submitPhoneData = async () => {
     createToast(toast, "发送失败", "手机号码格式不正确", "warning");
     return;
   }
-  try {
-    onShow();
-    const { msg } = await loginbyPhone();
-    createToast(toast, "登录成功", msg, "success");
-    reset();
-    user.userLogin();
-  } catch (e) {
-    console.error("登录失败:", e);
-    createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
-  }
+  openPuzzle(async () => {
+    try {
+      const login_res = await loginbyPhone();
+      console.log("登录成功:", login_res);
+      if (login_res.token) {
+        createToast(toast, "登录成功", "恭喜你", "success");
+        emd.hide()
+        reset()
+      }
+    } catch (e) {
+      console.error("登录失败:", e);
+      createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
+    }
+  });
 };
 </script>
 
@@ -161,40 +186,91 @@ const submitPhoneData = async () => {
   <div class="auth">
     <BButton @click="emd.show()" variant="primary">登录</BButton>
 
-    <BModal id="easy-login-box" title="登录" ok-title="登录" no-header-close footer centered>
-      <div class="lgo d-flex align-items-center justify-content-center gap-2 my-3">
-        <img src="/reks.svg" class="img-thumbnail top_pic mb-3" alt="reks_label.png" />
+    <BModal
+      id="easy-login-box"
+      title="登录"
+      ok-title="登录"
+      no-header-close
+      footer
+      centered
+    >
+      <div
+        class="lgo d-flex align-items-center justify-content-center gap-2 my-3"
+      >
+        <img
+          src="/reks.svg"
+          class="img-thumbnail top_pic mb-3"
+          alt="reks_label.png"
+        />
         <figure class="figure">
           <figcaption>Rekindle Everything</figcaption>
         </figure>
       </div>
       <BTabs content-class="mt-3" align="center" lazy pills>
         <BTab title="短信登录">
-          <div class="form w-75 mx-auto">
+          <div class="form w-75 mx-auto" v-if="isShow">
+            <div class="box box-show" v-if="isShow === true">
+              <Vcode :show="isShow" type="inside" @success="onSuccess" />
+            </div>
+          </div>
+          <div class="form w-75 mx-auto" v-else>
             <BForm class="mx-auto" validated>
-              <BFormFloatingLabel class="mt-4 mb-2" label="手机号" label-for="user-phone">
-                <BFormInput type="tel" id="user-phone" placeholder="请输入手机号" v-model="phoneData.phone" is-valid
-                  required />
+              <BFormFloatingLabel
+                class="mt-4 mb-2"
+                label="手机号"
+                label-for="user-phone"
+              >
+                <BFormInput
+                  type="tel"
+                  id="user-phone"
+                  placeholder="请输入手机号"
+                  v-model="phoneData.phone"
+                  is-valid
+                  required
+                />
                 <div class="invalid-feedback">请输入手机号</div>
               </BFormFloatingLabel>
 
               <BInputGroup class="mb-2">
                 <BFormFloatingLabel label="验证码" label-for="user-code">
-                  <BFormInput type="text" id="user-code" placeholder="请输入验证码" v-model="phoneData.code"
-                    :disabled="phoneData.phone.length === 0" required />
+                  <BFormInput
+                    type="text"
+                    id="user-code"
+                    placeholder="请输入验证码"
+                    v-model="phoneData.code"
+                    :disabled="phoneData.phone.length === 0"
+                    required
+                  />
                 </BFormFloatingLabel>
 
-                <BButton v-if="!codeActive" text="button" :disabled="phoneData.phone.length === 0" variant="primary"
-                  @click="sendCode">获取验证码</BButton>
-                <BButton v-else text="button" :disabled="true" variant="primary">{{ remaining }}s</BButton>
+                <BButton
+                  v-if="!codeActive"
+                  text="button"
+                  :disabled="phoneData.phone.length === 0"
+                  variant="primary"
+                  @click="sendCode"
+                  >获取验证码</BButton
+                >
+                <BButton v-else text="button" :disabled="true" variant="primary"
+                  >{{ remaining }}s</BButton
+                >
               </BInputGroup>
 
-              <BFormCheckbox v-model="phoneData.iaccept" name="checkbox-1" class="mt-4 mb-2">
+              <BFormCheckbox
+                v-model="phoneData.iaccept"
+                name="checkbox-1"
+                class="mt-4 mb-2"
+              >
                 我已阅读并同意<a href="#">用户协议</a>和<a href="#">隐私政策</a>
               </BFormCheckbox>
 
-              <BButton :disabled="phoneData.code.length === 0" class="w-100 mt-4 mb-3" variant="primary"
-                @click="submitPhoneData">登录</BButton>
+              <BButton
+                :disabled="phoneData.code.length === 0"
+                class="w-100 mt-4 mb-3"
+                variant="primary"
+                @click="submitPhoneData"
+                >登录</BButton
+              >
             </BForm>
           </div>
         </BTab>
@@ -202,19 +278,48 @@ const submitPhoneData = async () => {
         <BTab title="账号登录">
           <div class="form w-75 mx-auto">
             <BForm class="mx-auto">
-              <BFormFloatingLabel class="mt-4 mb-3" label="账号" label-for="user-account">
-                <BFormInput type="email" id="user-account" placeholder="请输入账号" v-model="accountData.account" />
+              <BFormFloatingLabel
+                class="mt-4 mb-3"
+                label="账号"
+                label-for="user-account"
+              >
+                <BFormInput
+                  type="email"
+                  id="user-account"
+                  placeholder="请输入账号"
+                  v-model="accountData.account"
+                />
               </BFormFloatingLabel>
 
-              <BFormFloatingLabel class="mb-2" label="密码" label-for="user-password">
-                <BFormInput type="password" id="user-password" placeholder="请输入密码" v-model="accountData.password" />
+              <BFormFloatingLabel
+                class="mb-2"
+                label="密码"
+                label-for="user-password"
+              >
+                <BFormInput
+                  type="password"
+                  id="user-password"
+                  placeholder="请输入密码"
+                  v-model="accountData.password"
+                />
               </BFormFloatingLabel>
 
-              <BButton class="w-100 mt-5" variant="primary" @click="loginbyAccount">登录</BButton>
+              <BButton
+                class="w-100 mt-5"
+                variant="primary"
+                @click="loginbyAccount"
+                >登录</BButton
+              >
 
-              <div class="freshman mt-3 d-flex align-items-center justify-content-center">
+              <div
+                class="freshman mt-3 d-flex align-items-center justify-content-center"
+              >
                 我没有账号
-                <BPopover target=".freshman" placement="bottom" triggers="hover focus">
+                <BPopover
+                  target=".freshman"
+                  placement="bottom"
+                  triggers="hover focus"
+                >
                   首次使用，请使用短信登录注册账号
                 </BPopover>
               </div>
@@ -223,7 +328,6 @@ const submitPhoneData = async () => {
         </BTab>
       </BTabs>
 
-      <Vcode :show="isShow" @success="onSuccess" @close="onClose" />
       <template #footer>
         <div class="d-flex w-100 justify-content-between text-primary">
           <BLink to="/forgot">忘记密码</BLink>
@@ -242,9 +346,24 @@ const submitPhoneData = async () => {
 :deep(.nav-pills) {
   gap: 2rem;
 }
-
+:deep(.vue-puzzle-vcode) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .wechat-login {
   cursor: pointer;
+}
+
+.box-show {
+  border: 1px solid rgba(0, 0, 0, 0.089);
+  border-radius: 20px;
+  padding: 1.8rem;
+}
+
+.giveup {
+  margin-top: 1rem;
+  transform: translateY(12px);
 }
 
 .top_pic {
