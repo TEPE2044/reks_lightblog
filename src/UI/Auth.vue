@@ -18,7 +18,7 @@ const toast = useToast();
 
 // 验证码锁
 const codeActive = ref(false);
-let rnext: RNext | null = null;
+
 /*
 login-methods
 - phoneLogin 手机号登录（验证码登录）
@@ -36,23 +36,20 @@ puzzle
 # var
 - isShow 控制puzzle显示变量
 - puzzle_isSuccess 成功时puzzle的变量,由user.ts管理
+- rnext 存储下一个函数
 # func
 - onShow 控制puzzle显示的函数
-- onClose 关闭puzzle触发的函数
+- openPuzzle 处理异步事件的函数
 - onSuccess puzzle验证成功时执行的函数
 */
 const isShow = ref(false);
-
-const onShow = () => {
-  isShow.value = true;
-};
+// rnext是下个要执行的函数，可能是异步的
+let rnext: RNext | null = null;
 const openPuzzle = (job: RNext) => {
   rnext = job;
   isShow.value = true;
 };
-// const onClose = () => {
-//   isShow.value = false;
-// };
+
 const onSuccess = () => {
   isShow.value = false;
   if (rnext) {
@@ -83,8 +80,8 @@ const getCode = async () => {
   try {
     const code_res = await reapi({
       method: "POST",
-      // url: "/auth/send-sms-code",
-      url: "/auth/fake-sms-code",
+      url: "/auth/send-sms-code",
+      // url: "/auth/fake-sms-code",
       data: {
         phone: phoneData.phone,
         codeActive: codeActive.value,
@@ -106,11 +103,11 @@ const sendCode = async () => {
       return;
     }
     // 检查手机号格式
-    if (!phoneData.phone || phoneData.phone.length !== 11) {
+    else if (!phoneData.phone || phoneData.phone.length !== 11) {
       createToast(toast, "发送失败", "请输入正确的手机号码", "warning");
       return;
     }
-    if (!phoneRegex(phoneData.phone)) {
+    else if (!phoneRegex(phoneData.phone)) {
       createToast(toast, "发送失败", "手机号码格式不正确", "warning");
       return;
     }
@@ -138,7 +135,7 @@ const sendCode = async () => {
 const loginbyPhone = async () => {
   const res = await reapi({
     method: "POST",
-    url: "/auth/fake-login-by-phone",
+    url: "/auth/login-by-phone",
     data: {
       phone: phoneData.phone,
       code: phoneData.code,
@@ -153,15 +150,11 @@ const submitPhoneData = async () => {
     createToast(toast, "登录失败", "请同意用户协议和隐私政策", "warning");
     return;
   }
-  if (codeActive.value === false) {
-    createToast(toast, "登录失败", "请先获取验证码", "warning");
-    return;
-  }
-  if (!phoneData.phone || phoneData.phone.length !== 11) {
+  else if (!phoneData.phone || phoneData.phone.length !== 11) {
     createToast(toast, "发送失败", "请输入正确的手机号码", "warning");
     return;
   }
-  if (!phoneRegex(phoneData.phone)) {
+  else if (!phoneRegex(phoneData.phone)) {
     createToast(toast, "发送失败", "手机号码格式不正确", "warning");
     return;
   }
@@ -170,7 +163,9 @@ const submitPhoneData = async () => {
       const login_res = await loginbyPhone();
       console.log("登录成功:", login_res);
       if (login_res.token) {
-        createToast(toast, "登录成功", "恭喜你", "success");
+        // 存储token
+        user.userLogin()
+        createToast(toast, "登录成功", "欢迎回来", "success");
         emd.hide()
         reset()
       }

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const reapi = axios.create({
-  baseURL: "http://localhost:8000/api/v1/",
+  baseURL: "http://localhost:12404/api/v1/",
   timeout: 10000,
   withCredentials: true,
   headers: {
