@@ -36,7 +36,10 @@ import ProfileCard from '../UI/ProfileCard.vue';
       "caro profilecard";
     grid-template-columns: 4fr 1fr;
     gap: 20px;
-
+    @media (max-width: 768px) {
+      display: flex;
+      flex-direction: column;
+    }
     .activities-caro {
       grid-area: caro;
     }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import MessageBar from "../UI/MessageBar.vue";
 import SearchBar from "../UI/SearchBar.vue";
 
 // interface ToolItem {
@@ -44,9 +45,9 @@ import SearchBar from "../UI/SearchBar.vue";
           <div class="search-bar offset-1">
             <SearchBar />
           </div>
-          <!-- <div class="signIn-btn">
-            <BAvatar size="3rem" class="avatar" variant="light" />
-          </div> -->
+          <div class="signIn-btn">
+            <MessageBar />
+          </div>
         </div>
       </BContainer>
     </div>

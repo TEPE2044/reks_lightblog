@@ -4,4 +4,9 @@ interface PhoneData {
   iaccept: boolean;
 }
 
-export type { PhoneData };
+interface AccountData{
+  account:string;
+  password:string;
+}
+
+export type { PhoneData,AccountData };

@@ -55,13 +55,6 @@ const easyLogout = () => {
           <div class="user-name">梦璃東</div>
         </div>
 
-        <BButtonGroup>
-          <BButton variant="outline-success">一键签到</BButton>
-          <BButton variant="outline-danger" @click="easyLogout"
-            >退出登录</BButton
-          >
-        </BButtonGroup>
-
         <div class="metrics-bar d-flex flex-row gap-5 mt-2">
           <div
             class="metrics-content d-flex flex-column align-items-center"
@@ -72,6 +65,13 @@ const easyLogout = () => {
             <div class="label">{{ metrics.label }}</div>
           </div>
         </div>
+
+        <BButtonGroup>
+          <BButton variant="outline-success">一键签到</BButton>
+          <BButton variant="outline-danger" @click="easyLogout"
+            >退出登录</BButton
+          >
+        </BButtonGroup>
       </div>
     </transition>
   </div>
@@ -87,6 +87,9 @@ const easyLogout = () => {
   width: 100%;
   box-sizing: border-box;
   border: 1px solid #e0e0e0;
+  @media (max-width:768px) {
+    height: fit-content;
+  }
 }
 
 .user-name {

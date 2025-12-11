@@ -18,7 +18,7 @@ const handleSearch = () => {
 
 <template>
   <div class="search-bar position-relative d-flex align-items-center">
-    <input type="text" class="search-input position-absolute" v-model="searchContent" placeholder="索引万物" />
+    <input type="text" @keydown.enter="handleSearch" class="search-input position-absolute" v-model="searchContent" placeholder="索引万物" />
     <div class="search-icon" @click="handleSearch">
       <Icon icon="bi:search" />
     </div>
@@ -29,7 +29,7 @@ const handleSearch = () => {
 <style lang="scss" scoped>
 //TODO: 使搜索栏宽度可变，而且需要向左延展
 $flexible-width:10rem;
-$expanded-width:$flexible-width + 0.5rem;
+$expanded-width:$flexible-width + 0.4rem;
 .search-bar {
   width: $flexible-width;
   height: 30px;

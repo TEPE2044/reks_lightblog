@@ -5,11 +5,13 @@ export const userStore = defineStore('user', () => {
     const puzzle_isSuccess = ref(false)
     const isLoggedIn = ref(false)
 
-    const userLogin = () => {
+    const userLogin = (token:string) => {
+        localStorage.setItem('token', token)
         isLoggedIn.value = true
     }
 
     const userLogout = () => {
+        localStorage.removeItem('token')
         isLoggedIn.value = false
     }
 
