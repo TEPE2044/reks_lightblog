@@ -1,17 +1,22 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import Auth from "./Auth.vue";
+import { createToast } from "../Utils/reks-toast";
 const metricsData = ref([
   { label: "订阅", value: 0 },
   { label: "博客", value: 0 },
   { label: "积分", value: 0 },
 ]);
 
+
 import { userStore } from "../Store/user";
+import { useToast } from "bootstrap-vue-next";
 const user = userStore();
+const toast = useToast();
 
 const easyLogout = () => {
   user.userLogout();
+  createToast(toast,"登出成功", "下次再见！", "info");
 };
 </script>
 

@@ -38,6 +38,12 @@ const openPuzzle = (job: RNext) => {
   isShow.value = true;
 };
 
+const cancelLogin = () => {
+  rnext = null
+  isShow.value = false
+  codeActive.value = false;
+}
+
 const onSuccess = () => {
   isShow.value = false;
   if (rnext) {
@@ -94,33 +100,38 @@ const getCode = async () => {
 
 // trigger 触发发送短信
 const sendCode = async () => {
-  try {
-    // 检查是否同意用户协议
-    if (!phoneData.iaccept) {
-      createToast(toast, "登录失败", "请同意用户协议和隐私政策", "warning");
-      return;
-    }
-    // 检查手机号格式
-    else if (!phoneData.phone || phoneData.phone.length !== 11) {
-      createToast(toast, "发送失败", "请输入正确的手机号码", "warning");
-      return;
-    } else if (!phoneRegex(phoneData.phone)) {
-      createToast(toast, "发送失败", "手机号码格式不正确", "warning");
-      return;
-    }
+  // 检查是否同意用户协议
+  if (!phoneData.iaccept) {
+    createToast(toast, "登录失败", "请同意用户协议和隐私政策", "warning");
+    return;
+  }
+  // 检查手机号格式
+  else if (!phoneData.phone || phoneData.phone.length !== 11) {
+    createToast(toast, "发送失败", "请输入正确的手机号码", "warning");
+    return;
+  } else if (!phoneRegex(phoneData.phone)) {
+    createToast(toast, "发送失败", "手机号码格式不正确", "warning");
+    return;
+  }
 
+  try {
     codeActive.value = true;
-    start();
-    // OnlyTest
-    const getcode_res = await getCode();
-    if (getcode_res) {
-      createToast(
-        toast,
-        "验证码已发送",
-        `验证码已发送至${phoneData.phone}`,
-        "success"
-      );
-    }
+    openPuzzle(async () => {
+      try {
+        start();
+        const getcode_res = await getCode();
+        if (getcode_res) {
+          createToast(
+            toast,
+            "验证码已发送",
+            `验证码已发送至${phoneData.phone}`,
+            "success"
+          );
+        }
+      } catch (e) {
+        console.error("发送验证码失败:",e)
+      }
+    });
   } catch (e) {
     stop();
     console.error("发送验证码失败:", e);
@@ -143,7 +154,8 @@ const loginbyPhone = async () => {
   return res.data;
 };
 
-const submitPhoneData = async () => {
+import {useDebounceFn} from "@vueuse/core";
+const submitPhoneData = useDebounceFn(async () => {
   if (phoneData.iaccept === false) {
     createToast(toast, "登录失败", "请同意用户协议和隐私政策", "warning");
     return;
@@ -154,23 +166,21 @@ const submitPhoneData = async () => {
     createToast(toast, "发送失败", "手机号码格式不正确", "warning");
     return;
   }
-  openPuzzle(async () => {
-    try {
-      const login_res = await loginbyPhone();
-      console.log("登录成功:", login_res);
-      if (login_res.token) {
-        // 存储token
-        user.userLogin(login_res.token);
-        createToast(toast, "登录成功", "", "success");
-        emd.hide();
-        reset();
-      }
-    } catch (e) {
-      console.error("登录失败:", e);
-      createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
+  try {
+    const login_res = await loginbyPhone();
+    console.log("登录成功:", login_res);
+    if (login_res.token) {
+      // 存储token
+      user.userLogin(login_res.token);
+      createToast(toast, "登录成功", "欢迎回来", "success");
+      emd.hide();
+      reset();
     }
-  });
-};
+  } catch (e) {
+    console.error("登录失败:", e);
+    createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
+  }
+}, 1300);
 
 /*
 login-methods
@@ -183,7 +193,7 @@ const accountData = reactive<AccountData>({
 
 const loginbyAccount = () => {
   //TODO: 账号登录功能待实现
-}
+};
 </script>
 
 <template>
@@ -269,6 +279,7 @@ const loginbyAccount = () => {
           <div class="form w-75 mx-auto" v-if="isShow">
             <div class="box box-show" v-if="isShow === true">
               <Vcode :show="isShow" type="inside" @success="onSuccess" />
+              <BButton class="d-flex justify-content-center align-items-center mt-4" @click="cancelLogin">取消登录</BButton>
             </div>
           </div>
           <div class="form w-75 mx-auto" v-else>
