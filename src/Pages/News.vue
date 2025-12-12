@@ -12,11 +12,11 @@ const mode = ref<"mix" | "category">("mix");
         <BButton
           @click="mode = 'mix'"
           :variant="mode === 'mix' ? 'dark' : 'outline-dark'"
-          ><Icon icon="bi:layout-wtf" /> 混合布局</BButton>
+          ><Icon icon="bi:layout-wtf" /> 混合</BButton>
         <BButton
           @click="mode = 'category'"
           :variant="mode === 'category' ? 'dark' : 'outline-dark'"
-          ><Icon icon="bi:layout-three-columns" /> 分类布局</BButton>
+          ><Icon icon="bi:layout-three-columns" /> 分类</BButton>
       </BButtonGroup>
     </div>
 
