@@ -1,27 +1,27 @@
-// // 区分原生的FormData API和我们自己的数据结构
-// interface AccountData {
-//   account: string;
-//   password: string;
-// }
-// const accountData = reactive<AccountData>({
-//   account: "",
-//   password: "",
-// });
+// const loginbyAccount = useDebounceFn(() => {
+//   // 校验规则数组
+//   const checks = [
+//     {
+//       valid: !!accountData.account && accountData.account.length === 11,
+//       msg: "请输入正确的账号",
+//     },
+//     {
+//       valid: phoneRegex(accountData.account),
+//       msg: "账号格式不正确",
+//     },
+//     {
+//       valid: !!accountData.password && accountData.password.length >= 6,
+//       msg: "请输入正确的密码",
+//     },
+//   ];
 
-// const loginbyAccount = () => {
-  //   const accountError = accountValidation(
-    //     accountData.account,
-    //     accountData.password
-    //   )
-//     ? ""
-//     : "请输入有效的账号和密码";
-
-//   if (accountError) {
-//     createToast(toast, "登录失败", accountError, "warning");
-//     return;
+//   for (const check of checks) {
+//     if (!check.valid) {
+//       createToast(toast, "发送失败", check.msg, "warning");
+//       return;
+//     }
 //   }
-//   onShow();
-//   createToast(toast, "验证成功", "你是人类", "success");
-//   reset();
-//   emd.hide();
-// };
+
+//   // 通过校验后，执行登录逻辑
+//   // ...
+// }, 1000);
