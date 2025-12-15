@@ -1,24 +1,51 @@
-import { defineStore } from "pinia"
-import { ref } from "vue"
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import router from "../Router";
+import { setAxiosHeader } from "../Requests/reapi";
 
-export const userStore = defineStore('user', () => {
-    const puzzle_isSuccess = ref(false)
-    const isLoggedIn = ref(false)
+export const userStore = defineStore("user", () => {
+  const rcode = ref<string>("");
+  const payload = ref<string>("");
+  const isLoggedIn = ref(!!localStorage.getItem("token"));
 
-    const userLogin = (token:string) => {
-        localStorage.setItem('token', token)
-        isLoggedIn.value = true
+  const userLogin = async (tokens: { rcode: string; payload: string }) => {
+    isLoggedIn.value = true;
+    rcode.value = tokens.rcode;
+    payload.value = tokens.payload;
+
+    localStorage.setItem("payload", tokens.payload);
+    localStorage.setItem("rcode", tokens.rcode);
+
+    await setAxiosHeader(tokens.payload, tokens.rcode);
+    
+  };
+
+  const userLogout = () => {
+    rcode.value = "";
+    payload.value = "";
+    localStorage.removeItem("rcode");
+    localStorage.removeItem("payload");
+    isLoggedIn.value = false;
+    router.replace('/')
+  };
+
+  const restoreFromLocal = () => {
+    const storedRcode = localStorage.getItem("rcode");
+    const storedPayload = localStorage.getItem("payload");
+    if (storedRcode && storedPayload) {
+      rcode.value = storedRcode;
+      payload.value = storedPayload;
+      setAxiosHeader(storedPayload, storedRcode);
+      isLoggedIn.value = true;
     }
+  };
 
-    const userLogout = () => {
-        localStorage.removeItem('token')
-        isLoggedIn.value = false
-    }
-
-    return {
-        isLoggedIn,
-        puzzle_isSuccess,
-        userLogin,
-        userLogout
-    }
-})
+  return {
+    rcode,
+    payload,
+    isLoggedIn,
+    userLogin,
+    userLogout,
+    restoreFromLocal
+  };
+});

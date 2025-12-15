@@ -11,7 +11,6 @@ import { userStore } from "../Store/user";
 import type { RNext } from "../Utils/reks-next-job";
 
 const user = userStore();
-
 const emd = useToggle("easy-login-box");
 // 账号登录数据
 const toast = useToast();
@@ -25,7 +24,6 @@ const codeActive = ref(false);
 puzzle
 # var
 - isShow 控制puzzle显示变量
-- puzzle_isSuccess 成功时puzzle的变量,由user.ts管理
 - rnext 存储下一个函数
 # func
 - onShow 控制puzzle显示的函数
@@ -41,10 +39,10 @@ const openPuzzle = (job: RNext) => {
 };
 
 const cancelLogin = () => {
-  rnext = null
-  isShow.value = false
+  rnext = null;
+  isShow.value = false;
   codeActive.value = false;
-}
+};
 
 const onSuccess = () => {
   isShow.value = false;
@@ -53,7 +51,7 @@ const onSuccess = () => {
     rnext = null;
   }
 };
-
+// TODO:加一个loading动画
 /*
 login-methods
 - phoneLogin 手机号登录（验证码登录）
@@ -83,6 +81,7 @@ const { remaining, start, stop } = useCountdown(countdownSeconds, {
 
 // request 获取短信验证码
 const getCode = async () => {
+  loading.value = true;
   try {
     const code_res = await reapi({
       method: "POST",
@@ -121,17 +120,29 @@ const sendCode = async () => {
     openPuzzle(async () => {
       try {
         start();
+
         const getcode_res = await getCode();
+        loading.value = false;
         if (getcode_res) {
+          
+          stop();
           createToast(
             toast,
             "验证码已发送",
             `验证码已发送至${phoneData.phone}`,
             "success"
           );
+        } else {
+          
+          stop();
+          codeActive.value = false;
         }
       } catch (e) {
-        console.error("发送验证码失败:", e)
+        console.log("验证码发送失败，重置计时器");
+        codeActive.value = false;
+        stop();
+        
+        console.error("发送验证码失败:", e);
       }
     });
   } catch (e) {
@@ -143,6 +154,7 @@ const sendCode = async () => {
 
 // request 账号登录
 const loginbyPhone = async () => {
+  loading.value = true;
   const res = await reapi({
     method: "POST",
     // url: "/auth/login-by-phone",
@@ -152,6 +164,15 @@ const loginbyPhone = async () => {
       code: phoneData.code,
       iaccept: phoneData.iaccept,
     },
+  });
+  return res.data;
+};
+
+// request 获取用户信息
+const getUserProfile = async () => {
+  const res = await reapi({
+    method: "GET",
+    url: "/user/profile",
   });
   return res.data;
 };
@@ -171,12 +192,16 @@ const submitPhoneData = useDebounceFn(async () => {
   try {
     const login_res = await loginbyPhone();
     console.log("登录成功:", login_res);
-    if (login_res.token) {
+    if (login_res.tokens) {
       // 存储token
-      user.userLogin(login_res.token);
+      await user.userLogin(login_res.tokens);
       createToast(toast, "登录成功", "欢迎回来", "success");
+      const user_info = await getUserProfile();
+      alert(JSON.stringify(user_info)); // 测试用，后续删除
       emd.hide();
       reset();
+    } else {
+      createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
     }
   } catch (e) {
     console.error("登录失败:", e);
@@ -194,6 +219,7 @@ const accountData = reactive<AccountData>({
 });
 
 import { hashPsw } from "../Utils/reks-crypto";
+const loading = ref(false);
 
 const loginbyAccount = async (hashpsw: string) => {
   const res = await reapi({
@@ -206,16 +232,22 @@ const loginbyAccount = async (hashpsw: string) => {
     },
   });
   return res.data;
-}
+};
 
 // 更优雅的写法2026/12/13（🐧跳舞）
 const sumbitAccountData = useDebounceFn(() => {
   // 账号登录功能待实现
   const check = [
-    { valid: !!accountData.account && accountData.account.length === 11, msg: "请输入正确的账号" },
+    {
+      valid: !!accountData.account && accountData.account.length === 11,
+      msg: "请输入正确的账号",
+    },
     { valid: phoneRegex(accountData.account), msg: "账号格式不正确" },
-    { valid: accountData.password && accountData.password.length >= 6, msg: "请输入正确的密码" },
-  ]
+    {
+      valid: accountData.password && accountData.password.length >= 6,
+      msg: "请输入正确的密码",
+    },
+  ];
   for (const item of check) {
     if (!item.valid) {
       createToast(toast, "登录失败", item.msg, "warning");
@@ -224,7 +256,7 @@ const sumbitAccountData = useDebounceFn(() => {
   }
 
   try {
-    // TODO:密码加密
+    // 密码加密
     const hashed_password = hashPsw(accountData.password);
     openPuzzle(async () => {
       try {
@@ -241,64 +273,107 @@ const sumbitAccountData = useDebounceFn(() => {
         console.error("账号登录失败:", e);
         createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
       }
-    })
+    });
   } catch (e) {
     console.error("账号登录失败:", e);
     createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
   }
-
 }, 1000);
 
 watchEffect(() => {
   console.log("accept", phoneData.iaccept);
   console.log("account", accountData.account.length);
 });
-
 </script>
 
 <template>
   <div class="auth">
     <BButton @click="emd.show()" variant="primary">登录</BButton>
 
-    <BModal id="easy-login-box" title="登录" ok-title="登录" no-header-close footer centered>
-      <div class="lgo d-flex align-items-center justify-content-center gap-2 my-3">
-        <img src="/reks.svg" class="img-thumbnail top_pic mb-3" alt="reks_label.png" />
+    <BModal
+      id="easy-login-box"
+      title="登录"
+      ok-title="登录"
+      no-header-close
+      footer
+      centered
+    >
+      <div
+        class="lgo d-flex align-items-center justify-content-center gap-2 my-3"
+      >
+        <img
+          src="/reks.svg"
+          class="img-thumbnail top_pic mb-3"
+          alt="reks_label.png"
+        />
         <figure class="figure">
           <figcaption>ReKindle Everything</figcaption>
         </figure>
       </div>
 
-      <div class="form w-75 mx-auto" v-if="isShow">
-        <div class="box box-show" v-if="isShow === true">
-          <Vcode :show="isShow" type="inside" @success="onSuccess" />
-          <BButton class="d-flex justify-content-center align-items-center mt-4" @click="cancelLogin">取消登录</BButton>
-        </div>
+      <div class="box box-show w-75 mx-auto" v-if="isShow">
+        <Vcode :show="isShow" type="inside" @success="onSuccess" />
+        <BButton
+          class="d-flex justify-content-center align-items-center mt-4"
+          @click="cancelLogin"
+          >取消登录</BButton
+        >
       </div>
-      <BTabs content-class="mt-3" align="center" lazy pills v-else>
+      <BTabs content-class="mt-3" align="center" lazy pills>
         <BTab title="账号登录">
           <div class="form w-75 mx-auto">
             <BForm class="mx-auto" validated>
-              <BFormFloatingLabel class="mt-4 mb-3" label="账号" label-for="user-account">
-                <BFormInput autocomplete="cellphone" type="tel" id="user-account" placeholder="请输入账号(手机号)" is-valid
-                  required v-model="accountData.account" />
-                <div class="invalid-feedback">
-                  请输入账号(手机号)
-                </div>
+              <BFormFloatingLabel
+                class="mt-4 mb-3"
+                label="账号"
+                label-for="user-account"
+              >
+                <BFormInput :disabled="loading"
+                  autocomplete="cellphone"
+                  type="tel"
+                  id="user-account"
+                  placeholder="请输入账号(手机号)"
+                  is-valid
+                  required
+                  v-model="accountData.account"
+                />
+                <div class="invalid-feedback">请输入账号(手机号)</div>
               </BFormFloatingLabel>
 
-              <BFormFloatingLabel class="mb-2" label="密码" label-for="user-password">
-                <BFormInput autocomplete="current-password" type="password" id="user-password" placeholder="请输入密码"
-                  v-model="accountData.password" is-valid required />
-                <div class="invalid-feedback">
-                  请输入密码
-                </div>
+              <BFormFloatingLabel
+                class="mb-2"
+                label="密码"
+                label-for="user-password"
+              >
+                <BFormInput :disabled="loading"
+                  autocomplete="current-password"
+                  type="password"
+                  id="user-password"
+                  placeholder="请输入密码"
+                  v-model="accountData.password"
+                  is-valid
+                  required
+                />
+                <div class="invalid-feedback">请输入密码</div>
               </BFormFloatingLabel>
 
-              <BButton class="w-100 mt-2" variant="primary" @click="sumbitAccountData">登录</BButton>
+              <BButton
+                class="w-100 mt-2"
+                variant="primary"
+                @click="sumbitAccountData"
+                :disabled="loading"
+                >登录</BButton
+              >
 
-              <div class="freshman mt-3 d-flex align-items-center justify-content-center">
+              <div
+                class="freshman mt-3 d-flex align-items-center justify-content-center"
+              >
                 我没有账号
-                <BPopover target=".freshman" placement="bottom" triggers="hover focus">
+                <BPopover
+                  target=".freshman"
+                  placement="bottom"
+                  triggers="hover focus"
+                >
                   首次使用，请使用短信登录注册账号
                 </BPopover>
               </div>
@@ -306,33 +381,70 @@ watchEffect(() => {
           </div>
         </BTab>
 
-        <BTab title="短信登录">
+        <BTab title="短信登录" ref="message">
           <div class="form w-75 mx-auto">
             <BForm class="mx-auto" validated>
-              <BFormFloatingLabel class="mt-4 mb-2" label="手机号" label-for="user-phone">
-                <BFormInput type="tel" id="user-phone" placeholder="请输入手机号" v-model="phoneData.phone" is-valid
-                  required />
+              <BFormFloatingLabel
+                class="mt-4 mb-2"
+                label="手机号"
+                label-for="user-phone"
+              >
+                <BFormInput
+                  type="tel"
+                  id="user-phone"
+                  placeholder="请输入手机号"
+                  v-model="phoneData.phone"
+                  is-valid
+                  required
+                />
                 <div class="invalid-feedback">请输入手机号</div>
               </BFormFloatingLabel>
 
               <BInputGroup class="mb-2">
                 <BFormFloatingLabel label="验证码" label-for="user-code">
-                  <BFormInput type="text" id="user-code" placeholder="请输入验证码" v-model="phoneData.code"
-                    :disabled="phoneData.phone.length === 0" required />
+                  <BFormInput
+                    type="text"
+                    id="user-code"
+                    placeholder="请输入验证码"
+                    v-model="phoneData.code"
+                    :disabled="phoneData.phone.length === 0"
+                    required
+                  />
                 </BFormFloatingLabel>
 
-                <BButton v-if="!codeActive" text="button" :disabled="phoneData.phone.length === 0" variant="primary"
-                  @click="sendCode">获取验证码
+                <BButton
+                  v-if="!codeActive"
+                  text="button"
+                  :disabled="phoneData.phone.length === 0"
+                  variant="primary"
+                  @click="sendCode"
+                  >获取验证码
                 </BButton>
-                <BButton v-else text="button" :disabled="true" variant="primary">{{ remaining }}s</BButton>
+                <BButton v-else text="button" :disabled="true" variant="primary"
+                  >{{ remaining }}s</BButton
+                >
               </BInputGroup>
             </BForm>
-            <BFormCheckbox v-model="phoneData.iaccept" name="checkbox-1" class="mt-4 mb-2" :state="phoneData.iaccept">
-              我已阅读并同意<BLink class="prt" href="#">用户协议</BLink>和<BLink class="prt" href="#">隐私政策</BLink>
+            <BFormCheckbox
+              v-model="phoneData.iaccept"
+              name="checkbox-1"
+              class="mt-4 mb-2"
+              :state="phoneData.iaccept"
+            >
+              我已阅读并同意<BLink class="prt" href="#">用户协议</BLink>和<BLink
+                class="prt"
+                href="#"
+                >隐私政策</BLink
+              >
             </BFormCheckbox>
 
-            <BButton :disabled="phoneData.code.length === 0" class="w-100 mt-4 mb-3" variant="primary"
-              @click="submitPhoneData">登录</BButton>
+            <BButton
+              :disabled="phoneData.code.length === 0"
+              class="w-100 mt-4 mb-3"
+              variant="primary"
+              @click="submitPhoneData"
+              >登录</BButton
+            >
           </div>
         </BTab>
       </BTabs>
@@ -373,11 +485,19 @@ watchEffect(() => {
 .wechat-login {
   cursor: pointer;
 }
-
+// inset: 0;
+// /* 等价于 */
+// top: 0; right: 0; bottom: 0; left: 0;
 .box-show {
-  border: 1px solid rgba(0, 0, 0, 0.089);
-  border-radius: 20px;
   padding: 1.8rem;
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .giveup {

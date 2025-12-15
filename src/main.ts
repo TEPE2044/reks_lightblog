@@ -5,8 +5,10 @@ import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
 import './style.css'
 import router from "./Router";
 import { createPinia } from 'pinia'
+import { userStore } from './Store/user'
 
 const pinia = createPinia()
 const app = createApp(App)
-
 app.use(router).use(pinia).mount('#app')
+const user = userStore()
+user.restoreFromLocal()
