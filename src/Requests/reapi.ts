@@ -9,6 +9,18 @@ const reapi = axios.create({
     "Content-Type": "application/json",
   },
 });
+// 请求拦截器
+reapi.interceptors.request.use(config => {
+  const rcode = localStorage.getItem("rcode");
+  const payload = localStorage.getItem("payload");
+  if (rcode && payload) {
+    config.headers["Authorization"] = `Bearer ${rcode}`;
+    config.headers["X-Payload"] = payload;
+  }
+  return config;
+})
+
+
 // 响应拦截器
 reapi.interceptors.response.use(
   res => res,
@@ -21,11 +33,4 @@ reapi.interceptors.response.use(
     return Promise.reject(err);
   }
 )
-
-const setAxiosHeader = async (payload: string, rcode: string) => {
-  reapi.defaults.headers.common["Authorization"] = `Bearer ${rcode}`;
-  reapi.defaults.headers.common["X-Payload"] = payload;
-}
-
-export { setAxiosHeader };
 export default reapi;

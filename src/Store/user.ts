@@ -1,23 +1,20 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import router from "../Router";
-import { setAxiosHeader } from "../Requests/reapi";
+
 
 export const userStore = defineStore("user", () => {
   const rcode = ref<string>("");
   const payload = ref<string>("");
   const isLoggedIn = ref(!!localStorage.getItem("token"));
 
-  const userLogin = async (tokens: { rcode: string; payload: string }) => {
+  const userLogin = (tokens: { rcode: string; payload: string }) => {
     isLoggedIn.value = true;
     rcode.value = tokens.rcode;
     payload.value = tokens.payload;
 
     localStorage.setItem("payload", tokens.payload);
     localStorage.setItem("rcode", tokens.rcode);
-
-    await setAxiosHeader(tokens.payload, tokens.rcode);
-    
   };
 
   const userLogout = () => {
@@ -35,7 +32,6 @@ export const userStore = defineStore("user", () => {
     if (storedRcode && storedPayload) {
       rcode.value = storedRcode;
       payload.value = storedPayload;
-      setAxiosHeader(storedPayload, storedRcode);
       isLoggedIn.value = true;
     }
   };

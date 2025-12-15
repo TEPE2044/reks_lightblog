@@ -194,7 +194,7 @@ const submitPhoneData = useDebounceFn(async () => {
     console.log("登录成功:", login_res);
     if (login_res.tokens) {
       // 存储token
-      await user.userLogin(login_res.tokens);
+      user.userLogin(login_res.tokens);
       createToast(toast, "登录成功", "欢迎回来", "success");
       const user_info = await getUserProfile();
       alert(JSON.stringify(user_info)); // 测试用，后续删除
