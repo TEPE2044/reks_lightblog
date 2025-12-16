@@ -10,6 +10,10 @@ import { useCountdown } from "@vueuse/core";
 import { userStore } from "../Store/user";
 import type { RNext } from "../Utils/reks-next-job";
 
+const props = withDefaults(defineProps<{ showTrigger?: boolean }>(), {
+  showTrigger: true,
+});
+
 const user = userStore();
 const emd = useToggle("easy-login-box");
 // 账号登录数据
@@ -288,7 +292,9 @@ watchEffect(() => {
 
 <template>
   <div class="auth">
-    <BButton @click="emd.show()" variant="primary">登录</BButton>
+    <BButton v-if="props.showTrigger" @click="emd.show()" variant="primary"
+      >登录</BButton
+    >
 
     <BModal
       id="easy-login-box"

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import Auth from "./Auth.vue";
 import { createToast } from "../Utils/reks-toast";
 const metricsData = ref([
   { label: "订阅", value: 0 },
@@ -10,9 +9,10 @@ const metricsData = ref([
 
 
 import { userStore } from "../Store/user";
-import { useToast } from "bootstrap-vue-next";
+import { useToast, useToggle } from "bootstrap-vue-next";
 const user = userStore();
 const toast = useToast();
+const emd = useToggle("easy-login-box");
 
 const easyLogout = () => {
   user.userLogout();
@@ -39,7 +39,7 @@ const easyLogout = () => {
           </div>
 
           <div class="auth-btn">
-            <Auth/>
+            <BButton variant="primary" @click="emd.show()">登录</BButton>
           </div>
         </div>
       </div>

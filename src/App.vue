@@ -10,6 +10,9 @@
     <footer>
       <Footer />
     </footer>
+    <Teleport to="body">
+      <Auth :show-trigger="false" />
+    </Teleport>
   </BApp>
 </template>
 
@@ -18,6 +21,7 @@ import { BApp } from "bootstrap-vue-next";
 import Header from "./Components/Header.vue";
 import MainLayout from "./Layouts/MainLayout.vue";
 import Footer from "./Components/Footer.vue";
+import Auth from "./UI/Auth.vue";
 </script>
 
 <style lang="scss" scoped>
