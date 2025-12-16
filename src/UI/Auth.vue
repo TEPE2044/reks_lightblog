@@ -128,8 +128,6 @@ const sendCode = async () => {
         const getcode_res = await getCode();
         loading.value = false;
         if (getcode_res) {
-          
-          stop();
           createToast(
             toast,
             "验证码已发送",
@@ -137,7 +135,6 @@ const sendCode = async () => {
             "success"
           );
         } else {
-          
           stop();
           codeActive.value = false;
         }
@@ -457,8 +454,7 @@ watchEffect(() => {
 
       <template #footer>
         <div class="d-flex w-100 justify-content-between text-primary">
-          <BLink to="/forgot">忘记密码</BLink>
-          <BLink to="/help">遇到问题</BLink>
+          <BLink to="/help" @click="emd.hide()">遇到问题?</BLink>
         </div>
       </template>
     </BModal>

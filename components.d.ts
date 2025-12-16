@@ -11,6 +11,8 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    BAccordion: typeof import('bootstrap-vue-next/components/BAccordion')['BAccordion']
+    BAccordionItem: typeof import('bootstrap-vue-next/components/BAccordion')['BAccordionItem']
     BAlert: typeof import('bootstrap-vue-next/components/BAlert')['BAlert']
     BAvatar: typeof import('bootstrap-vue-next/components/BAvatar')['BAvatar']
     BBadge: typeof import('bootstrap-vue-next/components/BBadge')['BBadge']
@@ -32,6 +34,7 @@ declare module 'vue' {
     BFormGroup: typeof import('bootstrap-vue-next/components/BFormGroup')['BFormGroup']
     BFormInput: typeof import('bootstrap-vue-next/components/BFormInput')['BFormInput']
     BFormInvalidFeedback: typeof import('bootstrap-vue-next/components/BForm')['BFormInvalidFeedback']
+    BFormTextarea: typeof import('bootstrap-vue-next/components/BFormTextarea')['BFormTextarea']
     BFormValidFeedback: typeof import('bootstrap-vue-next/components/BForm')['BFormValidFeedback']
     BImg: typeof import('bootstrap-vue-next/components/BImg')['BImg']
     BInputGroup: typeof import('bootstrap-vue-next/components/BInputGroup')['BInputGroup']
