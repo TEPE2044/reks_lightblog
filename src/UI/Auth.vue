@@ -237,7 +237,7 @@ const loginbyAccount = async (hashpsw: string) => {
 
 // 更优雅的写法2026/12/13（🐧跳舞）
 const sumbitAccountData = useDebounceFn(() => {
-  // 账号登录功能待实现
+  // 账号登录功能
   const check = [
     {
       valid: !!accountData.account && accountData.account.length === 11,
@@ -297,9 +297,9 @@ watchEffect(() => {
       id="easy-login-box"
       title="登录"
       ok-title="登录"
-      no-header-close
       footer
       centered
+      no-header-close
     >
       <div
         class="lgo d-flex align-items-center justify-content-center gap-2 my-3"
@@ -332,7 +332,7 @@ watchEffect(() => {
                 label-for="user-account"
               >
                 <BFormInput :disabled="loading"
-                  autocomplete="cellphone"
+                  autocomplete="current-account"
                   type="tel"
                   id="user-account"
                   placeholder="请输入账号(手机号)"

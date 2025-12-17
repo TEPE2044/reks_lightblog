@@ -1,10 +1,8 @@
 <template>
-  <button @click="loading = !loading">切换</button>
-  <hr />
   <BCard class="rs-card" v-skeleton="loading">
     <template #img>
       <div class="rs-img border-bottom">
-        <img v-skeleton-item class="w-100 h-100" src="/mod.webp" alt="ai" />
+        <img v-skeleton-item class="w-100 h-100" src="/melo.webp" alt="ai" />
       </div>
     </template>
     <template #default>
@@ -14,8 +12,8 @@
             <template #target><BAvatar v-skeleton-item /></template>
 
             <template #title
-              ><BLink class="rs-title fw-bold text-danger"
-                >ReKindlers-JackyView</BLink
+              ><BLink class="rs-title fw-bold "
+                >@JackyView</BLink
               ></template
             >
             <template #default
@@ -24,9 +22,9 @@
           </BPopover>
         </div>
         <div class="rs-right w-75">
-          <div class="rs-title" v-skeleton-item>少女前线 SOPMOD2</div>
+          <div class="rs-title" v-skeleton-item>三个火铳手</div>
           <div class="rs-content text-secondary" v-skeleton-item>
-            狗子可爱捏
+            枫丹
           </div>
         </div>
       </div>
@@ -35,9 +33,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-
-const loading = ref(false);
+// import { ref } from "vue";
+const loading = defineProps<{
+  loading: boolean;
+}>();
 // 完成 Perfect
 </script>
 

@@ -29,16 +29,18 @@ const emd = useToggle("easy-login-box");
         class="position-absolute top-0 start-100 translate-middle"
       />
     </BButton>
+
     <BButton @click="emd.show()" class="position-relative" variant="light" v-if="!user.isLoggedIn">
       <Icon icon="bi:person-circle" />
     </BButton>
+
     <BDropdown
       v-else
       auto-close="inside"
       offset="15"
       variant="light"
       toggle-class="text-decoration-none"
-      class="position-relative"
+      class="position-relative "
       no-caret
     >
       <template #button-content>
@@ -46,21 +48,20 @@ const emd = useToggle("easy-login-box");
       </template>
       <div class="rs-dropdown-card">
         <div
-          class="avatar d-flex flex justify-content-center align-items-center"
+          class="avatar mt-2 d-flex flex justify-content-center align-items-center"
         >
-          <BAvatar size="72px" src="/ai.webp" />
+          <BAvatar size="lg"/>
         </div>
         <div class="info d-flex flex justify-content-center align-items-center">
-          <BLink class="name mt-1">梦璃東</BLink>
+          <p class="name mt-3 mb-1">梦璃東</p>
         </div>
       </div>
       <BDropdownDivider />
-      <BDropdownItem><Icon icon="bi:shop" /> 积分商城</BDropdownItem>
-      <BDropdownItem><Icon icon="bi:upload" /> 投稿管理</BDropdownItem>
+      <BDropdownItem class="text-center" to="/space">我的空间</BDropdownItem>
+      <BDropdownItem class="text-center" to="/store">积分商城</BDropdownItem>
+      <BDropdownItem class="text-center" to="/upload">投稿管理</BDropdownItem>
       <BDropdownDivider />
-      <BDropdownItem><Icon icon="bi:patch-question" /> 帮助</BDropdownItem>
-      <BDropdownDivider />
-      <BDropdownItem @click="user.userLogout"><Icon icon="bi:box-arrow-right" /> 退出登录</BDropdownItem>
+      <BDropdownItem class="text-center" @click="user.userLogout">退出登录</BDropdownItem>
     </BDropdown>
   </div>
 </template>

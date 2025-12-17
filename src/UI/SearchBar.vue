@@ -33,7 +33,7 @@ $expanded-width:$flexible-width + 0.4rem;
 .search-bar {
   width: $flexible-width;
   height: 30px;
-  background: white;
+  background: rgba(255, 255, 255, 0.650);
   border-radius: 15px;
   transition: width 0.3s ease;
   // fix

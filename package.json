@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@vueuse/core": "^14.1.0",
+    "@x-ui-vue3/skeleton": "^1.0.2",
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
     "bootstrap-vue-next": "^0.41.0",

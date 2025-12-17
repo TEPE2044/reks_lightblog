@@ -1,14 +1,16 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+//TODO:重构
+</script>
 
 <template>
-  <BContainer class="recommand">
+  <BContainer class="recommand mb-4">
     <figure class="mt-3">
       <blockquote class="blockquote">
         <p class="label-word">ReKindle Everything</p>
       </blockquote>
     </figure>
 
-    <BCard class="recommand-tab mt-2" no-body>
+    <BCard class="recommand-tab mt-2 mb-4" no-body>
       <BCardHeader header-tag="nav">
         <BNav card-header tabs>
           <BNavItem to="/news/" exact exact-active-class="active"

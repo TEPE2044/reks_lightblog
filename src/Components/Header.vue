@@ -26,7 +26,7 @@ import SearchBar from "../UI/SearchBar.vue";
 <template>
   <div class="header bg-image-layer">
     <div class="bg-color-layer">
-      <BContainer class="header-content d-flex flex-row align-items-center gap-5">
+      <BContainer class="header-content d-flex flex-row gap-5">
         <!--      左侧Header-->
         <div class="header-left d-flex flex-row align-items-center gap-4">
           <!--        Logo部分-->
@@ -83,7 +83,6 @@ import SearchBar from "../UI/SearchBar.vue";
   }
 
   .header-content {
-    border-bottom: 1px solid rgba(15, 15, 15, 0.144);
     width: 100%;
     height: 100%;
     display: flex;
@@ -93,7 +92,7 @@ import SearchBar from "../UI/SearchBar.vue";
       //float在flex中无效，使用margin-left自动撑开
       margin-left: auto;
       //微调方式
-      margin-right: 4rem;
+      margin-right: 2.5rem;
 
       .avatar {
         border: 0.3px solid rgba(128, 128, 128, 0.21);
