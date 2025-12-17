@@ -33,8 +33,8 @@ import ProfileCard from '../UI/ProfileCard.vue';
     margin-top: 7.3rem;
     display: grid;
     grid-template-areas:
-      "caro profilecard";
-    grid-template-columns: 4fr 1fr;
+      "profilecard caro";
+    grid-template-columns: 1fr 4fr;
     gap: 20px;
     @media (max-width: 768px) {
       display: flex;

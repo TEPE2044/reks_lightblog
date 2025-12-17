@@ -4,8 +4,7 @@ import { ref } from "vue";
 const imageList = ref<string[]>([
   "/imagePlaceholder.webp",
   "/lh.webp",
-  "/pm.webp",
-  "/lh.webp",
+  "/pm.webp"
 ]);
 
 const currentIndex = ref(0);
@@ -86,7 +85,7 @@ const choose = (index: number) => {
       }
       .main-img {
         object-fit: cover;
-        object-position: top center;
+        object-position: center;
         border-radius: 12px;
       }
     }
