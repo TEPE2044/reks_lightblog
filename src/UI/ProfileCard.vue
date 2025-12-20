@@ -17,24 +17,16 @@ const emd = useToggle("easy-login-box");
 
 const easyLogout = () => {
   user.userLogout();
-  createToast(toast,"登出成功", "下次再见！", "info");
+  createToast(toast, "登出成功", "下次再见！", "info");
 };
 </script>
 
 <template>
-  <div
-    class="profileCard d-flex flex-column align-items-center justify-content-center gap-3 mt-2"
-  >
+  <div class="profileCard d-flex flex-column align-items-center justify-content-center gap-3 mt-2">
     <transition name="fadeIn" mode="out-in">
       <!-- 把两个状态作为 transition 的直接子元素并加 key，保证 out-in 正确工作 -->
-      <div
-        v-if="!user.isLoggedIn"
-        key="logged-out"
-        class="user-no-login mt-3 pb-3"
-      >
-        <div
-          class="easy-login d-flex flex-row gap-4 justify-content-center align-items-center"
-        >
+      <div v-if="!user.isLoggedIn" key="logged-out" class="user-no-login mt-3 pb-3">
+        <div class="easy-login d-flex flex-row gap-4 justify-content-center align-items-center">
           <div class="avatar">
             <BAvatar size="3rem" class="avatar" variant="secondary" />
           </div>
@@ -45,39 +37,24 @@ const easyLogout = () => {
         </div>
       </div>
 
-      <div
-        v-else
-        key="logged-in"
-        class="user-login d-flex flex-column gap-4 justify-content-center align-items-center mt-3 pb-3 position-relative"
-      >
+      <div v-else key="logged-in"
+        class="user-login d-flex flex-column gap-4 justify-content-center align-items-center mt-3 pb-3 position-relative">
         <div class="d-flex flex-column gap-2 align-items-center">
           <!-- 如果头像加载失败或没有头像，使用默认头像 -->
-          <BAvatar
-            size="5rem"
-            src="/ai.webp"
-            class="avatar mb-2"
-            variant="secondary"
-          />
+          <BAvatar size="5rem" src="/ai.webp" class="avatar mb-2" variant="secondary" />
           <div class="user-name">梦璃東</div>
         </div>
-
+        <BButtonGroup>
+          <BButton size="sm" variant="outline-success">一键签到</BButton>
+          <BButton size="sm" variant="outline-danger" @click="easyLogout">退出登录</BButton>
+        </BButtonGroup>
         <div class="metrics-bar d-flex flex-row gap-5 mt-2">
-          <div
-            class="metrics-content d-flex flex-column align-items-center"
-            v-for="metrics in metricsData"
-            :key="metrics.label"
-          >
+          <div class="metrics-content d-flex flex-column align-items-center" v-for="metrics in metricsData"
+            :key="metrics.label">
             <div class="value">{{ metrics.value }}</div>
             <div class="label">{{ metrics.label }}</div>
           </div>
         </div>
-
-        <BButtonGroup>
-          <BButton variant="outline-success">一键签到</BButton>
-          <BButton variant="outline-danger" @click="easyLogout"
-            >退出登录</BButton
-          >
-        </BButtonGroup>
       </div>
     </transition>
   </div>
@@ -93,6 +70,7 @@ const easyLogout = () => {
   width: 100%;
   box-sizing: border-box;
   border: 1px solid #e0e0e0;
+
   @media (max-width:768px) {
     height: fit-content;
   }
@@ -147,6 +125,7 @@ const easyLogout = () => {
 
 /* reduced motion 支持 */
 @media (prefers-reduced-motion: reduce) {
+
   .fadeIn-enter-active,
   .fadeIn-leave-active {
     transition: none !important;
