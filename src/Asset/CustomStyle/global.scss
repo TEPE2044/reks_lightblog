@@ -24,6 +24,11 @@ $caro-height: 280px;
   
 }
 
+%reks-title{
+  padding-left: .3rem;
+  border-left: .5rem solid indianred;
+}
+
 
 @mixin rks_fadeIn {
   opacity: 0;

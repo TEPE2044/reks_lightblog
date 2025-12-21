@@ -2,6 +2,7 @@
 import Recommand from '../Layouts/Recommand.vue';
 import Caro from '../UI/Caro.vue';
 import ProfileCard from '../UI/ProfileCard.vue';
+import ShowCase from '../UI/ShowCase.vue';
 
 
 
@@ -18,8 +19,9 @@ import ProfileCard from '../UI/ProfileCard.vue';
         <ProfileCard />
       </div>
     </BContainer>
-
     <BContainer class="home-content mt-4">
+      <ShowCase/>
+      <!-- TODO:横向滚动盒子 -->
       <Recommand />
     </BContainer>
   </div>

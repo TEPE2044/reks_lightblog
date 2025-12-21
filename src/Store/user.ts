@@ -18,6 +18,7 @@ export const userStore = defineStore("user", () => {
   };
 
   const userLogout = () => {
+    // TODO:虽然不是在这里，但是每次登出要发送接口，把redis里的那条reks_code记录给清除掉
     rcode.value = "";
     payload.value = "";
     localStorage.removeItem("rcode");
