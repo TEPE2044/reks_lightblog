@@ -12,15 +12,12 @@ import ShowCase from '../UI/ShowCase.vue';
   <div class="home">
     <BContainer class="home-header">
       <div class="activities-caro">
-        <Caro />
-        <Recommand />
+        <Caro /> 
       </div>
 
       <div class="profilecard">
-        <div class="fixme">
           <ProfileCard />
-        </div> 
-      </div>
+      </div>  
     </BContainer>
     <BContainer class="home-content mt-4">
       <ShowCase/>
@@ -38,8 +35,8 @@ import ShowCase from '../UI/ShowCase.vue';
     margin-top: 7.3rem;
     display: grid;
     grid-template-areas:
-      " caro profilecard";
-    grid-template-columns: 4fr 1fr;
+      "profilecard caro";
+    grid-template-columns: 1fr 4fr;
     gap: 20px;
     @media (max-width: 768px) {
       display: flex;
@@ -51,11 +48,6 @@ import ShowCase from '../UI/ShowCase.vue';
 
     .profilecard {
       grid-area: profilecard;
-
-      .fixme{    
-        width: 200px;  
-        position: fixed;
-      }
     }
   }
 }
