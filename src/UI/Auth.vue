@@ -197,8 +197,7 @@ const submitPhoneData = useDebounceFn(async () => {
       // 存储token
       user.userLogin(login_res.tokens);
       createToast(toast, "登录成功", "欢迎回来", "success");
-      const user_info = await getUserProfile();
-      alert(JSON.stringify(user_info)); // 测试用，后续删除
+      // const user_info = await getUserProfile(); 
       emd.hide();
       reset();
     } else {
@@ -272,7 +271,7 @@ const sumbitAccountData = useDebounceFn(() => {
         }
       } catch (e) {
         console.error("账号登录失败:", e);
-        createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
+        createToast(toast, "登录失败", "账号不存在或账号信息错误", "danger");
       }
     });
   } catch (e) {

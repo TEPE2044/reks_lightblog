@@ -9,7 +9,7 @@
       <div class="rs-body d-flex flex-row gap-4 align-items-center">
         <div class="rs-left ps-1">
           <BPopover class="mt-2" placement="bottom">
-            <template #target><BAvatar v-skeleton-item /></template>
+            <template #target><BAvatar src="/ysg.jpg" v-skeleton-item /></template>
 
             <template #title
               ><BLink class="rs-title fw-bold "
@@ -22,7 +22,7 @@
           </BPopover>
         </div>
         <div class="rs-right w-75">
-          <div class="rs-title" v-skeleton-item>三个火铳手</div>
+          <div class="rs-title" v-skeleton-item>三个火铳手1414</div>
           <div class="rs-content text-secondary" v-skeleton-item>
             枫丹
           </div>
@@ -43,8 +43,9 @@ const loading = defineProps<{
 <style lang="scss" scoped>
 .rs-card {
   box-sizing: border-box;
-  width: 400px;
-  height: fit-content;
+  // width: 400px;
+  // height: 480px;
+  max-height: 480px;
 
   .rs-img {
     width: 100%;
@@ -55,15 +56,11 @@ const loading = defineProps<{
     .rs-right {
       .rs-title {
         will-change: contents;
-        width: 275px;
+        // width: 275px;
         overflow: hidden;
         font-weight: bold;
         white-space: nowrap;
         text-overflow: ellipsis;
-        font-size: larger;
-        &:hover {
-          white-space: wrap;
-        }
       }
     }
   }
