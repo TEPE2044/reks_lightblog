@@ -38,7 +38,7 @@ const easyLogout = () => {
       </div>
 
       <div v-else key="logged-in"
-        class="user-login d-flex flex-column gap-4 justify-content-center align-items-center mt-3 pb-3 position-relative">
+        class="user-login d-flex flex-column gap-4 justify-content-center align-items-center mt-4 pb-3 position-relative">
         <div class="d-flex flex-column gap-2 align-items-center">
           <!-- 如果头像加载失败或没有头像，使用默认头像 -->
           <BAvatar size="5rem" src="/ai.webp" class="avatar mb-2" variant="secondary" />
@@ -48,8 +48,8 @@ const easyLogout = () => {
           <BButton size="sm" variant="outline-success">一键签到</BButton>
           <BButton size="sm" variant="outline-danger" @click="easyLogout">退出登录</BButton>
         </BButtonGroup>
-        <div class="metrics-bar d-flex flex-row gap-5 mt-2">
-          <div class="metrics-content d-flex flex-column align-items-center" v-for="metrics in metricsData"
+        <div class="metrics-bar d-flex flex-row gap-2 mt-2">
+          <div class="metrics-content d-flex flex-column align-items-center px-2" v-for="metrics in metricsData"
             :key="metrics.label">
             <div class="value">{{ metrics.value }}</div>
             <div class="label">{{ metrics.label }}</div>

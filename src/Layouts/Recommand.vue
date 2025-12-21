@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div class="recommand mb-4">
+  <div class="recommand mb-4 mt-4">
     <BCard class="recommand-tab mb-4" no-body>
       <BCardHeader header-tag="nav">
         <BNav align="center" pills>

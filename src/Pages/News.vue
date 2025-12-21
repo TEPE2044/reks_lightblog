@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
+
 import { ref } from "vue";
 
 const mode = ref<"mix" | "category">("mix");
@@ -7,20 +7,6 @@ const mode = ref<"mix" | "category">("mix");
 
 <template>
   <div class="news">
-    <div class="mode-select mb-4 d-flex justify-content-end">
-      <BButtonGroup>
-        <BButton
-          @click="mode = 'mix'"
-          :variant="mode === 'mix' ? 'dark' : 'outline-dark'"
-          ><Icon icon="bi:layout-wtf" /> 混合</BButton>
-        <BButton
-          @click="mode = 'category'"
-          :variant="mode === 'category' ? 'dark' : 'outline-dark'"
-          ><Icon icon="bi:layout-three-columns" /> 分类</BButton>
-      </BButtonGroup>
-    </div>
-
-    <div class="mix-mode" v-if="mode === 'mix'">
       <BCardGroup columns>
         <BCard
           title="Card title that wraps to a new line"
@@ -110,7 +96,6 @@ const mode = ref<"mix" | "category">("mix");
       </BCardGroup>
     </div>
 
-    <div class="category-mode" v-if="mode === 'category'">
       <div class="ns">
         <BCard
           v-for="n in 8"
@@ -126,8 +111,6 @@ const mode = ref<"mix" | "category">("mix");
           </BCardText>
         </BCard>
       </div>
-    </div>
-  </div>
 </template>
 
 <style lang="scss" scoped>

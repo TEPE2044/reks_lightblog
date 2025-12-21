@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Aside: typeof import('./src/components/Aside.vue')['default']
     BAccordion: typeof import('bootstrap-vue-next/components/BAccordion')['BAccordion']
     BAccordionItem: typeof import('bootstrap-vue-next/components/BAccordion')['BAccordionItem']
     BAlert: typeof import('bootstrap-vue-next/components/BAlert')['BAlert']
@@ -43,10 +44,12 @@ declare module 'vue' {
     BNav: typeof import('bootstrap-vue-next/components/BNav')['BNav']
     BNavbarNav: typeof import('bootstrap-vue-next/components/BNavbar')['BNavbarNav']
     BNavItem: typeof import('bootstrap-vue-next/components/BNav')['BNavItem']
+    BNavItemDropdown: typeof import('bootstrap-vue-next/components/BNav')['BNavItemDropdown']
     BPopover: typeof import('bootstrap-vue-next/components/BPopover')['BPopover']
     BTab: typeof import('bootstrap-vue-next/components/BTabs')['BTab']
     BTabs: typeof import('bootstrap-vue-next/components/BTabs')['BTabs']
     BTh: typeof import('bootstrap-vue-next/components/BTable')['BTh']
+    CaroSkeleton: typeof import('./src/components/CaroSkeleton.vue')['default']
     Footer: typeof import('./src/components/Footer.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']

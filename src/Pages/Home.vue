@@ -12,15 +12,18 @@ import ProfileCard from '../UI/ProfileCard.vue';
     <BContainer class="home-header">
       <div class="activities-caro">
         <Caro />
+        <Recommand />
       </div>
 
       <div class="profilecard">
-        <ProfileCard />
+        <div class="fixme">
+          <ProfileCard />
+        </div> 
       </div>
     </BContainer>
 
     <BContainer class="home-content mt-4">
-      <Recommand />
+      
     </BContainer>
   </div>
 </template>
@@ -33,8 +36,8 @@ import ProfileCard from '../UI/ProfileCard.vue';
     margin-top: 7.3rem;
     display: grid;
     grid-template-areas:
-      "profilecard caro";
-    grid-template-columns: 1fr 4fr;
+      " caro profilecard";
+    grid-template-columns: 4fr 1fr;
     gap: 20px;
     @media (max-width: 768px) {
       display: flex;
@@ -46,6 +49,11 @@ import ProfileCard from '../UI/ProfileCard.vue';
 
     .profilecard {
       grid-area: profilecard;
+
+      .fixme{    
+        width: 200px;  
+        position: fixed;
+      }
     }
   }
 }
