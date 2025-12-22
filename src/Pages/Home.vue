@@ -21,7 +21,6 @@ import ShowCase from '../UI/ShowCase.vue';
     </BContainer>
     <BContainer class="home-content mt-4">
       <ShowCase/>
-      <!-- TODO:横向滚动盒子 -->
       <Recommand />
     </BContainer>
   </div>

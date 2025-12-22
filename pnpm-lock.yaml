@@ -38,6 +38,9 @@ importers:
       vue-router:
         specifier: ^4.6.3
         version: 4.6.4(vue@3.5.25(typescript@5.9.3))
+      vue-select-avatar:
+        specifier: 3.0.0-alpha.5
+        version: 3.0.0-alpha.5(vue@3.5.25(typescript@5.9.3))
       vue3-puzzle-vcode:
         specifier: ^1.1.7
         version: 1.1.7
@@ -992,6 +995,11 @@ packages:
     peerDependencies:
       vue: ^3.5.0
 
+  vue-select-avatar@3.0.0-alpha.5:
+    resolution: {integrity: sha512-SSoebXkc9wJrolg/aP0IdzgpFlVi/DPjpcFmq9oBK1JsOCRZQAGaXGtWW1bV9E3p1spX4Z11d/5/ZOG8R6KPYQ==}
+    peerDependencies:
+      vue: ^3.5.13 <4.0.0
+
   vue-tsc@3.1.8:
     resolution: {integrity: sha512-deKgwx6exIHeZwF601P1ktZKNF0bepaSN4jBU3AsbldPx9gylUc1JDxYppl82yxgkAgaz0Y0LCLOi+cXe9HMYA==}
     hasBin: true
@@ -1784,6 +1792,10 @@ snapshots:
   vue-router@4.6.4(vue@3.5.25(typescript@5.9.3)):
     dependencies:
       '@vue/devtools-api': 6.6.4
+      vue: 3.5.25(typescript@5.9.3)
+
+  vue-select-avatar@3.0.0-alpha.5(vue@3.5.25(typescript@5.9.3)):
+    dependencies:
       vue: 3.5.25(typescript@5.9.3)
 
   vue-tsc@3.1.8(typescript@5.9.3):
