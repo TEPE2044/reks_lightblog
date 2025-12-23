@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import Recommand from '../Layouts/Recommand.vue';
-import Caro from '../UI/Caro.vue';
-import ProfileCard from '../UI/ProfileCard.vue';
-import ShowCase from '../UI/ShowCase.vue';
+import Caro from '../Widgets/Caro.vue';
+import ProfileCard from '../Widgets/ProfileCard.vue';
+import ShowCase from '../Widgets/ShowCase.vue';
 
 
 

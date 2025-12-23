@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import MessageBar from "../UI/MessageBar.vue";
-import SearchBar from "../UI/SearchBar.vue";
+import MessageBar from "../Widgets/MessageBar.vue";
+import SearchBar from "../Widgets/SearchBar.vue";
 
 // interface ToolItem {
 //     content: string;

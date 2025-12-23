@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import MusicCard from '../UI/MusicCard.vue';
+import MusicCard from '../Widgets/MusicCard.vue';
 
 
 </script>

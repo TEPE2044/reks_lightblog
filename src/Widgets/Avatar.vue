@@ -16,6 +16,7 @@ const selectAvatar = () => {
   esa.show();
 };
 
+
 const viewportRef = ref<InstanceType<typeof Viewport>>();
 const src = ref("");
 const fileSize = ref(0);
@@ -64,37 +65,40 @@ const handleLoad = (e: Event) => {
 </script>
 
 <template>
-  <div class="avatar d-flex align-items-center gap-2" @click="selectAvatar">
+  <div
+    class="avatar d-flex align-items-center gap-2"
+    @click="selectAvatar"
+  >
     <BAvatar v-if="!src" size="lg" />
     <BAvatar v-else :src="src" size="lg" @load="handleLoad" />
+    <BButton class="ms-4" @click="handleClear">清除</BButton>
+    <BModal
+      id="avatar-me"
+      @ok="handleCropper"
+      title="选择头像"
+      ok-title="截取"
+      cancel-title="取消"
+    >
+      <BButton class="mb-3" @click="handleSelect">选择图片</BButton>
+
+      <div
+        class="view-box d-flex gap-5 align-items-center justify-content-center"
+      >
+        <Viewport
+          class="viewport"
+          :width="180"
+          :height="180"
+          ref="viewportRef"
+          grid
+          fixed-image
+        />
+        <Preview :round="true" :viewport-ref="viewportRef" bg="#252526" />
+      </div>
+    </BModal>
   </div>
   <!-- <div style="font-size: 13px">
       {{ `${size}x${size} ${formatBytes(fileSize)}` }}
     </div> -->
-  <BButton class="ms-4" @click="handleClear">清除</BButton>
-  <BModal
-    id="avatar-me"
-    @ok="handleCropper"
-    title="选择头像"
-    ok-title="截取"
-    cancel-title="取消"
-  >
-    <BButton class="mb-3" @click="handleSelect">选择图片</BButton>
-
-    <div
-      class="view-box d-flex gap-5 align-items-center justify-content-center"
-    >
-      <Viewport
-        class="viewport"
-        :width="180"
-        :height="180"
-        ref="viewportRef"
-        grid
-        fixed-image
-      />
-      <Preview :round="true" :viewport-ref="viewportRef" bg="#252526" />
-    </div>
-  </BModal>
 </template>
 
 <style lang="scss" scoped></style>

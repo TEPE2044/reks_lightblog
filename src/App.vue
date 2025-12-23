@@ -21,7 +21,8 @@ import { BApp } from "bootstrap-vue-next";
 import Header from "./Components/Header.vue";
 import MainLayout from "./Layouts/MainLayout.vue";
 import Footer from "./Components/Footer.vue";
-import Auth from "./UI/Auth.vue";
+import Auth from "./Widgets/Auth.vue";
+import Avatar from "./Widgets/Avatar.vue";
 </script>
 
 <style lang="scss" scoped>
