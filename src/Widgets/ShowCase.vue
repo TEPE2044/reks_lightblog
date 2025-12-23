@@ -7,11 +7,14 @@
             <div class="case-title h5">
                 熔岩电台
             </div>
-            <div class="case mt-4" >
-                <div class="case-box" v-for="value in 3" :key="value">
+            <div class="case mt-4">
+                <div class="case-box" v-for="value in 2" :key="value">
                     <img class="case-img" src="/ysg.jpg" alt="">
                 </div>
-                <div class="case-box" v-for="value in 3" :key="value">
+                <div class="case-box" v-for="value in 2" :key="value">
+                    <img class="case-img" src="/ly.jpg" alt="">
+                </div>
+                <div class="case-box" v-for="value in 2" :key="value">
                     <img class="case-img" src="/ys.jpg" alt="">
                 </div>
             </div>

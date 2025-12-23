@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BlogCard from '../Widgets/BlogCard.vue';
 import MusicCard from '../Widgets/MusicCard.vue';
 
 
@@ -7,8 +8,7 @@ import MusicCard from '../Widgets/MusicCard.vue';
 <template>
   <div class="news">
     <BCardGroup columns>
-      <MusicCard v-for="iu in 5" :key="iu" :loading="false"/>
-
+      <BlogCard v-for="iu in 5" :key="iu"/>
       <BCard header="Quote">
         <blockquote class="blockquote mb-0">
           <p>

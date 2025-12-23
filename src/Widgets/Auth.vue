@@ -218,17 +218,16 @@ const accountData = reactive<AccountData>({
   password: "",
 });
 
-import { hashPsw } from "../Utils/reks-crypto";
 const loading = ref(false);
 
-const loginbyAccount = async (hashpsw: string) => {
+const loginbyAccount = async () => {
   const res = await reapi({
     method: "POST",
     // url: "/auth/login-by-account",
     url: "/auth/fake-login-by-account",
     data: {
       account: accountData.account,
-      password: hashpsw,
+      password: accountData.password,
     },
   });
   return res.data;
@@ -244,7 +243,7 @@ const sumbitAccountData = useDebounceFn(() => {
     },
     { valid: phoneRegex(accountData.account), msg: "账号格式不正确" },
     {
-      valid: accountData.password && accountData.password.length >= 6,
+      valid: accountData.password && accountData.password.length >= 6 && accountData.password.length <= 20,
       msg: "请输入正确的密码",
     },
   ];
@@ -256,11 +255,11 @@ const sumbitAccountData = useDebounceFn(() => {
   }
 
   try {
-    // 密码加密
-    const hashed_password = hashPsw(accountData.password);
+    // 密码加密 -> 密码不加密了
+    // const hashed_password = hashPsw(accountData.password);
     openPuzzle(async () => {
       try {
-        const res = await loginbyAccount(hashed_password);
+        const res = await loginbyAccount();
         console.log("账号登录成功:", res);
         if (res.token) {
           // 存储token
