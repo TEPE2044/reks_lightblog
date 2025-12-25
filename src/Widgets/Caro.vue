@@ -61,10 +61,6 @@ const choose = (index: number) => {
   display: grid;
   grid-template-areas: "main thumbnail";
   grid-template-columns: 4fr 1fr;
-  @media (max-width: 768px) {
-    grid-template-areas: "main" "thumbnail";
-    grid-template-columns: 1fr;
-  }
   //decoration
   border-radius: 12px;
   background-color: #fafafa;

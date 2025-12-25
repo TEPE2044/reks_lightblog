@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import BlogCard from '../Widgets/BlogCard.vue';
-import MusicCard from '../Widgets/MusicCard.vue';
 
 
 </script>

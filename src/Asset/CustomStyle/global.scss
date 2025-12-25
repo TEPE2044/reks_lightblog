@@ -46,3 +46,10 @@ $caro-height: 280px;
     }
   }
 }
+
+:deep(.b-avatar-img img) {
+  image-rendering: -webkit-optimize-quality;
+  image-rendering: crisp-edges;
+  filter: blur(0.5px) !important;
+  transform: scale(1.005) !important;
+}

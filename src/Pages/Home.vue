@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Recommand from '../Layouts/Recommand.vue';
 import Caro from '../Widgets/Caro.vue';
-import ProfileCard from '../Widgets/ProfileCard.vue';
+import ProfileCard from '../Widgets/FastLogin.vue';
 import ShowCase from '../Widgets/ShowCase.vue';
 
 

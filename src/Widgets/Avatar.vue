@@ -10,13 +10,16 @@ import {
 } from "vue-select-avatar";
 
 import { ref } from "vue";
-import { useToggle } from "bootstrap-vue-next";
+import { useToast, useToggle } from "bootstrap-vue-next";
+import { userStore } from "../Store/user";
+import { createToast } from "../Utils/reks-toast";
 const esa = useToggle("avatar-me");
 const selectAvatar = () => {
   esa.show();
 };
 
-
+const user = userStore();
+const toast = useToast();
 const viewportRef = ref<InstanceType<typeof Viewport>>();
 const src = ref("");
 const fileSize = ref(0);
@@ -25,8 +28,12 @@ const size = ref(0);
 const handleSelect = () => {
   viewportRef.value?.select({ maxFileSize: 20 * 1024 * 1024 }).catch((err) => {
     if (isCancelError(err)) return;
-    // 错误处理
-    console.error(err);
+
+    if (getErrorMessage(err)) {
+      createToast(toast, "无法识别的文件", "你确定这是图片？", "danger");
+      console.error(err);
+      return;
+    }
   });
 };
 
@@ -65,12 +72,12 @@ const handleLoad = (e: Event) => {
 </script>
 
 <template>
-  <div
-    class="avatar d-flex align-items-center gap-2"
-    @click="selectAvatar"
-  >
-    <BAvatar v-if="!src" size="lg" />
-    <BAvatar v-else :src="src" size="lg" @load="handleLoad" />
+  <div class="avatar d-flex align-items-center gap-2">
+    <div class="avatar-click" @click="selectAvatar" v-if="!src">
+      <BAvatar size="100px" :src="user.userInfo.avatar || ''" />
+    </div>
+
+    <BAvatar v-else :src="src" size="100px" @load="handleLoad" />
     <BButton class="ms-4" @click="handleClear">清除</BButton>
     <BModal
       id="avatar-me"
@@ -101,4 +108,11 @@ const handleLoad = (e: Event) => {
     </div> -->
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:deep(.b-avatar-img img) {
+  image-rendering: -webkit-optimize-quality;
+  image-rendering: crisp-edges;
+  filter: blur(0.5px) !important;
+  transform: scale(1.005) !important;
+}
+</style>

@@ -197,7 +197,9 @@ const submitPhoneData = useDebounceFn(async () => {
       // 存储token
       user.userLogin(login_res.tokens);
       createToast(toast, "登录成功", "欢迎回来", "success");
-      // const user_info = await getUserProfile(); 
+      const user_info = await getUserProfile(); 
+      user.storeUserInfo(user_info.data);
+      console.log("用户信息:", user_info);
       emd.hide();
       reset();
     } else {

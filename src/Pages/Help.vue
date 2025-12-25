@@ -41,16 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import gql from "graphql-tag";
-import { useQuery } from "@vue/apollo-composable";
-const { result, refetch } = useQuery(
-  gql`
-    query {
-      feedback
-    }
-  `
-);
-console.log(result);
+
 </script>
 
 <style lang="scss" scoped>

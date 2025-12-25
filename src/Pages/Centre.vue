@@ -1,26 +1,29 @@
 <script setup lang="ts">
-import { useToggle } from "bootstrap-vue-next";
-const esa = useToggle("avatar-me");
+import { userStore } from "../Store/user";
+const user = userStore();
 
 const navs = [
-  { name: "我的投稿", path: "/some/route/foo" },
-  { name: "我的收藏", path: "/some/route/aar" },
-  { name: "我的合集", path: "/some/route/bar" },
-  { name: "我的积分", path: "/some/route/car" },
-  { name: "我的关注", path: "/some/route/dar" },
-  { name: "我的等级", path: "/some/route/ear" },
-  { name: "安全设置", path: "/some/route/far" },
+  { name: "我的博客", path: {name:'my-blog'} },
+  { name: "我的收藏", path: {name:'my-fav'} },
+  { name: "编辑资料", path: {name:'edit-profile'} },
 ];
 </script>
 <template>
   <div class="centre w-100 h-100">
     <BContainer
-      class="centre-header p-5 d-flex align-items-center justify-content-around mt-5"
+      class="centre-header p-5 d-flex align-items-center justify-content-around mt-5 gap-3"
     >
       <div class="infos d-flex gap-3 align-items-center">
+        <div class="avatar">
+          <BAvatar size="100px" style="box-shadow: grey 2px 3px 2px 1px;" :src="user.userInfo?.avatar || ''" />
+        </div>
         <div class="info">
-          <div class="name fw-bolder h5">梦璃東</div>
-          <div class="sign text-secondary">这个人很懒</div>
+          <div class="name fw-bolder h5">
+            {{ user.userInfo?.username || "无名" }}
+          </div>
+          <div class="sign text-secondary">
+            {{ user.userInfo?.signature || "这个人很懒" }}
+          </div>
         </div>
       </div>
       <div class="btns">
@@ -36,11 +39,12 @@ const navs = [
     <BContainer class="centre-body mt-5 h-100">
       <div class="centre-sidebar p-3">
         <BNav card-header tabs vertical>
-          <!-- <BNavItem>'s with child routes. Note the trailing slash on the first <BNavItem> -->
+         
           <BNavItem
             v-for="nav in navs"
             :key="nav.name"
             :to="nav.path"
+            router-tag="router-link"
             exact
             exact-active-class="active"
           >
@@ -60,6 +64,7 @@ const navs = [
 
 <style lang="scss" scoped>
 @use "../Asset/CustomStyle/global.scss";
+
 :deep(.nav-link) {
   color: firebrick;
 }
@@ -69,7 +74,7 @@ const navs = [
     position: relative;
     width: 100%;
     @extend %reks-card-box;
-    gap: 6rem; 
+    gap: 6rem;
   }
   .centre-body {
     display: grid;

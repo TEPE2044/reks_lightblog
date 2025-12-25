@@ -41,7 +41,28 @@ const router = createRouter({
         {
             path: '/centre',
             name: 'centre',
-            component: () => import('../Pages/Centre.vue')
+            component: () => import('../Pages/Centre.vue'),
+            children:[
+                {
+                    path: '',
+                    redirect: {name: 'my-blog'}
+                },
+                {
+                    path:'my-blog',
+                    name:'my-blog',
+                    component:() => import("../Widgets/MyBlog.vue")
+                },
+                {
+                    path:'my-fav',
+                    name:'my-fav',
+                    component:() => import("../Widgets/MyFav.vue")
+                },
+                {
+                    path: 'edit-profile',
+                    name: 'edit-profile',
+                    component: () => import('../Widgets/EditProfile.vue')
+                }
+            ]
         },
         {
             path:'/help',
