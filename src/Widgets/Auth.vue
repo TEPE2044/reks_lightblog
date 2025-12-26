@@ -142,7 +142,7 @@ const sendCode = async () => {
         console.log("验证码发送失败，重置计时器");
         codeActive.value = false;
         stop();
-        
+
         console.error("发送验证码失败:", e);
       }
     });
@@ -178,6 +178,7 @@ const getUserProfile = async () => {
   return res.data;
 };
 
+// trigger 手机号登录
 import { useDebounceFn } from "@vueuse/core";
 const submitPhoneData = useDebounceFn(async () => {
   if (phoneData.iaccept === false) {
@@ -192,12 +193,12 @@ const submitPhoneData = useDebounceFn(async () => {
   }
   try {
     const login_res = await loginbyPhone();
-    console.log("登录成功:", login_res);
+    // console.log("登录成功:", login_res);
     if (login_res.tokens) {
       // 存储token
       user.userLogin(login_res.tokens);
       createToast(toast, "登录成功", "欢迎回来", "success");
-      const user_info = await getUserProfile(); 
+      const user_info = await getUserProfile();
       user.storeUserInfo(user_info.data);
       console.log("用户信息:", user_info);
       emd.hide();
@@ -245,7 +246,10 @@ const sumbitAccountData = useDebounceFn(() => {
     },
     { valid: phoneRegex(accountData.account), msg: "账号格式不正确" },
     {
-      valid: accountData.password && accountData.password.length >= 6 && accountData.password.length <= 20,
+      valid:
+        accountData.password &&
+        accountData.password.length >= 6 &&
+        accountData.password.length <= 20,
       msg: "请输入正确的密码",
     },
   ];
@@ -261,12 +265,15 @@ const sumbitAccountData = useDebounceFn(() => {
     // const hashed_password = hashPsw(accountData.password);
     openPuzzle(async () => {
       try {
-        const res = await loginbyAccount();
-        console.log("账号登录成功:", res);
-        if (res.token) {
+        const login_res = await loginbyAccount();
+        // console.log("账号登录成功:", login_res);
+        if (login_res.tokens) {
           // 存储token
-          user.userLogin(res.token);
+          user.userLogin(login_res.tokens);
           createToast(toast, "登录成功", "欢迎回来", "success");
+          const user_info = await getUserProfile();
+          user.storeUserInfo(user_info.data);
+          console.log("用户信息:", user_info);
           emd.hide();
           reset();
         }
@@ -331,7 +338,8 @@ watchEffect(() => {
                 label="账号"
                 label-for="user-account"
               >
-                <BFormInput :disabled="loading"
+                <BFormInput
+                  :disabled="loading"
                   autocomplete="current-account"
                   type="tel"
                   id="user-account"
@@ -348,7 +356,8 @@ watchEffect(() => {
                 label="密码"
                 label-for="user-password"
               >
-                <BFormInput :disabled="loading"
+                <BFormInput
+                  :disabled="loading"
                   autocomplete="current-password"
                   type="password"
                   id="user-password"
