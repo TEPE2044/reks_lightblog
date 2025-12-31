@@ -9,10 +9,12 @@
     </main>
     <footer>
       <Footer />
+      <MusicPlayer />
     </footer>
     <Teleport to="body">
       <Auth :show-trigger="false" />
     </Teleport>
+    
   </BApp>
 </template>
 
@@ -22,6 +24,7 @@ import Header from "./Components/Header.vue";
 import MainLayout from "./Layouts/MainLayout.vue";
 import Footer from "./Components/Footer.vue";
 import Auth from "./Widgets/Auth.vue";
+import MusicPlayer from "./Widgets/MusicPlayer.vue";
 </script>
 
 <style lang="scss" scoped>

@@ -11,5 +11,7 @@
 </template>
 
 <style scoped>
-
+.footer{
+    margin-bottom: 6rem;
+}
 </style>
