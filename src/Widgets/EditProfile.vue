@@ -9,10 +9,10 @@
       </div>
 
       <div
-        class="info d-flex mt-4 flex-column align-items-center justify-content-center"
+        class="info mt-4 mx-auto col-6"
       >
-        <BForm class="d-flex flex-column gap-4">
-          <BInputGroup prepend="@">
+        <BForm class="d-flex flex-column gap-4 ">
+          <BInputGroup prepend="昵称">
             <BFormInput
               id="inline-form-input-username"
               :placeholder="user.userInfo?.username"
@@ -22,7 +22,7 @@
             <BFormRadioGroup v-model="default_gender" :options="options">
             </BFormRadioGroup>
           </BInputGroup>
-          <BInputGroup>
+          <BInputGroup prepend="签名">
             <BFormInput
               id="inline-form-input-signature"
               :placeholder="

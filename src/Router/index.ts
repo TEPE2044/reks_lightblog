@@ -61,6 +61,11 @@ const router = createRouter({
                     path: 'edit-profile',
                     name: 'edit-profile',
                     component: () => import('../Widgets/EditProfile.vue')
+                },
+                {
+                    path:'safe-setting',
+                    name:'safe-setting',
+                    component:() => import('../Widgets/SafeSetting.vue')
                 }
             ]
         },
