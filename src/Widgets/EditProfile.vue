@@ -1,8 +1,11 @@
 <template>
   <div class="edit-profile p-4">
-    <BAlert show variant="success">
+    <div class="edit-title h5 ps-2">
+      我的信息
+    </div>
+    <!-- <BAlert show variant="success" dismissible>
       请完善您的个人信息，以便我们为您提供更好的服务。
-    </BAlert>
+    </BAlert> -->
     <div class="profile">
       <div class="avatar mt-4 d-flex align-items-center justify-content-center">
         <Avatar />
@@ -21,6 +24,9 @@
           <BInputGroup>
             <BFormRadioGroup v-model="default_gender" :options="options">
             </BFormRadioGroup>
+          </BInputGroup>
+          <BInputGroup prepend="生日">
+            <BFormInput id="inline-form-input-birthday" type="date"/>
           </BInputGroup>
           <BInputGroup prepend="签名">
             <BFormInput
@@ -52,4 +58,9 @@ const options = [
 ]
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@use "../Asset/CustomStyle/global.scss";
+.edit-title{
+  @extend %reks-title;
+}
+</style>
