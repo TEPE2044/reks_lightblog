@@ -15,7 +15,8 @@ const getRecoverCode = () => {
   console.log("oops！");
 };
 // TODO:设置密码逻辑，直接向该人类发送验证码，校验，是->进入密码修改，不是（错误次数大于5）->滚，强制下线（根据风险评估封禁该账号）
-// TODO:设置邮箱逻辑，
+// TODO:设置邮箱逻辑，用户输入邮箱后发往服务器，锁定表单，检验该邮箱是否有效，成功，生成一次性token，存入状态到redis中
+// TODO:使用jinjitemplate载入HTML邮件（待设计）
 </script>
 <template>
   <div class="safe-settings p-3">
