@@ -6,7 +6,7 @@ import MusicCard from './MusicCard.vue';
   <div class="showcase">
     <div class="scroll-bar w-100 mb-4 p-4">
       <div class="case-title h5">熔岩电台</div>
-      <div class="case mt-4">
+      <div class="case py-4 mt-4">
         <MusicCard v-for="is in 10" :key="is"/>
       </div>
     </div>

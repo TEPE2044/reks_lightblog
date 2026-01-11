@@ -26,7 +26,7 @@
             </BFormRadioGroup>
           </BInputGroup>
           <BInputGroup prepend="生日">
-            <BFormInput id="inline-form-input-birthday" type="date"/>
+            <BFormInput min="1900-01-01" max="2026-01-01" id="inline-form-input-birthday" type="date"/>
           </BInputGroup>
           <BInputGroup prepend="签名">
             <BFormInput

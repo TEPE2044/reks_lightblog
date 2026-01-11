@@ -12,6 +12,6 @@
 
 <style scoped>
 .footer{
-    margin-bottom: 6rem;
+    margin-bottom: 4rem;
 }
 </style>

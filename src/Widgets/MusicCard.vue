@@ -11,11 +11,11 @@ import { Icon } from "@iconify/vue";
     <!-- 悬停层 + 底部信息 合并 -->
     <div class="meta d-flex flex-column justify-content-between p-3 position-absolute">
       <div class="header">
-        <BAvatar size="90" class="mb-2 me-3" src="/ysg.jpg" />
+        <BAvatar size="60" class="mb-2 me-3" src="/ysg.jpg" />
         <BButton size="sm" variant="dark">+ 关注</BButton>
         <div class="info">
           <div class="title h3 fw-semibold">UnderGround</div>
-            <p class="author">Jacky View</p> 
+          <p class="author">Jacky View</p>
 
         </div>
       </div>
@@ -52,6 +52,7 @@ $overlay: rgba(177, 177, 177, 0.5);
   .cover {
     width: 100%;
     height: 100%;
+
     img {
       width: 100%;
       height: 100%;
@@ -72,10 +73,12 @@ $overlay: rgba(177, 177, 177, 0.5);
     .controls {
       align-self: flex-end;
       transition: transform 0.3s ease;
+
       .cion {
         will-change: transform;
         cursor: pointer;
         transition: transform 0.3s ease;
+
         &:hover {
           transform: scale(1.2);
         }
@@ -88,6 +91,7 @@ $overlay: rgba(177, 177, 177, 0.5);
     .cover img {
       transform: scale(1.05);
     }
+
     .meta {
       transform: translateY(0);
     }

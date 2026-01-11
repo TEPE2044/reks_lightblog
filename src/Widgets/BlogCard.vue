@@ -2,7 +2,7 @@
 
 <template>
   <BCard class="blog-card" v-skeleton="false">
-    <template #header>
+    <template #footer>
       <div class="rs-card-header d-flex flex-row gap-4 align-items-center">
         <div class="rs-avatar ps-1">
           <BAvatar src="/ysg.jpg" v-skeleton-item />
@@ -20,26 +20,19 @@
       <div class="rs-body">
         <div class="rs-card-img-list d-flex flex-row gap-2" v-skeleton-item>
           <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
-          <img class="rs-img" src="/ly.jpg" alt="Music Card Demo" />
+           <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
+            <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
+
         </div>
         <div class="rs-card-content mt-2" v-skeleton-item @click="">
-          <div class="rs-title fw-bold">Hello,ReKindlers</div>
+          <div class="rs-title h5" title="Hello,ReKindlers"><strong>Hello,ReKindlers</strong></div>
           <div class="rs-desc mt-2">Since 2024</div>
         </div>
       </div>
-    </template>
-
-    <template #footer>
-      <div
-        class="rs-card-footer d-flex flex-row align-items-center justify-content-between gap-5"
-      >
+      <div class="rs-card-footer mt-3 d-flex flex-row align-items-center justify-content-between gap-5">
         <div class="rs-subscribe d-flex flex-row gap-2">
-          <BButton v-skeleton-item size="sm" variant="outline-secondary"
-            >点赞</BButton
-          >
-          <BButton v-skeleton-item size="sm" variant="outline-secondary"
-            >收藏</BButton
-          >
+          <BButton v-skeleton-item size="sm" variant="outline-secondary">点赞</BButton>
+          <BButton v-skeleton-item size="sm" variant="outline-secondary">阅读</BButton>
         </div>
 
         <div class="rs-comments-info d-inline-flex flex-row gap-3">
@@ -53,26 +46,37 @@
 
 <style lang="scss" scoped>
 $card-max-width: 500px;
-.rs-body {
+
+.blog-card {
   max-width: $card-max-width;
+}
+
+.rs-body {
   .rs-card-img-list {
-    max-width: $card-max-width;
-    overflow-x: overlay;
+    overflow-x: auto;
     padding: 0;
+
     .rs-img {
-      width: $card-max-width;
-      height: 300px;
+      max-width: 301px;
+      height: 200px;
       object-fit: contain;
-      border-radius: 8px;
       transition: all 0.5s ease;
+
       &:hover {
         cursor: pointer;
-        filter: brightness(0.8);
       }
     }
   }
+
   .rs-card-content {
     max-width: $card-max-width;
+
+    .rs-title {
+      width: 300px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 }
 </style>
