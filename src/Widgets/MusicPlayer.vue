@@ -68,19 +68,33 @@ const toggleExpand = () => {
 
 watchEffect(() => {
   console.log(mode.value);
-  console.log(onTop.value)
+  console.log(onTop.value);
 });
 </script>
 <template>
-
-  <div :class="{ ontop: onTop }" class="music-player border d-flex align-items-center justify-content-center gap-5">
+  <div
+    :class="{ ontop: onTop }"
+    class="music-player border d-flex align-items-center justify-content-center gap-5"
+  >
     <div class="controls-1 d-flex gap-3 align-items-center">
       <div class="front r-icon" @click.stop="">
         <Icon icon="bi:skip-start" width="25" height="25" />
       </div>
       <div class="togglePlay r-icon" @click.stop="togglePlay">
-        <Icon v-if="!isPlay" icon="bi:play-circle" width="35" height="35" title="播放" />
-        <Icon v-else icon="bi:pause-circle" width="35" height="35" title="暂停" />
+        <Icon
+          v-if="!isPlay"
+          icon="bi:play-circle"
+          width="35"
+          height="35"
+          title="播放"
+        />
+        <Icon
+          v-else
+          icon="bi:pause-circle"
+          width="35"
+          height="35"
+          title="暂停"
+        />
       </div>
       <div class="next r-icon" @click.stop="">
         <Icon icon="bi:skip-end" width="25" height="25" />
@@ -103,9 +117,24 @@ watchEffect(() => {
         <template #target>
           <div class="volume-icons r-icon" @click.stop="handleMuted">
             <div v-if="!muted">
-              <Icon icon="bi:volume-down" v-if="volume < 50 && volume > 0" width="30" height="30" />
-              <Icon icon="bi:volume-up" v-if="volume >= 50" width="30" height="30" />
-              <Icon icon="bi:volume-off" v-if="volume == 0" width="30" height="30" />
+              <Icon
+                icon="bi:volume-down"
+                v-if="volume < 50 && volume > 0"
+                width="30"
+                height="30"
+              />
+              <Icon
+                icon="bi:volume-up"
+                v-if="volume >= 50"
+                width="30"
+                height="30"
+              />
+              <Icon
+                icon="bi:volume-off"
+                v-if="volume == 0"
+                width="30"
+                height="30"
+              />
             </div>
             <div v-else>
               <Icon icon="bi:volume-mute" width="30" height="30" />
@@ -121,8 +150,14 @@ watchEffect(() => {
       </BPopover>
     </div>
 
-    <div class="r-progressBar d-flex align-items-center gap-3 user-select-none" @click.stop="">
-      <div class="thumbail-album rounded border r-icon" @click.stop="toggleExpand()">
+    <div
+      class="r-progressBar d-flex align-items-center gap-3 user-select-none"
+      @click.stop=""
+    >
+      <div
+        class="thumbail-album rounded border r-icon"
+        @click.stop="toggleExpand()"
+      >
         <img class="thumbail-img" src="/ysg.jpg" />
       </div>
       <span>00:00</span>
@@ -141,24 +176,66 @@ watchEffect(() => {
       </div>
     </div>
 
-    <BOffcanvas body-scrolling header-class="fw-bold" lazy no-backdrop shadow="lg" title="播放列表" :placement="placement"
-      v-model="show">
+    <BOffcanvas
+      body-scrolling
+      header-class="fw-bold"
+      lazy
+      no-backdrop
+      shadow="lg"
+      title="播放列表"
+      :placement="placement"
+      v-model="show"
+    >
       <template #default>
         <div class="buttons">
-          <BButton size="sm" variant="outline-secondary" class="clear d-inline-flex align-items-center gap-1 me-1">
+          <BButton
+            size="sm"
+            variant="outline-secondary"
+            class="clear d-inline-flex align-items-center gap-1 me-1"
+          >
             <Icon icon="bi:trash" width="16" height="16" /> 清空列表
           </BButton>
-          <BButton size="sm" variant="outline-secondary" class="collect d-inline-flex align-items-center gap-1">
+          <BButton
+            size="sm"
+            variant="outline-secondary"
+            class="collect d-inline-flex align-items-center gap-1"
+          >
             <Icon icon="bi:plus-square" width="16" height="16" />
             收藏全部
           </BButton>
         </div>
-        <div class="scroll-list mt-5">1 2 3</div>
+        <div class="scroll-list mt-5">
+          <div
+            v-for="i in 8"
+            :key="`sad${i}`"
+            class="list-item p-3 border rounded-1 mt-3 d-flex justify-content-between align-items-center shadow-sm"
+          >
+            <div class="left d-flex align-items-center gap-3">
+              <div class="cover">
+                <BAvatar square src="/ysg.jpg" />
+              </div>
+              <div class="info d-inline-flex flex-column align-items-start">
+                <span class="title h5">CeruleanBlue</span>
+                <span class="author text-secondary">Klute</span>
+              </div>
+            </div>
+            <div class="right text-secondary">06:01</div>
+          </div>
+        </div>
       </template>
       <template #footer> </template>
     </BOffcanvas>
-    <BModal @backdrop="toggleExpand()" size="xl" id="music-player-inner" no-header-close backdrop scrollable centered
-      no-footer lazy>
+    <BModal
+      @backdrop="toggleExpand()"
+      size="xl"
+      id="music-player-inner"
+      no-header-close
+      backdrop
+      scrollable
+      centered
+      no-footer
+      lazy
+    >
       <template #header>
         <BButton size="sm" variant="outline-dark" @click="toggleExpand()">
           <Icon icon="bi:chevron-bar-down"></Icon>
@@ -166,8 +243,14 @@ watchEffect(() => {
       </template>
       <div class="rs-controls-1 d-flex align-items-center flex-row gap-2">
         <div class="img-list user-select-none">
-          <BImg v-for="img in img_list" @click="console.log('nihaoshijie')" :src="img.url" :alt="img.alt" rounded
-            width="250" />
+          <BImg
+            v-for="img in img_list"
+            @click="console.log('nihaoshijie')"
+            :src="img.url"
+            :alt="img.alt"
+            rounded
+            width="250"
+          />
         </div>
 
         <div class="rs-song-info d-flex flex-column user-select-none p-3">
@@ -282,7 +365,8 @@ watchEffect(() => {
       background-color: rgb(204, 115, 115);
       border: 1px solid white;
       margin-top: -6px;
-      border-image: linear-gradient(#df5634, #ffb7b7) 0 fill / 8 20 8 0 / 0px 0px 0 2000px;
+      border-image: linear-gradient(#df5634, #ffb7b7) 0 fill / 8 20 8 0 / 0px
+        0px 0 2000px;
       will-change: background;
       transition: all 0.3s ease;
     }
