@@ -21,10 +21,10 @@ const createToast = (
   body: string,
   variant: ToastVariant["variant"]
 ) => {
-    if(toastCount.value >= 5){
-        // console.log(toastCount.value)
-        return;
-    }
+  if (toastCount.value >= 5) {
+    // console.log(toastCount.value)
+    return;
+  }
 
   try {
     toast.create({
@@ -36,10 +36,10 @@ const createToast = (
         variant,
       },
       position: "bottom-end",
-      onHidden:() => {
+      onHidden: () => {
         toastCount.value = Math.max(0, toastCount.value - 1);
         // console.log("toast关闭，当前数量：", toastCount.value);
-      }
+      },
     });
     toastCount.value += 1;
   } catch (e) {
