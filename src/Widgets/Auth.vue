@@ -5,7 +5,6 @@ import type { PhoneData, AccountData } from "../Utils/reks-interface";
 import { createToast } from "../Utils/reks-toast";
 import { reactive, ref, shallowRef, watchEffect } from "vue";
 import Vcode from "vue3-puzzle-vcode";
-import reapi from "../Requests/reapi";
 import { useCountdown } from "@vueuse/core";
 import { userStore } from "../Store/user";
 import type { RNext } from "../Utils/reks-next-job";
@@ -83,25 +82,6 @@ const { remaining, start, stop } = useCountdown(countdownSeconds, {
   },
 });
 
-// request 获取短信验证码
-const getCode = async () => {
-  loading.value = true;
-  try {
-    const code_res = await reapi({
-      method: "POST",
-      // url: "/auth/send-sms-code",
-      url: "/auth/fake-sms-code",
-      data: {
-        phone: phoneData.phone,
-        codeActive: codeActive.value,
-      },
-    });
-    return code_res;
-  } catch (e) {
-    console.error("获取验证码失败:", e);
-    createToast(toast, "发送失败", "网络或服务错误，请稍后重试", "danger");
-  }
-};
 
 // trigger 触发发送短信
 const sendCode = async () => {
@@ -124,8 +104,8 @@ const sendCode = async () => {
     openPuzzle(async () => {
       try {
         start();
-
-        const getcode_res = await getCode();
+        loading.value = true;
+        const getcode_res = await getCode(phoneData.phone,codeActive.value);
         loading.value = false;
         if (getcode_res) {
           createToast(
@@ -137,12 +117,13 @@ const sendCode = async () => {
         } else {
           stop();
           codeActive.value = false;
+          createToast(toast, "发送失败", "网络或服务错误，请稍后重试", "danger");
         }
       } catch (e) {
         console.log("验证码发送失败，重置计时器");
         codeActive.value = false;
         stop();
-
+        createToast(toast, "发送失败", "网络或服务错误，请稍后重试", "danger");
         console.error("发送验证码失败:", e);
       }
     });
@@ -153,33 +134,9 @@ const sendCode = async () => {
   }
 };
 
-// request 账号登录
-const loginbyPhone = async () => {
-  loading.value = true;
-  const res = await reapi({
-    method: "POST",
-    // url: "/auth/login-by-phone",
-    url: "/auth/fake-login-by-phone",
-    data: {
-      phone: phoneData.phone,
-      code: phoneData.code,
-      iaccept: phoneData.iaccept,
-    },
-  });
-  return res.data;
-};
-
-// request 获取用户信息
-const getUserProfile = async () => {
-  const res = await reapi({
-    method: "GET",
-    url: "/user/profile",
-  });
-  return res.data;
-};
-
 // trigger 手机号登录
 import { useDebounceFn } from "@vueuse/core";
+import { getCode, getUserProfile, loginbyAccount, loginbyPhone } from "../Hooks/Auth";
 const submitPhoneData = useDebounceFn(async () => {
   if (phoneData.iaccept === false) {
     createToast(toast, "登录失败", "请同意用户协议和隐私政策", "warning");
@@ -192,7 +149,8 @@ const submitPhoneData = useDebounceFn(async () => {
     return;
   }
   try {
-    const login_res = await loginbyPhone();
+    loading.value = true;
+    const login_res = await loginbyPhone(phoneData);
     // console.log("登录成功:", login_res);
     if (login_res.tokens) {
       // 存储token
@@ -223,18 +181,6 @@ const accountData = reactive<AccountData>({
 
 const loading = ref(false);
 
-const loginbyAccount = async () => {
-  const res = await reapi({
-    method: "POST",
-    // url: "/auth/login-by-account",
-    url: "/auth/fake-login-by-account",
-    data: {
-      account: accountData.account,
-      password: accountData.password,
-    },
-  });
-  return res.data;
-};
 
 // 更优雅的写法2026/12/13（🐧跳舞）
 const sumbitAccountData = useDebounceFn(() => {
@@ -265,7 +211,7 @@ const sumbitAccountData = useDebounceFn(() => {
     // const hashed_password = hashPsw(accountData.password);
     openPuzzle(async () => {
       try {
-        const login_res = await loginbyAccount();
+        const login_res = await loginbyAccount(accountData);
         // console.log("账号登录成功:", login_res);
         if (login_res.tokens) {
           // 存储token
