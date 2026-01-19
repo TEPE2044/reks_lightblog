@@ -21,7 +21,6 @@ const toast = useToast();
 // 验证码锁
 const codeActive = ref(false);
 
-//TODO:超过一定登录次数，提示：你似乎不是人类，请稍后再试
 //TODO:后续人机交互设计：同时按下按键处理/Canvas WebGL处理
 /*
 puzzle
