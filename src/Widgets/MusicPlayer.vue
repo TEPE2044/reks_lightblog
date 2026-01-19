@@ -26,7 +26,8 @@
       togglePlay,
       nextSong,
       frontSong,
-      selectFromList
+      selectFromList,
+      handleClickPlay
     } = playerStore();
     const fakeDatas = [
       {
@@ -245,7 +246,7 @@
             <img class="thumbail-img" :src="playList[currentIndex]?.cover" />
           </div>
           <span>{{ currentTime }}</span>
-          <BFormInput class="progress" v-model="progress" type="range" max="100" min="0" />
+          <BFormInput @input="handleClickPlay(progress)" class="progress" v-model="progress" type="range" max="100" min="0" />
           <span>{{ duration }}</span>
         </div>
         <div class="controls-3 d-flex gap-4 align-items-center">
