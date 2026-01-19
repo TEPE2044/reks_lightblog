@@ -28,7 +28,6 @@
       frontSong,
       selectFromList
     } = playerStore();
-    // TODO:他说这个Howler每次播完都要重新创建一个实例你说这扯不扯
     const fakeDatas = [
       {
         cover: "/ai.webp",

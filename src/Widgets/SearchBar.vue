@@ -27,7 +27,7 @@ const handleSearch = () => {
 </template>
 
 <style lang="scss" scoped>
-//TODO: 使搜索栏宽度可变，而且需要向左延展
+// 使搜索栏宽度可变，而且需要向左延展
 $flexible-width:10rem;
 $expanded-width:$flexible-width + 0.4rem;
 .search-bar {
