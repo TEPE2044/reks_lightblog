@@ -2,11 +2,8 @@ import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
 import { Howl } from "howler";
 import { formatPlayerTime } from "../Utils/reks-format-time";
+import type { QueueItem } from "../Utils/reks-interface";
 
-export interface QueueItem {
-  cover: string;
-  songURL: string;
-}
 // 全局播放器实例
 // bug-fix:修复了下一首播放时，组件拿不到最新的player实例的问题
 let player: Howl | null = null;

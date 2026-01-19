@@ -9,4 +9,9 @@ interface AccountData{
   password:string;
 }
 
-export type { PhoneData,AccountData };
+interface QueueItem {
+  cover: string;
+  songURL: string;
+}
+
+export type { PhoneData,AccountData,QueueItem };

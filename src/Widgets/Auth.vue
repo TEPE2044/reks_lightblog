@@ -22,7 +22,7 @@ const toast = useToast();
 const codeActive = ref(false);
 
 //TODO:超过一定登录次数，提示：你似乎不是人类，请稍后再试
-
+//TODO:后续人机交互设计：同时按下按键处理/Canvas WebGL处理
 /*
 puzzle
 # var
@@ -82,6 +82,7 @@ const { remaining, start, stop } = useCountdown(countdownSeconds, {
   },
 });
 
+const loading = ref(false);
 
 // trigger 触发发送短信
 const sendCode = async () => {
@@ -105,19 +106,24 @@ const sendCode = async () => {
       try {
         start();
         loading.value = true;
-        const getcode_res = await getCode(phoneData.phone,codeActive.value);
+        const getcode_res = await getCode(phoneData.phone, codeActive.value);
         loading.value = false;
         if (getcode_res) {
           createToast(
             toast,
             "验证码已发送",
             `验证码已发送至${phoneData.phone}`,
-            "success"
+            "success",
           );
         } else {
           stop();
           codeActive.value = false;
-          createToast(toast, "发送失败", "网络或服务错误，请稍后重试", "danger");
+          createToast(
+            toast,
+            "发送失败",
+            "网络或服务错误，请稍后重试",
+            "danger",
+          );
         }
       } catch (e) {
         console.log("验证码发送失败，重置计时器");
@@ -136,7 +142,12 @@ const sendCode = async () => {
 
 // trigger 手机号登录
 import { useDebounceFn } from "@vueuse/core";
-import { getCode, getUserProfile, loginbyAccount, loginbyPhone } from "../Hooks/Auth";
+import {
+  getCode,
+  getUserProfile,
+  loginbyAccount,
+  loginbyPhone,
+} from "../Hooks/Auth";
 const submitPhoneData = useDebounceFn(async () => {
   if (phoneData.iaccept === false) {
     createToast(toast, "登录失败", "请同意用户协议和隐私政策", "warning");
@@ -154,6 +165,7 @@ const submitPhoneData = useDebounceFn(async () => {
     // console.log("登录成功:", login_res);
     if (login_res.tokens) {
       // 存储token
+      loading.value = false;
       user.userLogin(login_res.tokens);
       createToast(toast, "登录成功", "欢迎回来", "success");
       const user_info = await getUserProfile();
@@ -165,6 +177,7 @@ const submitPhoneData = useDebounceFn(async () => {
       createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
     }
   } catch (e) {
+    loading.value = false;
     console.error("登录失败:", e);
     createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
   }
@@ -178,9 +191,6 @@ const accountData = reactive<AccountData>({
   account: "",
   password: "",
 });
-
-const loading = ref(false);
-
 
 // 更优雅的写法2026/12/13（🐧跳舞）
 const sumbitAccountData = useDebounceFn(() => {
@@ -211,10 +221,12 @@ const sumbitAccountData = useDebounceFn(() => {
     // const hashed_password = hashPsw(accountData.password);
     openPuzzle(async () => {
       try {
+        loading.value = true;
         const login_res = await loginbyAccount(accountData);
         // console.log("账号登录成功:", login_res);
         if (login_res.tokens) {
           // 存储token
+          loading.value = false;
           user.userLogin(login_res.tokens);
           createToast(toast, "登录成功", "欢迎回来", "success");
           const user_info = await getUserProfile();
@@ -224,13 +236,15 @@ const sumbitAccountData = useDebounceFn(() => {
           reset();
         }
       } catch (e) {
+        loading.value = false;
         console.error("账号登录失败:", e);
-        createToast(toast, "登录失败", "账号不存在或账号信息错误", "danger");
+        createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
       }
     });
   } catch (e) {
+    loading.value = false;
     console.error("账号登录失败:", e);
-    createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
+    createToast(toast, "登录失败", "账号不存在或账号信息错误", "danger");
   }
 }, 1000);
 
@@ -319,7 +333,7 @@ watchEffect(() => {
                 class="w-100 mt-2"
                 variant="primary"
                 @click="sumbitAccountData"
-                :disabled="loading"
+                :disabled="loading === true"
                 >登录</BButton
               >
 
@@ -397,7 +411,7 @@ watchEffect(() => {
             </BFormCheckbox>
 
             <BButton
-              :disabled="phoneData.code.length === 0"
+              :disabled="phoneData.code.length === 0 && loading === true"
               class="w-100 mt-4 mb-3"
               variant="primary"
               @click="submitPhoneData"
