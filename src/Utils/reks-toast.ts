@@ -1,18 +1,6 @@
 import { useToast } from "bootstrap-vue-next";
 import { ref } from "vue";
-
-interface ToastVariant {
-  variant:
-    | "success"
-    | "danger"
-    | "warning"
-    | "info"
-    | "primary"
-    | "secondary"
-    | "light"
-    | "dark";
-}
-
+import type {ToastVariant} from './reks-interface'
 const toastCount = ref(0);
 
 const createToast = (

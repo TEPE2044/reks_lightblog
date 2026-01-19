@@ -4,9 +4,9 @@ interface PhoneData {
   iaccept: boolean;
 }
 
-interface AccountData{
-  account:string;
-  password:string;
+interface AccountData {
+  account: string;
+  password: string;
 }
 
 interface QueueItem {
@@ -14,4 +14,16 @@ interface QueueItem {
   songURL: string;
 }
 
-export type { PhoneData,AccountData,QueueItem };
+interface ToastVariant {
+  variant:
+    | "success"
+    | "danger"
+    | "warning"
+    | "info"
+    | "primary"
+    | "secondary"
+    | "light"
+    | "dark";
+}
+
+export type { PhoneData, AccountData, QueueItem, ToastVariant };

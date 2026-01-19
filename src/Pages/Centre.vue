@@ -51,11 +51,10 @@ const navs = [
             :to="nav.path"
             router-tag="router-link"
             exact
-            exact-active-class="active"
           >
             {{ nav.name }}
           </BNavItem>
-          <BNavItem @click="" exact exact-active-class="active"
+          <BNavItem @click="" exact
             >退出登录</BNavItem
           >
         </BNav>
