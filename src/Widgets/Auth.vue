@@ -54,7 +54,7 @@ const onSuccess = () => {
     rnext = null;
   }
 };
-// TODO:加一个loading动画
+// 加一个loading动画
 /*
 login-methods
 - phoneLogin 手机号登录（验证码登录）
