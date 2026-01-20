@@ -50,3 +50,11 @@ export const loginbyAccount = async (data:AccountData) => {
   });
   return res.data;
 };
+
+export const loginOut = async() => {
+  const res = await reapi({
+    method:'GET',
+    url:"/auth/logout"
+  })
+  return res
+}

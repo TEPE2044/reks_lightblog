@@ -1,6 +1,7 @@
 import axios from "axios";
 import { userStore } from "../Store/user";
 
+
 const regql = axios.create({
     baseURL: "http://localhost:12404/api/v1/gql",
     timeout: 15000,
@@ -22,10 +23,10 @@ regql.interceptors.request.use(config => {
 
 regql.interceptors.response.use(
     res => res,
-    err => {
+    async err => {
         if(err.response.status === 401) {
             const user = userStore();
-            user.userLogout();
+            await user.userLogout();
             alert("身份验证失败，请重新登录");
         }
         return Promise.reject(err);

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { userStore } from "../Store/user";
 
+
 const reapi = axios.create({
   baseURL: "http://localhost:12404/api/v1/",
   timeout: 15000,
@@ -24,7 +25,7 @@ reapi.interceptors.request.use(config => {
 // 响应拦截器
 reapi.interceptors.response.use(
   res => res,
-  err => {
+  async err => {
     if(err.response.status === 401) {
       const user = userStore();
       user.userLogout();

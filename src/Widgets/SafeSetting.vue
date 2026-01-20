@@ -4,8 +4,8 @@ import { useToggle } from "bootstrap-vue-next";
 import { ref, computed } from "vue";
 
 
-const esc = useToggle("easy-set-code");
-const esp = useToggle("easy-set-password");
+const esp = useToggle("easy-set-code");
+const espw = useToggle("easy-set-password");
 const ese = useToggle("easy-set-email");
 
 const pswVisible = ref(false);
@@ -30,7 +30,7 @@ const getRecoverCode = () => {
         class="safe-box d-flex align-items-center justify-content-center gap-3 offset"
       >
         <Icon icon="bi:key" width="30" height="30" />
-        <BButton variant="outline-primary" @click="esp.toggle()"
+        <BButton variant="outline-primary" @click="espw.toggle()"
           >设置密码</BButton
         >
       </BCol>

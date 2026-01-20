@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import router from "../Router";
-
+import { loginOut } from "../Hooks/Auth";
 
 export const userStore = defineStore("user", () => {
   const rcode = ref<string>("");
@@ -25,8 +25,14 @@ export const userStore = defineStore("user", () => {
     localStorage.setItem("rcode", tokens.rcode);
   };
 
-  const userLogout = () => {
-    // TODO:虽然不是在这里，但是每次登出要发送接口，把redis里的那条reks_code记录给清除掉
+  const userLogout = async() => {
+    // 每次登出要发送接口，把redis里的那条reks_code记录给清除掉
+    try{
+      await loginOut()
+    }catch(e){
+      console.warn("已退出登录",e)
+    }
+  
     rcode.value = "";
     payload.value = "";
     userInfo.value = '';
