@@ -13,7 +13,7 @@ import BlogCard from "../Widgets/BlogCard.vue";
 <style lang="scss" scoped>
 .ns {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 400px));
+  gap: 1.2rem;
 }
 </style>
