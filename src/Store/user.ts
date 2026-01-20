@@ -43,7 +43,7 @@ export const userStore = defineStore("user", () => {
     router.replace('/')
   };
 
-  const restoreFromLocal = () => {
+  const restoreFromLocal = async() => {
     const storedRcode = localStorage.getItem("rcode");
     const storedPayload = localStorage.getItem("payload");
     const localUser = localStorage.getItem("userInfo");
@@ -52,6 +52,8 @@ export const userStore = defineStore("user", () => {
       rcode.value = storedRcode;
       payload.value = storedPayload;
       isLoggedIn.value = true;
+    }else{
+      await userLogout()
     }
   };
 

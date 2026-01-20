@@ -14,4 +14,4 @@ const pinia = createPinia();
 const app = createApp(App);
 app.use(router).use(pinia).use(Skeleton).mount("#app");
 const user = userStore();
-user.restoreFromLocal();
+await user.restoreFromLocal();
