@@ -1,4 +1,14 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useTemplateRef } from "vue";
+import { useEventListener } from "@vueuse/core";
+
+
+const card_item = useTemplateRef('card-item')
+useEventListener(card_item, 'wheel', (e: WheelEvent) => {
+  e.preventDefault()
+  if (card_item.value) card_item.value.scrollLeft += e.deltaY
+}, { passive: false })
+</script>
 
 <template>
   <BCard class="blog-card" v-skeleton="false">
@@ -18,21 +28,28 @@
     </template>
     <template #default>
       <div class="rs-body">
-        <div class="rs-card-img-list d-flex flex-row gap-2" v-skeleton-item>
+        <div ref="card-item" class="rs-card-img-list d-flex flex-row gap-2" v-skeleton-item>
           <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
-           <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
-            <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
-
+          <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
+          <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
         </div>
         <div class="rs-card-content mt-2" v-skeleton-item @click="">
-          <div class="rs-title h5" title="Hello,ReKindlers"><strong>Hello,ReKindlers</strong></div>
+          <div class="rs-title h5" title="Hello,ReKindlers">
+            <strong>Hello,ReKindlers</strong>
+          </div>
           <div class="rs-desc mt-2">Since 2024</div>
         </div>
       </div>
-      <div class="rs-card-footer mt-3 d-flex flex-row align-items-center justify-content-between gap-5">
+      <div
+        class="rs-card-footer mt-3 d-flex flex-row align-items-center justify-content-between gap-5"
+      >
         <div class="rs-subscribe d-flex flex-row gap-2">
-          <BButton v-skeleton-item size="sm" variant="outline-secondary">点赞</BButton>
-          <BButton v-skeleton-item size="sm" variant="outline-secondary">阅读</BButton>
+          <BButton v-skeleton-item size="sm" variant="outline-secondary"
+            >点赞</BButton
+          >
+          <BButton v-skeleton-item size="sm" variant="outline-secondary"
+            >阅读</BButton
+          >
         </div>
 
         <div class="rs-comments-info d-inline-flex flex-row gap-3">
@@ -55,6 +72,25 @@ $card-max-width: 500px;
   .rs-card-img-list {
     overflow-x: auto;
     padding: 0;
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      background: #f0f0f0;
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(178, 34, 34, 0.76);
+      border-radius: 4px;
+      border: 2px solid #f0f0f0;
+      &:hover {
+        background: #764ba2;
+      }
+    }
+
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(178, 34, 34, 0.76) #f0f0f0;
 
     .rs-img {
       max-width: 301px;
