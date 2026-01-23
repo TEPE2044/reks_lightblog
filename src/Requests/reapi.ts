@@ -3,7 +3,7 @@ import { userStore } from "../Store/user";
 
 
 const reapi = axios.create({
-  baseURL: "http://api.rekindlers.top/api/v1/",
+  baseURL: "http://v1.rekindlers.top/api/v1/",
   timeout: 15000,
   withCredentials: true,
   headers: {
