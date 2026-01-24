@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+
+</script>
 
 <template>
   <BCard class="blog-card" v-skeleton="false">
@@ -18,14 +20,15 @@
     </template>
     <template #default>
       <div class="rs-body">
-        <div class="rs-card-img-list d-flex flex-row gap-2" v-skeleton-item>
+        <div ref="card-item" class="rs-card-img-list" v-skeleton-item>
           <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
-           <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
-            <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
-
+          <img class="rs-img" src="/ai.webp" alt="Music Card Demo" />
+          <img class="rs-img" src="/melo.webp" alt="Music Card Demo" />
         </div>
         <div class="rs-card-content mt-2" v-skeleton-item @click="">
-          <div class="rs-title h5" title="Hello,ReKindlers"><strong>Hello,ReKindlers</strong></div>
+          <div class="rs-title h5" title="Hello,ReKindlers">
+            <strong >Hello,ReKindlers</strong>
+          </div>
           <div class="rs-desc mt-2">Since 2024</div>
         </div>
       </div>
@@ -45,37 +48,59 @@
 </template>
 
 <style lang="scss" scoped>
-$card-max-width: 500px;
-
 .blog-card {
-  max-width: $card-max-width;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .rs-body {
   .rs-card-img-list {
-    overflow-x: auto;
-    padding: 0;
-
-    .rs-img {
-      max-width: 301px;
-      height: 200px;
-      object-fit: contain;
-      transition: all 0.5s ease;
-
-      &:hover {
-        cursor: pointer;
+    display: grid;
+    gap: 12px;
+    max-height: 600px;
+    overflow: hidden;
+    grid-template-columns: 1.5fr 1fr; // 默认按“三图”列比
+    // > 表示子元素
+    &:not(:has(>:nth-child(2))) {
+     >:nth-child(1) {
+        // equals grid-row: 1/3;
+        grid-column: span 3;
       }
     }
+
+    &:not(:has(>:nth-child(3))) {
+      grid-template-columns: 1fr 1fr; // 两图时，均分
+    }
+
+    &:has(>:nth-child(3)) {
+      >:nth-child(1) {
+        // equals grid-row: 1/3;
+        grid-row: span 2;
+      }
+    }
+
+    .rs-img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      transition: all 0.5s ease;
+    }
+
+
   }
 
   .rs-card-content {
-    max-width: $card-max-width;
+    // max-width: $card-max-width;
 
     .rs-title {
       width: 300px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+      }
     }
   }
 }

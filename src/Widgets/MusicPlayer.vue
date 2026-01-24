@@ -179,6 +179,7 @@
 
     watch(isOffc, (offcanvas_show) => {
       if (offcanvas_show) {
+        // 后面改用vueuse的EventListener
         document.addEventListener("click", handleCloseOffCanvas);
       } else {
         document.removeEventListener("click", handleCloseOffCanvas);
