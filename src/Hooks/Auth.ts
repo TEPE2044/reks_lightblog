@@ -18,8 +18,7 @@ export const getCode = async (phone: string, codeActive: boolean) => {
 export const loginbyPhone = async (data: PhoneData) => {
   const res = await reapi({
     method: "POST",
-    // url: "/auth/login-by-phone",
-    url: "/auth/fake-login-by-phone",
+    url: "/auth/login-by-phone",
     data: {
       phone: data.phone,
       code: data.code,
