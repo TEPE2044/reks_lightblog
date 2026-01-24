@@ -37,7 +37,7 @@ import ShowCase from '../Widgets/ShowCase.vue';
       "profilecard caro";
     grid-template-columns: 1fr 4fr;
     gap: 20px;
-    @media (max-width: 768px) {
+    @media (max-width: 1000px) {
       display: flex;
       flex-direction: column;
     }

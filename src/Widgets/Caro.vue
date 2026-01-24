@@ -4,7 +4,7 @@ import { ref } from "vue";
 const imageList = ref<string[]>([
   "/imagePlaceholder.webp",
   "/lh.webp",
-  "/pm.webp"
+  "/pm.webp",
 ]);
 
 const currentIndex = ref(0);
@@ -51,7 +51,6 @@ const choose = (index: number) => {
 
 <style scoped lang="scss">
 @use "../Asset/CustomStyle/global.scss" as global;
-
 .caro {
   //size
   width: 100%;
@@ -65,10 +64,16 @@ const choose = (index: number) => {
   border-radius: 12px;
   background-color: #fafafa;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  @media (max-width: 768px) {
+    grid-template-areas: "main thumbnail";
+    grid-template-columns: 3fr 1fr;
+  }
+  @media (max-width: 550px) {
+    // TODO:
+  }
 
   .caro-full {
     grid-area: main;
-    height: 100%;
     max-height: global.$caro-height;
     border-radius: 12px 0 0 12px;
 
@@ -92,19 +97,22 @@ const choose = (index: number) => {
     height: 100%;
     background: #faf6f2;
     border-radius: 0 12px 12px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     .thumbnail-img-container {
       width: 90%;
       flex-direction: column;
-      @media (max-width: 768px) {
-        flex-direction: row;
-      }
 
       .thumbnail-img {
         width: 100%;
         max-height: 80px;
         @media (max-width: 768px) {
           max-height: 50px;
+        }
+        @media (max-width: 425px) {
+          max-height: 40px;
         }
         object-fit: cover;
         object-position: top center;

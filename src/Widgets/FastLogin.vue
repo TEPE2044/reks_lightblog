@@ -31,7 +31,7 @@ const easyLogout = () => {
         class="user-no-login mt-3 pb-3"
       >
         <div
-          class="easy-login d-flex flex-md-row flex-sm-column gap-4 justify-content-center align-items-center"
+          class="easy-login d-flex flex-row gap-4 justify-content-center align-items-center"
         >
           <div class="avatar">
             <BAvatar size="3rem" class="avatar" variant="secondary" />
@@ -82,6 +82,7 @@ const easyLogout = () => {
 <style scoped lang="scss">
 @use "../Asset/CustomStyle/global.scss" as global;
 @use "../Asset/CustomStyle/open-font.scss";
+
 
 .fastlogin {
   @extend %reks-card-box;
