@@ -2,27 +2,24 @@
 </script>
 
 <template>
-  <div class="recommand mb-4">
-    <BCard class="recommand-tab mb-4" no-body>
-      <BCardHeader header-tag="nav">
-        <BNav align="center" pills>
-          <BNavItem to="/news/" exact exact-active-class="active"
-            >推荐
-          </BNavItem>
-          <BNavItem to="/subscribe/" exact exact-active-class="active"
-            >订阅
-          </BNavItem>
-        </BNav>
-      </BCardHeader>
+  <div class="recommand py-4">
+    <div class="recommand-tab mb-4">
+      <BNav align="center" pills>
+        <BNavItem to="/news/" exact exact-active-class="active">推荐
+        </BNavItem>
+        <BNavItem to="/subscribe/" exact exact-active-class="active">订阅
+        </BNavItem>
+      </BNav>
 
-      <BCardBody class="content">
+
+      <div class="content">
         <Keep-alive>
           <transition name="fade" mode="out-in">
             <RouterView />
           </transition>
         </Keep-alive>
-      </BCardBody>
-    </BCard>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -39,6 +36,8 @@
 
 .recommand {
   border-radius: 12px;
+  @extend %reks-card-box;
+  // background-color: rgba(255, 255, 255, 0.591);
 
   .label-word {
     color: #660909;
@@ -47,23 +46,13 @@
   min-height: 400px;
 
   .recommand-tab {
+
     /* 保证内容区高度一致，避免切换时父容器高度跳动 */
     .content {
       min-height: 300px;
       position: relative;
       /* 为绝对定位的进入元素提供上下文 */
     }
-
-    /* 如果你使用 <transition> 包裹 RouterView，可以让进入的组件绝对定位 */
-    .recommand-content {
-      position: absolute;
-      inset: 0;
-      /* top:0; right:0; bottom:0; left:0 */
-    }
   }
-}
-
-.b-card-body {
-  min-height: 300px; // 保证内容区高度一致
 }
 </style>

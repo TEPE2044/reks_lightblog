@@ -5,15 +5,15 @@ import BlogCard from "../Widgets/BlogCard.vue";
 <template>
 
   <div class="ns">
-    <BlogCard v-for="iu in 9" :key="iu" />
+    <BlogCard v-for="iu in 2" :key="iu" />
   </div>
 
 </template>
 
 <style lang="scss" scoped>
-.ns {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px,auto));
-  gap: 1.2rem;
+.ns{
+  column-count: 3;
+  column-gap: .5rem;
+  padding: 1.5rem;
 }
 </style>
