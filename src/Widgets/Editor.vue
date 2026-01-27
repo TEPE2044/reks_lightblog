@@ -6,7 +6,6 @@ import { Editor, Toolbar } from "@wangeditor-next/editor-for-vue";
 import type { IEditorConfig, IToolbarConfig } from "@wangeditor-next/editor";
 import { Icon } from "@iconify/vue";
 import { useToggle } from "bootstrap-vue-next";
-import reapi from "../Requests/reapi";
 import { editorStore } from "../Store/editor";
 import { upload_img } from "../Hooks/Editor";
 const { editor, valueHTML, pub_tags, pub_title } = storeToRefs(editorStore());
@@ -60,7 +59,9 @@ const editorConfig: Partial<IEditorConfig> = {
   MENU_CONF: {
     uploadImage: {
       metaWithUrl: false,
-      onSuccess: () => {},
+      onSuccess: (insertFn: any, res) => {
+        insertFn(res.data.url, res.data.alt || "", res.data.url);
+      },
       onFailed: () => {},
       onError: () => {},
       base64LimitSize: 0,
