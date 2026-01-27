@@ -1,5 +1,5 @@
 <script setup lang="ts">
-
+// const datas = defineProps<{ images:[],title:string,desc:string }>()
 </script>
 
 <template>
@@ -8,39 +8,6 @@
       <div ref="card-item" class="rs-card-img-list" v-skeleton-item>
         <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
         <img class="rs-img" src="/ai.webp" alt="Music Card Demo" />
-        <img class="rs-img" src="/melo.webp" alt="Music Card Demo" />
-      </div>
-    </div>
-
-
-    <div class="rs-card-content mt-4" v-skeleton-item @click="">
-      <div class="rs-title h5" title="Hello,ReKindlers">
-        <strong>Hello,ReKindlers</strong>
-      </div>
-      <div class="rs-desc mt-2">Since 2024</div>
-    </div>
-  </BCard>
-
-  <BCard class="blog-card mt-4" v-skeleton="false">
-    <div class="rs-body">
-      <div ref="card-item" class="rs-card-img-list" v-skeleton-item>
-        <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
-      </div>
-    </div>
-
-
-    <div class="rs-card-content mt-4" v-skeleton-item @click="">
-      <div class="rs-title h5" title="Hello,ReKindlers">
-        <strong>Hello,ReKindlers</strong>
-      </div>
-      <div class="rs-desc mt-2">Since 2024</div>
-    </div>
-  </BCard>
-
-  <BCard class="blog-card mt-4" v-skeleton="false">
-    <div class="rs-body">
-      <div ref="card-item" class="rs-card-img-list" v-skeleton-item>
-        <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
         <img class="rs-img" src="/melo.webp" alt="Music Card Demo" />
       </div>
     </div>
