@@ -22,6 +22,8 @@ declare module 'vue' {
     BCardBody: typeof import('bootstrap-vue-next/components/BCard')['BCardBody']
     BCardHeader: typeof import('bootstrap-vue-next/components/BCard')['BCardHeader']
     BCardText: typeof import('bootstrap-vue-next/components/BCard')['BCardText']
+    BCarousel: typeof import('bootstrap-vue-next/components/BCarousel')['BCarousel']
+    BCarouselSlide: typeof import('bootstrap-vue-next/components/BCarousel')['BCarouselSlide']
     BCol: typeof import('bootstrap-vue-next/components/BContainer')['BCol']
     BContainer: typeof import('bootstrap-vue-next/components/BContainer')['BContainer']
     BDropdown: typeof import('bootstrap-vue-next/components/BDropdown')['BDropdown']

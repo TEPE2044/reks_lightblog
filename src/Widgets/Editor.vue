@@ -10,7 +10,7 @@ import { editorStore } from "../Store/editor";
 import { upload_img } from "../Hooks/Editor";
 const { editor, valueHTML, pub_tags, pub_title } = storeToRefs(editorStore());
 const { handleCreated, handleChange } = editorStore();
-// TODO:tag长度限制、专业模式->开启MarkDown、新手指引、自动保存、退出前保存、挂机保存、XSS过滤、CRUD、草稿、评论
+// TODO:专业模式->开启MarkDown、新手指引、自动保存、退出前保存、挂机保存、草稿、评论
 const epw = useToggle("preview");
 const preview = () => {
   if (pub_title.value !== "") {
