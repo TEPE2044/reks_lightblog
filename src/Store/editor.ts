@@ -6,7 +6,7 @@ import { ref, shallowRef } from "vue";
 
 export const editorStore = defineStore("editor", () => {
   // 编辑器实例
-  const editor = shallowRef<IDomEditor>();
+  const editor = shallowRef<IDomEditor|undefined>();
   // markdown支持
   // Boot.registerModule(markdownModule);
   //标题

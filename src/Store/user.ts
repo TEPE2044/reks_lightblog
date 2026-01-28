@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import router from "../Router";
 import { loginOut } from "../Hooks/Auth";
 
 export const userStore = defineStore("user", () => {
