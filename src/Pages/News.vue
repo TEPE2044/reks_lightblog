@@ -12,8 +12,8 @@ import BlogCard from '../Widgets/BlogCard.vue';
 
 <style lang="scss" scoped>
 .ns{
-  column-count: 3;
-  column-gap: .5rem;
+  column-count: 4;
+  column-gap: .2rem;
   padding: 1.5rem;
 }
 </style>

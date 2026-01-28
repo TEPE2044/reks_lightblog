@@ -50,6 +50,7 @@ declare module 'vue' {
     BTabs: typeof import('bootstrap-vue-next/components/BTabs')['BTabs']
     Footer: typeof import('./src/components/Footer.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
+    HubHeader: typeof import('./src/components/HubHeader.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

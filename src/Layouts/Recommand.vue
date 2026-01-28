@@ -1,13 +1,17 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia';
+import { userStore } from '../Store/user';
+
+const { isLoggedIn } = storeToRefs(userStore())
 </script>
 
 <template>
-  <div class="recommand py-4">
+  <div class="recommand py-3">
     <div class="recommand-tab mb-4">
       <BNav align="center" pills>
-        <BNavItem to="/news/" exact exact-active-class="active">推荐
+        <BNavItem to="/main/" exact exact-active-class="active">推荐
         </BNavItem>
-        <BNavItem to="/subscribe/" exact exact-active-class="active">订阅
+        <BNavItem to="/subscribe/" exact exact-active-class="active" v-if="isLoggedIn === true">订阅
         </BNavItem>
       </BNav>
 

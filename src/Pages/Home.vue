@@ -20,7 +20,8 @@ import ShowCase from '../Widgets/ShowCase.vue';
       </div>
     </BContainer>
     <BContainer class="home-content mt-4">
-      <ShowCase/>
+        <ShowCase/>
+        <ShowCase/>
       <div class="recommand">
          <Recommand />
       </div>

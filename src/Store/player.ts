@@ -15,6 +15,10 @@ export const playerStore = defineStore("player", () => {
   const duration = ref<string>("");
   const currentTime = ref<string>("");
   const progress = ref<number>(0);
+  const isHidden = ref(false);
+  const toggleHidden = () => {
+    isHidden.value = !isHidden.value;
+  };
 
   watch(mode, () => {
     if (player) {
@@ -210,6 +214,8 @@ export const playerStore = defineStore("player", () => {
     duration,
     currentTime,
     progress,
+    isHidden,
+    toggleHidden,
     initPlayList,
     updateTime,
     handleMuted,

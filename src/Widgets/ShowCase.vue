@@ -13,7 +13,7 @@ useEventListener(showcase, 'wheel', (e: WheelEvent) => {
 <template>
   <div class="showcase">
     <div class="scroll-bar w-100 mb-4 p-4">
-      <div class="case-title h5">熔岩电台</div>
+      <div class="case-title h5">电台上新</div>
       <div ref="showcase" class="case py-4 mt-4">
         <MusicCard v-for="is in 10" :key="is" />
       </div>

@@ -410,7 +410,7 @@ watchEffect(() => {
             </BFormCheckbox>
 
             <BButton
-              :disabled="phoneData.code.length === 0 && loading === true"
+              :disabled="loading === true"
               class="w-100 mt-4 mb-3"
               variant="primary"
               @click="submitPhoneData"
