@@ -99,7 +99,7 @@ watchEffect(() => {
 });
 </script>
 <template>
-  <div class="editors mx-auto">
+  <div class="editors mx-auto mt-5">
     <div class="title w-100">
       <input
         v-model="pub_title"

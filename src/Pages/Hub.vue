@@ -1,10 +1,14 @@
-<script setup lang="ts">
-//TODO : Create Hub Page
-</script>
-
 <template>
-  <div class="hub-page"></div>
+  <div class="hub mt-5">
+  </div>
 </template>
 
+<script lang="ts" setup>
+import Editor from '../Widgets/Editor.vue';
+
+
+</script>
+
 <style lang="scss" scoped>
+
 </style>

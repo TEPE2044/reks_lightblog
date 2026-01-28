@@ -40,7 +40,6 @@ export const userStore = defineStore("user", () => {
     localStorage.removeItem("payload");
     localStorage.removeItem("userinfo");
     isLoggedIn.value = false;
-    router.replace('/')
   };
 
   const restoreFromLocal = async() => {

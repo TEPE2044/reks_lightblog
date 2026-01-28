@@ -13,11 +13,7 @@
 
 
       <div class="content">
-        <Keep-alive>
-          <transition name="fade" mode="out-in">
-            <RouterView />
-          </transition>
-        </Keep-alive>
+        <RouterView />
       </div>
     </div>
   </div>
