@@ -26,7 +26,7 @@ reapi.interceptors.request.use(config => {
 reapi.interceptors.response.use(
   res => res,
   async err => {
-    if(err.response.status === 401) {
+    if(err.response?.status === 401) {
       const user = userStore();
       user.userLogout();
       alert("身份验证失败，请重新登录");

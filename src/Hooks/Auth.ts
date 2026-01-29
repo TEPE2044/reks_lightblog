@@ -5,8 +5,7 @@ import type { AccountData, PhoneData } from "../Utils/reks-interface";
 export const getCode = async (phone: string, codeActive: boolean) => {
   const code_res = await reapi({
     method: "POST",
-    // url: "/auth/send-sms-code",
-    url: "/auth/fake-sms-code",
+    url: "/auth/send-sms-code",
     data: {
       phone: phone,
       codeActive: codeActive,
@@ -18,7 +17,7 @@ export const getCode = async (phone: string, codeActive: boolean) => {
 export const loginbyPhone = async (data: PhoneData) => {
   const res = await reapi({
     method: "POST",
-    url: "/auth/fake-login-by-phone",
+    url: "/auth/login-by-phone",
     data: {
       phone: data.phone,
       code: data.code,

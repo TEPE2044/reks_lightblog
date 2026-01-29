@@ -12,13 +12,13 @@ const router = createRouter({
             children: [
                 {
                     path: '',
-                    name:'news',
+                    name:'main',
                     // fix 使用命名路由重定向，避免相对路径歧义
-                    redirect: {name: 'home-news'}
+                    redirect: {name: 'home-main'}
                 },
                 {
-                    path: 'news',
-                    name: 'home-news',
+                    path: 'main',
+                    name: 'home-main',
                     component: () => import('../Pages/News.vue')
                 },
                 {
@@ -37,6 +37,10 @@ const router = createRouter({
             path: '/search',
             name: 'search',
             component: () => import('../Pages/Search.vue')
+        },{
+            path: '/upload',
+            name: 'upload',
+            component: () => import('../Pages/Upload.vue')
         },
         {
             path: '/centre',
@@ -44,7 +48,8 @@ const router = createRouter({
             component: () => import('../Pages/Centre.vue'),
             children:[
                 {
-                    path: '',
+                    path: 'my-blog',
+                    name:'my-blog',
                     redirect: {name: 'my-blog'}
                 },
                 {

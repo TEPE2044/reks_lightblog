@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import router from "../Router";
 import { loginOut } from "../Hooks/Auth";
 
 export const userStore = defineStore("user", () => {
@@ -40,7 +39,6 @@ export const userStore = defineStore("user", () => {
     localStorage.removeItem("payload");
     localStorage.removeItem("userinfo");
     isLoggedIn.value = false;
-    router.replace('/')
   };
 
   const restoreFromLocal = async() => {
