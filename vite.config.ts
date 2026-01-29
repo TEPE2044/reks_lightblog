@@ -16,4 +16,14 @@ export default defineConfig({
     host: "0.0.0.0",
     cors: true,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          editor: ["@wangeditor-next/editor"],
+          bv: ["bootstrap-vue-next"],
+        },
+      },
+    },
+  },
 });
