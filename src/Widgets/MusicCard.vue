@@ -9,12 +9,12 @@ import { Icon } from "@iconify/vue";
     </div>
 
     <!-- 悬停层 + 底部信息 合并 -->
-    <div class="meta d-flex flex-column justify-content-between p-3 position-absolute">
+    <div class="meta d-flex flex-column position-absolute p-2">
       <div class="header">
-        <BAvatar size="60" class="mb-2 me-3" src="/ysg.jpg" />
+        <BAvatar size="50" class="mb-0 me-3" src="/ysg.jpg" />
         <BButton size="sm" variant="dark">+ 关注</BButton>
         <div class="info">
-          <div class="title h3 fw-semibold">UnderGround</div>
+          <div class="title h4 fw-semibold">UnderGround</div>
           <p class="author">Jacky View</p>
 
         </div>
@@ -63,6 +63,8 @@ $overlay: rgba(177, 177, 177, 0.5);
 
   /* 悬停层 */
   .meta {
+    width: 100%;
+    height: 100%;
     inset: 0;
     background: $overlay;
     backdrop-filter: blur(10px);

@@ -36,7 +36,7 @@ useEventListener(showcase, 'wheel', (e: WheelEvent) => {
     display: flex;
     flex-wrap: nowrap;
     gap: 1rem;
-    height: g.$caro-height;
+    height: 240px;
     overflow-x: auto;
 
     /* WebKit 核心 */
