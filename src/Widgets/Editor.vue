@@ -218,7 +218,7 @@ watchEffect(() => {
 
     >.editor {
       overflow-y: auto;
-      min-height: 150px;
+      min-height: 301px;
       max-height: 400px;
       border-top: 1px solid rgb(211, 211, 211);
       border-bottom: 2px solid gainsboro;

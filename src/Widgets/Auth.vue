@@ -161,7 +161,7 @@ const submitPhoneData = useDebounceFn(async () => {
   try {
     loading.value = true;
     const login_res = await loginbyPhone(phoneData);
-    // console.log("登录成功:", login_res);
+    console.log("登录成功:", login_res);
     if (login_res.tokens) {
       // 存储token
       loading.value = false;
@@ -173,12 +173,14 @@ const submitPhoneData = useDebounceFn(async () => {
       emd.hide();
       reset();
     } else {
-      createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
+      createToast(toast, "登录失败", login_res.msg, "danger");
     }
   } catch (e) {
     loading.value = false;
     console.error("登录失败:", e);
     createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
+  }finally{
+    loading.value = false;
   }
 }, 1300);
 
