@@ -14,6 +14,13 @@ interface QueueItem {
   songURL: string;
 }
 
+interface PageWrapper{
+  currentPage:number,
+  perPage:number,
+  pageLimit:5,
+  rows:number
+}
+
 interface ToastVariant {
   variant:
     | "success"
@@ -26,4 +33,4 @@ interface ToastVariant {
     | "dark";
 }
 
-export type { PhoneData, AccountData, QueueItem, ToastVariant };
+export type { PhoneData, AccountData, QueueItem, ToastVariant,PageWrapper };
