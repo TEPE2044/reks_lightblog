@@ -63,8 +63,8 @@ const editorConfig: Partial<IEditorConfig> = {
       onSuccess: (insertFn: any, res) => {
         insertFn(res.data.url, res.data.alt || "", res.data.url);
       },
-      onFailed: () => { },
-      onError: () => { },
+      onFailed: () => {},
+      onError: () => {},
       base64LimitSize: 0,
       customUpload: async (file: any, insertFn: any) => {
         // 前端拦截图片类型
@@ -72,7 +72,7 @@ const editorConfig: Partial<IEditorConfig> = {
         form.append("img", file);
 
         try {
-          const res = await upload_img(form)
+          const res = await upload_img(form);
           if (res.errno === 0) {
             // insertFn 会把图片插到编辑器
             insertFn(res.data.url, res.data.alt || "", res.data.url);
@@ -87,17 +87,19 @@ const editorConfig: Partial<IEditorConfig> = {
   },
 };
 // 上传blog
-const submitCreate = async() => {
+const submitCreate = async () => {
   try {
-    const res = await upload_blog(pub_title.value,valueHTML.value,pub_tags.value)
-    console.log(res)
-  }catch(e){
-    console.error(e)
+    const res = await upload_blog(
+      pub_title.value,
+      valueHTML.value,
+      pub_tags.value,
+    );
+    console.log(res);
+  } catch (e) {
+    console.error(e);
     // TODO:toast提示
   }
-
-}
-
+};
 
 onMounted(() => {
   valueHTML.value = "";
@@ -108,7 +110,7 @@ onBeforeUnmount(() => {
   if (temp == null) return;
   temp.destroy();
   //fix
-  editor.value = undefined
+  editor.value = undefined;
 });
 watchEffect(() => {
   console.log(valueHTML.value);
@@ -117,18 +119,46 @@ watchEffect(() => {
 <template>
   <div class="editors mx-auto">
     <div class="title w-100">
-      <input v-model="pub_title" class="title-space w-100 border-0 mb-3 px-2" id="floatingTitle" type="text"
-        placeholder="从标题开始吧" />
+      <div class="form-floating mt-3 mb-3">
+        <input
+          type="text"
+          class="form-control"
+          id="uploadTitle"
+          v-model="pub_title"
+          maxlength="20"
+          minlength="1"
+          required
+        />
+        <label for="uploadTitle">从标题开始吧</label>
+      </div>
     </div>
 
     <div class="edit-space">
-      <Toolbar class="toolbar" :editor="editor" :defaultConfig="easyEditor" :mode="'default'" />
-      <Editor class="editor" v-model="valueHTML" :mode="'default'" :defaultConfig="editorConfig"
-        @onCreated="handleCreated" @onChange="handleChange" />
+      <Toolbar
+        class="toolbar"
+        :editor="editor"
+        :defaultConfig="easyEditor"
+        :mode="'default'"
+      />
+      <Editor
+        class="editor"
+        v-model="valueHTML"
+        :mode="'default'"
+        :defaultConfig="editorConfig"
+        @onCreated="handleCreated"
+        @onChange="handleChange"
+      />
     </div>
     <div class="tags mt-3 mb-3">
-      <BFormTags v-model="pub_tags" :limit="5" remove-on-delete add-button-text="Add" limit-tags-text="最多只能设置5个标签噢"
-        input-id="tags-basic" placeholder="设置标签(使用回车确定标签)" />
+      <BFormTags
+        v-model="pub_tags"
+        :limit="5"
+        remove-on-delete
+        add-button-text="Add"
+        limit-tags-text="最多只能设置5个标签噢"
+        input-id="tags-basic"
+        placeholder="设置标签(使用回车确定标签)"
+      />
     </div>
     <div class="options mt-4">
       <!-- 是否转载 -->
@@ -137,20 +167,38 @@ watchEffect(() => {
           <BButton class="float-end" variant="success"> 发布 </BButton>
         </template>
         <template #title><strong>确认发布?</strong></template>
-        <BButton size="sm" class="me-2" variant="success" @click="submitCreate()">
+        <BButton
+          size="sm"
+          class="me-2"
+          variant="success"
+          @click="submitCreate()"
+        >
           <Icon icon="bi-send" /> 发布
         </BButton>
         <BButton size="sm" variant="primary">
           <Icon icon="bi-box" /> 暂存
         </BButton>
       </BPopover>
-      <BButton class="float-end me-2" variant="primary" @click="preview()">预览</BButton>
+      <BButton class="float-end me-2" variant="primary" @click="preview()"
+        >预览</BButton
+      >
     </div>
   </div>
   <!-- 预览模态框 -->
-  <BModal scrollable no-close-on-backdrop no-backdrop no-footer size="lg" id="preview">
+  <BModal
+    scrollable
+    no-close-on-backdrop
+    no-backdrop
+    no-footer
+    size="lg"
+    id="preview"
+  >
     <h2 class="ptitle mb-4">{{ pub_title }}</h2>
-    <span v-for="tag in pub_tags" class="ptags border rounded-2 bg-white text-black me-2 p-1">{{ tag }}</span>
+    <span
+      v-for="tag in pub_tags"
+      class="ptags border rounded-2 bg-white text-black me-2 p-1"
+      >{{ tag }}</span
+    >
     <hr />
     <div class="content" v-html="valueHTML"></div>
     <div class="shadow-sm d-flex align-items-center justify-content-evenly p-4">
@@ -191,7 +239,7 @@ watchEffect(() => {
 }
 
 .editors {
-  width: 650px;
+  width: 100%;
   min-height: 200px;
   background-color: white;
   padding: 20px;
@@ -210,13 +258,14 @@ watchEffect(() => {
   }
 
   .edit-space {
-    >.toolbar {
+    width: 100px;
+    > .toolbar {
       display: flex;
       flex-direction: column;
       border-bottom: 2px solid gainsboro;
     }
 
-    >.editor {
+    > .editor {
       overflow-y: auto;
       min-height: 301px;
       max-height: 400px;
