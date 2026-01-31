@@ -71,7 +71,7 @@ onMounted(() => {
               style="padding-top: 0"
               v-for="i in pages.pageLimit"
             >
-              <div class="col-6 p-4 img-meta">
+              <div class="col-6 p-4 img-meta" :key="`rs${i}`">
                 <img
                   src="https://picsum.photos/id/1/200/300"
                   class="card-img"
