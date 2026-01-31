@@ -24,11 +24,6 @@ const description = ref('');
 const iconFile = ref(null);
 const audioFile = ref(null);
 
-// 文件上传处理
-const handleIconUpload = (e:Event) => {
-  iconFile.value = e.target?.files[0];
-};
-
 const handleAudioUpload = (e:Event) => {
   audioFile.value = e.target?.files[0];
 };
@@ -134,23 +129,6 @@ const what = ref('radio')
         <p v-if="what === 'radio'">上传电台封面</p>
         <p v-if="what === 'gallery'">上传图片</p>
         <p v-if="what === 'forum'">添加图片</p>
-        <div class="input-group mb-3" v-if="what !== 'forum'">
-          <input
-              type="file"
-              id="uploadIcon"
-              class="form-control"
-              @change="handleIconUpload"
-              accept="image/png,image/jpeg"
-              required>
-        </div>
-        <div class="input-group mb-3" v-else>
-          <input
-              type="file"
-              id="uploadIcon"
-              class="form-control"
-              @change="handleIconUpload"
-              accept="image/png,image/jpeg">
-        </div>
 
         <!-- 音频文件上传 -->
         <p v-if="what === 'radio'">上传音频文件</p>
