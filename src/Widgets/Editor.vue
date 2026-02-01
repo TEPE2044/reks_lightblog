@@ -1,26 +1,29 @@
 <script setup lang="ts">
 import "@wangeditor-next/editor/dist/css/style.css";
 import { storeToRefs } from "pinia";
-import { onMounted, onBeforeUnmount, watchEffect } from "vue";
+import { onMounted, onBeforeUnmount, ref } from "vue";
 import { Editor, Toolbar } from "@wangeditor-next/editor-for-vue";
 import type { IEditorConfig, IToolbarConfig } from "@wangeditor-next/editor";
 import { Icon } from "@iconify/vue";
-import { useToggle } from "bootstrap-vue-next";
+import { useToast, useToggle } from "bootstrap-vue-next";
 import { editorStore } from "../Store/editor";
 import { upload_img } from "../Hooks/Editor";
 import { upload_blog } from "../Hooks/Blog";
+import { createToast } from "../Utils/reks-toast";
+
+// 状态管理
 const { editor, valueHTML, pub_tags, pub_title } = storeToRefs(editorStore());
 const { handleCreated, handleChange } = editorStore();
-// TODO:专业模式->开启MarkDown、新手指引、自动保存、退出前保存、挂机保存、草稿、评论
-const epw = useToggle("preview");
-const preview = () => {
-  if (pub_title.value !== "") {
-    epw.show();
-  }
-  console.log("标题为空");
-};
 
-const easyEditor: Partial<IToolbarConfig> = {
+// variales
+const postType = ref(0);
+const audioFile = ref<File | null>(null);
+
+// modal
+const { show: showPreview } = useToggle("preview");
+
+// editor
+const toolbarConfig: Partial<IToolbarConfig> = {
   toolbarKeys: [
     {
       key: "group-image",
@@ -44,14 +47,6 @@ const easyEditor: Partial<IToolbarConfig> = {
     "justifyLeft",
     "justifyCenter",
     "justifyRight",
-    // {
-    //   key: "group-video",
-    //   title: "视频工具",
-    //   iconSvg:
-    //     '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" fill-rule="evenodd" d="M0 5a2 2 0 0 1 2-2h7.5a2 2 0 0 1 1.983 1.738l3.11-1.382A1 1 0 0 1 16 4.269v7.462a1 1 0 0 1-1.406.913l-3.111-1.382A2 2 0 0 1 9.5 13H2a2 2 0 0 1-2-2z"/></svg>',
-    //   menuKeys: ["insertVideo"],
-    //   // 暂不支持本地上传视频 menuKeys: ["insertVideo", "uploadVideo"],
-    // },
   ],
 };
 
@@ -60,229 +55,338 @@ const editorConfig: Partial<IEditorConfig> = {
   MENU_CONF: {
     uploadImage: {
       metaWithUrl: false,
+      // 成功/失败回调（如果使用服务端上传时启用）
       onSuccess: (insertFn: any, res) => {
         insertFn(res.data.url, res.data.alt || "", res.data.url);
       },
-      onFailed: () => {},
-      onError: () => {},
+      onFailed: () => { },
+      onError: () => { },
       base64LimitSize: 0,
-      customUpload: async (file: any, insertFn: any) => {
-        // 前端拦截图片类型
+      // 自定义上传
+      customUpload: async (file: File, insertFn: any) => {
         const form = new FormData();
         form.append("img", file);
 
         try {
           const res = await upload_img(form);
           if (res.errno === 0) {
-            // insertFn 会把图片插到编辑器
             insertFn(res.data.url, res.data.alt || "", res.data.url);
           } else {
             alert(res.message || "上传失败");
           }
-        } catch (e) {
-          console.error(e);
+        } catch (error) {
+          console.error("图片上传失败:", error);
         }
       },
     },
   },
 };
-// 上传blog
-const submitCreate = async () => {
+
+// ==================== 方法 ====================
+const toast = useToast()
+/** 打开预览 */
+const handlePreview = () => {
+  if (!pub_title.value.trim()) {
+    createToast(toast, "预览失败", "标题为空", "warning")
+    return;
+  }
+  showPreview();
+};
+
+/** 处理音频上传 */
+const handleAudioUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  audioFile.value = target.files?.[0] || null;
+};
+
+/** 提交发布 */
+const handleSubmit = async () => {
+  // 表单验证
+  if (!pub_title.value.trim()) {
+    alert("请输入标题");
+    return;
+  }
+  if (!valueHTML.value || valueHTML.value === "<p><br></p>") {
+    alert("请输入内容");
+    return;
+  }
+
   try {
     const res = await upload_blog(
       pub_title.value,
       valueHTML.value,
       pub_tags.value,
     );
-    console.log(res);
-  } catch (e) {
-    console.error(e);
-    // TODO:toast提示
+    console.log("发布成功:", res);
+    createToast(toast, "发布成功", "发布成功！期待上热门哦", "success")
+    // TODO：这里发完就要控制一下用户行为，不能让他一直点
+    // TODO: 发布成功后跳转到文章详情页或清空表单
+  } catch (error) {
+    console.error("发布失败:", error);
+    alert("发布失败，请重试");
   }
 };
 
+// ==================== 生命周期 ====================
 onMounted(() => {
   valueHTML.value = "";
 });
 
 onBeforeUnmount(() => {
-  const temp = editor.value;
-  if (temp == null) return;
-  temp.destroy();
-  //fix
-  editor.value = undefined;
-});
-watchEffect(() => {
-  console.log(valueHTML.value);
+  if (editor.value) {
+    editor.value.destroy();
+    editor.value = undefined as any;
+  }
 });
 </script>
+
 <template>
-  <div class="editors mx-auto">
-    <div class="title w-100">
-      <div class="form-floating mt-3 mb-3">
-        <input
-          type="text"
-          class="form-control"
-          id="uploadTitle"
-          v-model="pub_title"
-          maxlength="20"
-          minlength="1"
-          required
-        />
+  <div class="editor-container mx-auto">
+    <!-- 原创/转载选择，有争议 -->
+    <!-- <section class="post-type-section">
+      <p class="text-muted mb-2">是否原创?（这很重要，请谨慎选择）</p>
+      <div class="btn-group" role="group">
+        <input id="original" v-model="postType" type="radio" class="btn-check" value="0" />
+        <label class="btn btn-outline-primary" for="original">原创</label>
+
+        <input id="repost" v-model="postType" type="radio" class="btn-check" value="1" />
+        <label class="btn btn-outline-primary" for="repost">转载</label>
+      </div>
+    </section> -->
+
+    <!-- 标题输入 -->
+    <section class="title-section">
+      <div class="form-floating">
+        <input id="uploadTitle" v-model="pub_title" type="text" class="form-control" minlength="1" maxlength="20"
+          required placeholder="从标题开始吧" />
         <label for="uploadTitle">从标题开始吧</label>
       </div>
-    </div>
+    </section>
 
-    <div class="edit-space">
-      <Toolbar
-        class="toolbar"
-        :editor="editor"
-        :defaultConfig="easyEditor"
-        :mode="'default'"
-      />
-      <Editor
-        class="editor"
-        v-model="valueHTML"
-        :mode="'default'"
-        :defaultConfig="editorConfig"
-        @onCreated="handleCreated"
-        @onChange="handleChange"
-      />
-    </div>
-    <div class="tags mt-3 mb-3">
-      <BFormTags
-        v-model="pub_tags"
-        :limit="5"
-        remove-on-delete
-        add-button-text="Add"
-        limit-tags-text="最多只能设置5个标签噢"
-        input-id="tags-basic"
-        placeholder="设置标签(使用回车确定标签)"
-      />
-    </div>
-    <div class="options mt-4">
-      <!-- 是否转载 -->
+    <!-- 编辑器区域 -->
+    <section class="editor-section">
+      <Toolbar class="editor-toolbar" :editor="editor" :default-config="toolbarConfig" mode="default" />
+      <Editor v-model="valueHTML" class="editor-content" :default-config="editorConfig" mode="default"
+        @on-created="handleCreated" @on-change="handleChange" />
+    </section>
+
+    <!-- 标签输入 -->
+    <section class="tags-section">
+      <p class="section-title">上传标签</p>
+      <BFormTags v-model="pub_tags" input-id="tags-basic" :limit="5" duplicate-tag-text="重复标签" remove-on-delete
+        add-button-text="Add" limit-tags-text="最多只能设置5个标签噢" placeholder="设置标签(使用回车确定标签)" />
+    </section>
+
+    <!-- 音频上传 -->
+    <section class="audio-section">
+      <p class="section-title">上传音频</p>
+      <div class="input-group">
+        <input id="uploadAudio" type="file" class="form-control" accept="audio/mp3,audio/wav" required
+          @change="handleAudioUpload" />
+      </div>
+    </section>
+
+    <!-- 规定确认 -->
+    <section class="agreement-section">
+      <div class="form-check">
+        <input id="gridCheck1" class="form-check-input" type="checkbox" required />
+        <label class="form-check-label" for="gridCheck1">
+          我已阅读
+          <router-link to="/rule">相关规定</router-link>
+        </label>
+      </div>
+    </section>
+
+    <!-- 操作按钮 -->
+    <section class="actions-section">
       <BPopover placement="bottom">
         <template #target>
-          <BButton class="float-end" variant="success"> 发布 </BButton>
+          <BButton variant="success" class="float-end">发布</BButton>
         </template>
-        <template #title><strong>确认发布?</strong></template>
-        <BButton
-          size="sm"
-          class="me-2"
-          variant="success"
-          @click="submitCreate()"
-        >
+        <template #title>
+          <strong>确认发布?</strong>
+        </template>
+        <BButton size="sm" variant="success" class="me-2" @click="handleSubmit">
           <Icon icon="bi-send" /> 发布
         </BButton>
         <BButton size="sm" variant="primary">
           <Icon icon="bi-box" /> 暂存
         </BButton>
       </BPopover>
-      <BButton class="float-end me-2" variant="primary" @click="preview()"
-        >预览</BButton
-      >
-    </div>
+      <BButton variant="primary" class="float-end me-2" @click="handlePreview">
+        预览
+      </BButton>
+    </section>
   </div>
+
   <!-- 预览模态框 -->
-  <BModal
-    scrollable
-    no-close-on-backdrop
-    no-backdrop
-    no-footer
-    size="lg"
-    id="preview"
-  >
-    <h2 class="ptitle mb-4">{{ pub_title }}</h2>
-    <span
-      v-for="tag in pub_tags"
-      class="ptags border rounded-2 bg-white text-black me-2 p-1"
-      >{{ tag }}</span
-    >
-    <hr />
-    <div class="content" v-html="valueHTML"></div>
-    <div class="shadow-sm d-flex align-items-center justify-content-evenly p-4">
-      <div class="author d-flex gap-3 align-items-center">
-        <BAvatar size="50" />
-        <div class="author-details">
-          <div class="name fw-bolder h5">梦璃東</div>
-          <div class="sign text-secondary">梦璃東有梦</div>
-        </div>
+  <BModal id="preview" size="lg" scrollable no-close-on-backdrop no-backdrop no-footer>
+    <article class="preview-content">
+      <h2 class="preview-title">{{ pub_title }}</h2>
+
+      <div class="preview-tags">
+        <span v-for="tag in pub_tags" :key="tag" class="preview-tag">
+          {{ tag }}
+        </span>
       </div>
-      <BButton variant="outline-secondary" size="sm">+ 关注</BButton>
-    </div>
+
+      <hr />
+
+      <div class="preview-body" v-html="valueHTML"></div>
+
+      <footer class="preview-footer">
+        <div class="author-info">
+          <BAvatar size="50" />
+          <div class="author-details">
+            <div class="author-name">梦璃東</div>
+            <div class="author-sign">梦璃東有梦</div>
+          </div>
+        </div>
+        <BButton variant="outline-secondary" size="sm">+ 关注</BButton>
+      </footer>
+    </article>
   </BModal>
 </template>
 
 <style lang="scss" scoped>
-#preview {
-  .ptitle {
+// ==================== 变量 ====================
+$editor-width: 600px;
+$border-color: #d3d3d3;
+$border-radius: 5px;
+
+// ==================== 容器 ====================
+.editor-container {
+  width: 100%;
+  min-height: 200px;
+  padding: 20px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+// ==================== 区块间距 ====================
+section {
+  margin-bottom: 1rem;
+
+  &.post-type-section {
+    margin-top: 1rem;
+  }
+
+  &.actions-section {
+    margin-top: 1.5rem;
+  }
+}
+
+.section-title {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+// ==================== 标题输入 ====================
+.title-section {
+  .form-floating {
+    margin-top: 1rem;
+  }
+}
+
+// ==================== 编辑器 ====================
+.editor-section {
+  width: 100%;
+
+  .editor-toolbar {
+    border-bottom: 2px solid gainsboro;
+  }
+
+  .editor-content {
+    min-height: 301px;
+    max-height: 400px;
+    overflow-y: auto;
+    border-top: 1px solid $border-color;
+    border-bottom: 2px solid gainsboro;
+    border-bottom-left-radius: $border-radius;
+    border-bottom-right-radius: $border-radius;
+  }
+
+  // 统一宽度
+  :deep(.w-e-toolbar),
+  :deep(.w-e-text-container) {
+    width: $editor-width !important;
+  }
+}
+
+// ==================== 标签 ====================
+.tags-section {
+  :deep(.b-form-tags) {
+    width: $editor-width;
+  }
+}
+
+// ==================== 预览模态框 ====================
+.preview-content {
+  .preview-title {
     font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    margin-bottom: 1rem;
+    padding-top: 1rem;
   }
 
-  .ptags {
-    cursor: pointer;
-    font-size: small;
+  .preview-tags {
+    margin-bottom: 1rem;
+
+    .preview-tag {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      margin-right: 0.5rem;
+      font-size: small;
+      background-color: white;
+      border: 1px solid #dee2e6;
+      border-radius: 0.25rem;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+    }
   }
 
-  .content {
+  .preview-body {
     overflow: hidden;
-    width: fit-content;
+    width: 100%;
+
     :deep(p) {
       width: 100%;
 
       img {
-        width: 100%;
-      }
-    }
-  }
-}
-
-.editors {
-  width: 100%;
-  min-height: 200px;
-  background-color: white;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-
-  .title {
-    .title-space {
-      font-size: 24px;
-      outline: none;
-
-      &:focus {
-        box-shadow: none;
+        max-width: 100%;
+        height: auto;
       }
     }
   }
 
-  .edit-space {
-    width: 100px;
-    > .toolbar {
+  .preview-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    box-shadow: 0 -0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+
+    .author-info {
       display: flex;
-      flex-direction: column;
-      border-bottom: 2px solid gainsboro;
-    }
+      align-items: center;
+      gap: 1rem;
 
-    > .editor {
-      overflow-y: auto;
-      min-height: 301px;
-      max-height: 400px;
-      border-top: 1px solid rgb(211, 211, 211);
-      border-bottom: 2px solid gainsboro;
-      border-bottom-left-radius: 5px;
-      border-bottom-right-radius: 5px;
-    }
+      .author-details {
+        .author-name {
+          font-weight: bold;
+          font-size: 1.25rem;
+        }
 
-    .editor,
-    .toolbar {
-      width: 600px;
+        .author-sign {
+          color: #6c757d;
+        }
+      }
     }
-  }
-
-  .tags {
-    width: 600px;
   }
 }
 </style>

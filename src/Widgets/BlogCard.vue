@@ -6,7 +6,7 @@ const type = ref("mb");
 </script>
 
 <template>
-  <BCard class="blog-card mt-4" v-skeleton="false">
+  <BCard class="blog-card" v-skeleton="false">
     <template #header v-if="type === 'mb'">
       <!-- 长方形容器 -->
       <div
@@ -151,7 +151,6 @@ const type = ref("mb");
 .blog-card {
   break-inside: avoid;
   max-width: 300px;
-  float: right;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
 }
 

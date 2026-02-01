@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import AudioUpload from "../Widgets/AudioUpload.vue";
+
+import Editor from "../Widgets/Editor.vue";
 
 const selections = [
   { name: "随心写", icon: "bi-file-earmark-richtext" },
@@ -26,7 +27,7 @@ const selections = [
     </div>
 
     <div class="textarea mt-3 mb-3">
-      <AudioUpload />
+      <Editor />
     </div>
   </div>
 </template>
