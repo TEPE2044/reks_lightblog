@@ -2,13 +2,13 @@ import type { IDomEditor } from "@wangeditor-next/editor";
 import { defineStore } from "pinia";
 import { ref, shallowRef } from "vue";
 // import { Boot } from "@wangeditor-next/editor";
-// import markdownModule from "@wangeditor-next/plugin-markdown";
+// import markdownModule from '@wangeditor/plugin-md'
 
 export const editorStore = defineStore("editor", () => {
   // 编辑器实例
   const editor = shallowRef<IDomEditor|undefined>();
-  // markdown支持
-  // Boot.registerModule(markdownModule);
+  // // markdown支持
+  // Boot.registerModule(markdownModule as any);
   //标题
   const pub_title = ref<string>("")
   // 内容

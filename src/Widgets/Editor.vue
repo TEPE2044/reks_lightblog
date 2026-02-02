@@ -11,12 +11,14 @@ import { upload_img } from "../Hooks/Editor";
 import { upload_blog } from "../Hooks/Blog";
 import { createToast } from "../Utils/reks-toast";
 
+const postType = defineModel({ default: 'blog' })
+
 // 状态管理
 const { editor, valueHTML, pub_tags, pub_title } = storeToRefs(editorStore());
 const { handleCreated, handleChange } = editorStore();
 
 // variales
-const postType = ref(0);
+
 const audioFile = ref<File | null>(null);
 
 // modal
@@ -142,6 +144,9 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="editor-container mx-auto">
+    <!-- <div class="typed" v-if="postType === 'mblog'">
+      音乐博客
+    </div> -->
     <!-- 原创/转载选择，有争议 -->
     <!-- <section class="post-type-section">
       <p class="text-muted mb-2">是否原创?（这很重要，请谨慎选择）</p>
