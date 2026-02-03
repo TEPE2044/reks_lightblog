@@ -11,7 +11,7 @@ import { upload_img } from "../Hooks/Editor";
 import { upload_blog } from "../Hooks/Blog";
 import { createToast } from "../Utils/reks-toast";
 
-const postType = defineModel({ default: 'blog' })
+const postType = defineModel({ default: "blog" });
 
 // 状态管理
 const { editor, valueHTML, pub_tags, pub_title } = storeToRefs(editorStore());
@@ -61,8 +61,8 @@ const editorConfig: Partial<IEditorConfig> = {
       onSuccess: (insertFn: any, res) => {
         insertFn(res.data.url, res.data.alt || "", res.data.url);
       },
-      onFailed: () => { },
-      onError: () => { },
+      onFailed: () => {},
+      onError: () => {},
       base64LimitSize: 0,
       // 自定义上传
       customUpload: async (file: File, insertFn: any) => {
@@ -85,11 +85,11 @@ const editorConfig: Partial<IEditorConfig> = {
 };
 
 // ==================== 方法 ====================
-const toast = useToast()
+const toast = useToast();
 /** 打开预览 */
 const handlePreview = () => {
   if (!pub_title.value.trim()) {
-    createToast(toast, "预览失败", "标题为空", "warning")
+    createToast(toast, "预览失败", "标题为空", "warning");
     return;
   }
   showPreview();
@@ -120,7 +120,7 @@ const handleSubmit = async () => {
       pub_tags.value,
     );
     console.log("发布成功:", res);
-    createToast(toast, "发布成功", "发布成功！期待上热门哦", "success")
+    createToast(toast, "发布成功", "发布成功！期待上热门哦", "success");
     // TODO：这里发完就要控制一下用户行为，不能让他一直点
     // TODO: 发布成功后跳转到文章详情页或清空表单
   } catch (error) {
@@ -162,39 +162,106 @@ onBeforeUnmount(() => {
     <!-- 标题输入 -->
     <section class="title-section">
       <div class="form-floating">
-        <input id="uploadTitle" v-model="pub_title" type="text" class="form-control" minlength="1" maxlength="20"
-          required placeholder="从标题开始吧" />
+        <input
+          id="uploadTitle"
+          v-model="pub_title"
+          type="text"
+          class="form-control"
+          minlength="1"
+          maxlength="20"
+          required
+          placeholder="从标题开始吧"
+        />
         <label for="uploadTitle">从标题开始吧</label>
       </div>
     </section>
 
+    <section class="audio-cover" v-if="postType === 'audio'">
+      <div class="form-floating mb-3">
+        <textarea
+          class="form-control"
+          id="uploadContent"
+          
+          style="height: 8rem; resize: none"
+          required
+        ></textarea>
+        <!-- v-model="description" -->
+        <label for="uploadContent" >描述</label>
+      </div>
+
+      <p class="mt-2">上传电台封面</p>
+      <div class="input-group">
+        <input
+          type="file"
+          id="uploadIcon"
+          class="form-control"
+          @change=""
+          accept="image/png,image/jpeg"
+          required
+        />
+      </div>
+    </section>
+
     <!-- 编辑器区域 -->
-    <section class="editor-section">
-      <Toolbar class="editor-toolbar" :editor="editor" :default-config="toolbarConfig" mode="default" />
-      <Editor v-model="valueHTML" class="editor-content" :default-config="editorConfig" mode="default"
-        @on-created="handleCreated" @on-change="handleChange" />
+    <section class="editor-section" v-if="postType !== 'audio'">
+      <Toolbar
+        class="editor-toolbar"
+        :editor="editor"
+        :default-config="toolbarConfig"
+        mode="default"
+      />
+      <Editor
+        v-model="valueHTML"
+        class="editor-content"
+        :default-config="editorConfig"
+        mode="default"
+        @on-created="handleCreated"
+        @on-change="handleChange"
+      />
     </section>
 
     <!-- 标签输入 -->
-    <section class="tags-section">
+    <section class="tags-section" v-if="postType !== 'audio'">
       <p class="section-title">上传标签</p>
-      <BFormTags v-model="pub_tags" input-id="tags-basic" :limit="5" duplicate-tag-text="重复标签" remove-on-delete
-        add-button-text="Add" limit-tags-text="最多只能设置5个标签噢" placeholder="设置标签(使用回车确定标签)" />
+      <BFormTags
+        v-model="pub_tags"
+        input-id="tags-basic"
+        :limit="5"
+        duplicate-tag-text="重复标签"
+        remove-on-delete
+        add-button-text="Add"
+        limit-tags-text="最多只能设置5个标签噢"
+        placeholder="设置标签(使用回车确定标签)"
+      />
     </section>
 
     <!-- 音频上传 -->
-    <section class="audio-section">
+    <section
+      class="audio-section"
+      v-if="postType === 'mblog' || postType === 'audio'"
+    >
       <p class="section-title">上传音频</p>
       <div class="input-group">
-        <input id="uploadAudio" type="file" class="form-control" accept="audio/mp3,audio/wav" required
-          @change="handleAudioUpload" />
+        <input
+          id="uploadAudio"
+          type="file"
+          class="form-control"
+          accept="audio/mp3,audio/wav"
+          required
+          @change="handleAudioUpload"
+        />
       </div>
     </section>
 
     <!-- 规定确认 -->
     <section class="agreement-section">
       <div class="form-check">
-        <input id="gridCheck1" class="form-check-input" type="checkbox" required />
+        <input
+          id="gridCheck1"
+          class="form-check-input"
+          type="checkbox"
+          required
+        />
         <label class="form-check-label" for="gridCheck1">
           我已阅读
           <router-link to="/rule">相关规定</router-link>
@@ -225,7 +292,14 @@ onBeforeUnmount(() => {
   </div>
 
   <!-- 预览模态框 -->
-  <BModal id="preview" size="lg" scrollable no-close-on-backdrop no-backdrop no-footer>
+  <BModal
+    id="preview"
+    size="lg"
+    scrollable
+    no-close-on-backdrop
+    no-backdrop
+    no-footer
+  >
     <article class="preview-content">
       <h2 class="preview-title">{{ pub_title }}</h2>
 

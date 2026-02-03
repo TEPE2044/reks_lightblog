@@ -3,6 +3,8 @@ import { Icon } from "@iconify/vue";
 
 import Editor from "../Widgets/Editor.vue";
 import { ref } from "vue";
+import { useToast } from "bootstrap-vue-next";
+import { createToast } from "../Utils/reks-toast";
 
 const selections = ref([
   { name: "随心写", icon: "bi-file-earmark-richtext",typed:'blog'},
@@ -11,9 +13,15 @@ const selections = ref([
   { name: "专栏", icon: "bi-file-earmark-post",typed:'pro'},
 ]);
 
+const toast = useToast()
+
 const typed = ref(selections.value[0]?.typed);
 
 const selectType = (ntype:number) => {
+  if(ntype === 3){
+    createToast(toast,"敬请期待","暂未开放","warning")
+    return
+  }
   typed.value = selections.value[ntype]?.typed
   console.log(typed.value)
 }
