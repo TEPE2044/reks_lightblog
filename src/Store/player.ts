@@ -3,6 +3,7 @@ import { computed, ref, watch } from "vue";
 import { Howl } from "howler";
 import { formatPlayerTime } from "../Utils/reks-format-time";
 import type { QueueItem } from "../Utils/reks-interface";
+import { useToggle } from "@vueuse/core";
 
 // 全局播放器实例
 // bug-fix:修复了下一首播放时，组件拿不到最新的player实例的问题
@@ -15,10 +16,8 @@ export const playerStore = defineStore("player", () => {
   const duration = ref<string>("");
   const currentTime = ref<string>("");
   const progress = ref<number>(0);
-  const isHidden = ref(false);
-  const toggleHidden = () => {
-    isHidden.value = !isHidden.value;
-  };
+
+  const [isHidden,toggleHidden] = useToggle()
 
   watch(mode, () => {
     if (player) {
