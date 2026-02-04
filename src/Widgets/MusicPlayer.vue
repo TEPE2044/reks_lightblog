@@ -7,19 +7,19 @@
     watch,
     onUnmounted
   } from "vue";
-  import { useDebounceFn, useIntervalFn } from "@vueuse/core";
+  import { useDebounceFn, useIntervalFn,useToggle as vuseToggle } from "@vueuse/core";
   import { useToggle } from "bootstrap-vue-next";
   import type { Placement } from "bootstrap-vue-next";
   import { playerStore } from "../Store/player";
   import { storeToRefs } from "pinia";
-  const { playList, isPlay, muted, volume, mode, currentIndex, duration, currentTime, progress, isHidden } = storeToRefs(
+  const { playQueue, isPlay, muted, volume, mode, currentIndex, duration, currentTime, progress } = storeToRefs(
     playerStore()
   );
   const {
-    initPlayList,
+    initPlayQueue,
     handleMuted,
     removeAll,
-    removeFromPlayList,
+    removeFromPlayQueue,
     updateTime,
     createPlayer,
     togglePlay,
@@ -27,7 +27,6 @@
     frontSong,
     selectFromList,
     handleClickPlay,
-    toggleHidden
   } = playerStore();
   const fakeDatas = [
     {
@@ -91,7 +90,7 @@
         "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
     },
   ];
-  console.log(playList.value);
+  console.log(playQueue.value);
   const updateTimer = useIntervalFn(() => {
     updateTime();
   }, 500, { immediate: false });
@@ -103,7 +102,7 @@
     }
   })
   onMounted(() => {
-    initPlayList(fakeDatas);
+    initPlayQueue(fakeDatas);
     //复用变量但创建新实例  
     createPlayer();
   });
@@ -143,6 +142,13 @@
     "「在遥远的过去，和遥远的未来，一定也有无数人做出了和我一样的选择。我们…从不孤单。」",
   ]);
 
+  // 模式选择
+  const modeList = ref(["loop", "shuffle", "repeat"]);
+  const switchMode = useDebounceFn(() => {
+    const currentIndex = modeList.value.indexOf(mode.value);
+    const nextIndex = (currentIndex + 1) % modeList.value.length;
+    mode.value = modeList.value[nextIndex] as string;
+  }, 300);
   // 播放列表
   const isOffc = ref(false);
   const placement = ref<Placement>("end");
@@ -151,18 +157,19 @@
     onTop.value = false;
     expand.hide();
   };
-  // 模式选择
-  const modeList = ref(["loop", "shuffle", "repeat"]);
-  const switchMode = useDebounceFn(() => {
-    const currentIndex = modeList.value.indexOf(mode.value);
-    const nextIndex = (currentIndex + 1) % modeList.value.length;
-    mode.value = modeList.value[nextIndex] as string;
-  }, 300);
   // 详细界面
   const expand = useToggle("music-player-inner");
-  const onTop = ref(false);
+  const [onTop,toggleTop] = vuseToggle()
+  const isHidden = ref(false)
+  const toggleHidden = () => {
+    isHidden.value = !isHidden.value
+    if(isHidden.value === true){
+      isOffc.value = false;
+      onTop.value = false
+    }
+  }
   const toggleExpand = () => {
-    onTop.value = !onTop.value;
+    toggleTop()
     expand.toggle();
     isOffc.value = false;
   };
@@ -247,7 +254,7 @@
 
     <div class="r-progressBar d-flex align-items-center gap-3 user-select-none" @click.stop="">
       <div class="thumbail-album rounded border r-icon" @click.stop="toggleExpand()">
-        <img class="thumbail-img" :src="playList[currentIndex]?.cover" />
+        <img class="thumbail-img" :src="playQueue[currentIndex]?.cover" />
       </div>
       <span>{{ currentTime }}</span>
       <BFormInput @input="handleClickPlay(progress)" class="progress" v-model="progress" type="range" max="100"
@@ -293,17 +300,17 @@
       </template>
       <template #default>
         <div class="scroll-list">
-          <div v-for="song in playList" :key="`reks${song}`"
+          <div v-for="song in playQueue" :key="`reks${song}`"
             class="list-item position-relative p-3 border rounded-1 mt-3 d-flex justify-content-between align-items-center shadow-sm">
             <div class="meta d-flex flex-row align-items-center justify-content-center position-absolute">
               <div class="btns d-flex flex-row align-items-center justify-content-center gap-4">
-                <BButton variant="light" size="sm" @click.stop="selectFromList(playList.indexOf(song))">
+                <BButton variant="light" size="sm" @click.stop="selectFromList(playQueue.indexOf(song))">
                   <Icon icon="bi:play-circle" width="16" height="16" />
                 </BButton>
                 <BButton variant="light" size="sm" @click.stop="testX()">
                   <Icon icon="bi:heart" width="16" height="16" />
                 </BButton>
-                <BButton variant="light" size="sm" @click.stop="removeFromPlayList(playList.indexOf(song))">
+                <BButton variant="light" size="sm" @click.stop="removeFromPlayQueue(playQueue.indexOf(song))">
                   <Icon icon="bi:trash" width="16" height="16" />
                 </BButton>
                 <BDropdown :auto-close="true" no-caret no-flip offset="25" placement="left" variant="light" size="sm">
@@ -316,7 +323,7 @@
                       评论
                     </BDropdownItem>
                     <BDropdownDivider></BDropdownDivider>
-                    <BDropdownItem @click.stop="removeFromPlayList(playList.indexOf(song))">
+                    <BDropdownItem @click.stop="removeFromPlayQueue(playQueue.indexOf(song))">
                       <Icon icon="bi:trash" width="16" height="16" />
                       删除
                     </BDropdownItem>
