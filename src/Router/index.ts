@@ -3,15 +3,6 @@ import { createRouter, createWebHashHistory } from "vue-router";
 const router = createRouter({
   history: createWebHashHistory(),
   // 路由滚动行为：默认进入页面回到顶部；返回/前进恢复历史位置；带 hash 时定位锚点
-  scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition;
-    }
-    if (to.hash) {
-      return { el: to.hash };
-    }
-    return { left: 0, top: 0 };
-  },
   routes: [
     {
       path: "/",
