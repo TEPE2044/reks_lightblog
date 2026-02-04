@@ -1,17 +1,30 @@
 <script setup lang="ts">
 import Editor from "../Components/Editor.vue";
-import { ref, watch } from "vue";
+import { ref, watch, markRaw } from "vue";
 import { useToast } from "bootstrap-vue-next";
 import { createToast } from "../Utils/reks-toast";
 import { set } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { musicStore } from "../Store/music";
+import BiFileEarmarkRichtext from "~icons/bi/file-earmark-richtext";
+import BiFileEarmarkPlay from "~icons/bi/file-earmark-play";
+import BiFileEarmarkMusic from "~icons/bi/file-earmark-music";
+import BiFileEarmarkRichtextPost from "~icons/bi/file-earmark-post";
 
-const selections = ref([
-  { name: "随心写", icon: "i-bi-file-earmark-richtext", postType: "blog" },
-  { name: "音乐博客", icon: "i-bi-file-earmark-play", postType: "mblog" },
-  { name: "音频", icon: "i-bi-file-earmark-music", postType: "audio" },
-  { name: "专栏", icon: "i-bi-file-earmark-post", postType: "pro" },
+const iconMap = {
+  blog: markRaw(BiFileEarmarkRichtext),
+  mblog: markRaw(BiFileEarmarkPlay),
+  audio: markRaw(BiFileEarmarkMusic),
+  pro: markRaw(BiFileEarmarkRichtextPost),
+} as const;
+
+type IconKey = keyof typeof iconMap;
+
+const selections = ref<{ name: string; iconKey: IconKey; postType: string }[]>([
+  { name: "随心写", iconKey: "blog", postType: "blog" },
+  { name: "音乐博客", iconKey: "mblog", postType: "mblog" },
+  { name: "音频", iconKey: "audio", postType: "audio" },
+  { name: "专栏", iconKey: "pro", postType: "pro" },
 ]);
 
 const toast = useToast();
@@ -53,7 +66,7 @@ watch(postType, () => {
           @click="selectType(index)"
         >
           <div class="sname">{{ s.name }}</div>
-          <component :is="s.icon" style="font-size:1.4rem;" />
+          <component :is="iconMap[s.iconKey]" style="font-size: 1.4rem" />
         </BButton>
       </div>
     </div>

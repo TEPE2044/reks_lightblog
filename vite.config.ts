@@ -8,16 +8,18 @@ import IconsResolver from "unplugin-icons/resolver";
 export default defineConfig({
   plugins: [
     vue(),
-    Components({
-      resolvers: [
-        BootstrapVueNextResolver(),
-        IconsResolver(),
-      ],
-      dts: true,
-    }),
     Icons({
       compiler: "vue3",
       autoInstall: true,
+    }),
+    Components({
+      resolvers: [
+        BootstrapVueNextResolver(),
+        IconsResolver({
+          enabledCollections: ['bi']
+        }),
+      ],
+      dts: true,
     }),
   ],
   server: {
