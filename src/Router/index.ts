@@ -13,6 +13,7 @@ const router = createRouter({
       path: "/hub",
       name: "hub",
       component: () => import("../Pages/Hub.vue"),
+      meta: { scrollToTop: true },
       alias: "/hub",
       children: [
         {

@@ -3,8 +3,7 @@ import { useToggle } from 'bootstrap-vue-next';
 import router from '../Router';
 import { userStore } from '../Store/user';
 import { storeToRefs } from 'pinia';
-import { useWindowScroll } from '@vueuse/core';
-useWindowScroll
+
 const {isLoggedIn} = storeToRefs(userStore());
 const emd = useToggle("easy-login-box");
 const toHub = () => {
@@ -12,7 +11,9 @@ const toHub = () => {
         emd.toggle()
         return;
     } 
+    
     router.push('/hub')
+    
 }
 </script>
 

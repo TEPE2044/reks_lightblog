@@ -15,3 +15,16 @@ const app = createApp(App);
 app.use(router).use(pinia).use(Skeleton).mount("#app");
 const user = userStore();
 await user.restoreFromLocal();
+
+// 导航后复位 #app 容器滚动，仅在目标路由声明需要时生效
+router.afterEach((to, from) => {
+	// 仅在真正的路径变化且未使用 hash 锚点时复位
+	if (to.path !== from.path && !to.hash && to.meta && (to.meta as any).scrollToTop) {
+		requestAnimationFrame(() => {
+			const appEl = document.getElementById("app");
+			if (appEl) {
+				appEl.scrollTo({ top: 0, left: 0, behavior: "auto" });
+			}
+		});
+	}
+});
