@@ -1,30 +1,45 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-
-import Editor from "../Widgets/Editor.vue";
-import { ref } from "vue";
+import Editor from "../Components/Editor.vue";
+import { ref, watch } from "vue";
 import { useToast } from "bootstrap-vue-next";
 import { createToast } from "../Utils/reks-toast";
+import { set } from "@vueuse/core";
+import { storeToRefs } from "pinia";
+import { musicStore } from "../Store/music";
 
 const selections = ref([
-  { name: "随心写", icon: "bi-file-earmark-richtext",typed:'blog'},
-  { name: "音乐博客", icon: "bi:file-earmark-play",typed:'mblog'},
-  { name: "音频", icon: "bi-file-earmark-music",typed:'audio'},
-  { name: "专栏", icon: "bi-file-earmark-post",typed:'pro'},
+  { name: "随心写", icon: "bi-file-earmark-richtext", postType: "blog" },
+  { name: "音乐博客", icon: "bi:file-earmark-play", postType: "mblog" },
+  { name: "音频", icon: "bi-file-earmark-music", postType: "audio" },
+  { name: "专栏", icon: "bi-file-earmark-post", postType: "pro" },
 ]);
 
-const toast = useToast()
+const toast = useToast();
 
-const typed = ref(selections.value[0]?.typed);
+const postType = ref(selections.value[0]?.postType);
 
-const selectType = (ntype:number) => {
-  if(ntype === 3){
-    createToast(toast,"敬请期待","暂未开放","warning")
-    return
+const selectType = (ntype: number) => {
+  if (ntype === 3) {
+    createToast(toast, "敬请期待", "暂未开放", "warning");
+    return;
   }
-  typed.value = selections.value[ntype]?.typed
-  console.log(typed.value)
-}
+  postType.value = selections.value[ntype]?.postType;
+  //console.log(postType.value)
+};
+
+const { isOriginal, trackTitle, trackDesc, audioFile, wantUpload } =
+  storeToRefs(musicStore());
+
+watch(postType, () => {
+  set(isOriginal, false);
+  set(trackTitle, "");
+  set(trackDesc, "");
+  set(audioFile, null);
+  set(wantUpload, "uex");
+  console.log("----upload")
+  console.log(wantUpload.value)
+});
 </script>
 <template>
   <div class="upload">
@@ -32,8 +47,9 @@ const selectType = (ntype:number) => {
       <div class="selection d-flex flex-column gap-3">
         <!-- <p class="title">上传格式</p> -->
         <BButton
+          :class="{ slt: postType === s.postType }"
           class="select-item d-flex flex-row gap-3 align-items-center justify-content-center rounded-3 border-0"
-          v-for="(s,index) in selections"
+          v-for="(s, index) in selections"
           :key="`selecetion${s}`"
           @click="selectType(index)"
         >
@@ -44,7 +60,7 @@ const selectType = (ntype:number) => {
     </div>
 
     <div class="textarea mt-3 mb-3">
-      <Editor v-model="typed"/>
+      <Editor v-model="postType" />
     </div>
   </div>
 </template>
@@ -72,6 +88,9 @@ const selectType = (ntype:number) => {
         flex: 0 1;
         background-color: rgb(228, 196, 138);
         backdrop-filter: blur(0.2px);
+        &.slt {
+          background-color: rgb(153, 113, 38);
+        }
         > div {
           filter: blur(0.2px);
           font-size: large;

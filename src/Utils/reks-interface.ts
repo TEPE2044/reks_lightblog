@@ -33,4 +33,11 @@ interface ToastVariant {
     | "dark";
 }
 
-export type { PhoneData, AccountData, QueueItem, ToastVariant,PageWrapper };
+interface ApiProduct {
+  productCode: string;
+  productName: string;
+  category: string;
+  discontinued?: boolean;
+}
+
+export type { PhoneData, AccountData, QueueItem, ToastVariant,PageWrapper,ApiProduct };

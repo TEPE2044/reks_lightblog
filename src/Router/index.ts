@@ -70,7 +70,7 @@ const router = createRouter({
                 {
                     path:'safe-setting',
                     name:'safe-setting',
-                    component:() => import('../Widgets/SafeSetting.vue')
+                    component:() => import('../Components/SafeSetting.vue')
                 }
             ]
         },

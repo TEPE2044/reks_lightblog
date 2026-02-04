@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Auth: typeof import('./src/components/Auth.vue')['default']
     BAccordion: typeof import('bootstrap-vue-next/components/BAccordion')['BAccordion']
     BAccordionItem: typeof import('bootstrap-vue-next/components/BAccordion')['BAccordionItem']
     BAlert: typeof import('bootstrap-vue-next/components/BAlert')['BAlert']
@@ -52,11 +53,15 @@ declare module 'vue' {
     BRow: typeof import('bootstrap-vue-next/components/BContainer')['BRow']
     BTab: typeof import('bootstrap-vue-next/components/BTabs')['BTab']
     BTabs: typeof import('bootstrap-vue-next/components/BTabs')['BTabs']
+    Editor: typeof import('./src/components/Editor.vue')['default']
     Footer: typeof import('./src/components/Footer.vue')['default']
     Header: typeof import('./src/components/Header.vue')['default']
     HubHeader: typeof import('./src/components/HubHeader.vue')['default']
+    MusicForm: typeof import('./src/components/MusicForm.vue')['default']
+    MusicPlayer: typeof import('./src/components/MusicPlayer.vue')['default']
     Navbar: typeof import('./src/components/Navbar.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SafeSetting: typeof import('./src/components/SafeSetting.vue')['default']
   }
 }

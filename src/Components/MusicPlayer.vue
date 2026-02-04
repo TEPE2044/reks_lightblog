@@ -1,115 +1,124 @@
-  <script setup lang="ts">
-  import { Icon } from "@iconify/vue";
-  import {
-    ref,
-    shallowRef,
-    onMounted,
-    watch,
-    onUnmounted
-  } from "vue";
-  import { useDebounceFn, useIntervalFn,useToggle as vuseToggle } from "@vueuse/core";
-  import { useToggle } from "bootstrap-vue-next";
-  import type { Placement } from "bootstrap-vue-next";
-  import { playerStore } from "../Store/player";
-  import { storeToRefs } from "pinia";
-  const { playQueue, isHidden,isPlay, muted, volume, mode, currentIndex, duration, currentTime, progress } = storeToRefs(
-    playerStore()
-  );
-  const {
-    initPlayQueue,
-    handleMuted,
-    removeAll,
-    removeFromPlayQueue,
-    updateTime,
-    createPlayer,
-    togglePlay,
-    nextSong,
-    frontSong,
-    selectFromList,
-    handleClickPlay,
-  } = playerStore();
-  const fakeDatas = [
-    {
-      cover: "/ai.webp",
-      songURL:
-        "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-    },
-    {
-      cover: "/ysg2.jpg",
-      songURL:
-        "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250720132105_audio.mp3",
-    },
-    {
-      cover: "/ysg1.jpg",
-      songURL:
-        "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-    },
-    {
-      cover: "/mod.webp",
-      songURL:
-        "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-    },
-    {
-      cover: "/mod.webp",
-      songURL:
-        "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-    },
-    {
-      cover: "/mod.webp",
-      songURL:
-        "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-    },
-    {
-      cover: "/mod.webp",
-      songURL:
-        "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-    },
-    {
-      cover: "/mod.webp",
-      songURL:
-        "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-    },
-    {
-      cover: "/mod.webp",
-      songURL:
-        "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-    },
-    {
-      cover: "/mod.webp",
-      songURL:
-        "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-    },
-    {
-      cover: "/mod.webp",
-      songURL:
-        "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-    },
-    {
-      cover: "/mod.webp",
-      songURL:
-        "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-    },
-  ];
-  console.log(playQueue.value);
-  const updateTimer = useIntervalFn(() => {
+<script setup lang="ts">
+import { Icon } from "@iconify/vue";
+import { ref, shallowRef, onMounted, watch, onUnmounted } from "vue";
+import {
+  useDebounceFn,
+  useIntervalFn,
+  useToggle as vuseToggle,
+} from "@vueuse/core";
+import { useToggle } from "bootstrap-vue-next";
+import type { Placement } from "bootstrap-vue-next";
+import { playerStore } from "../Store/player";
+import { storeToRefs } from "pinia";
+const {
+  playQueue,
+  isHidden,
+  isPlay,
+  muted,
+  volume,
+  mode,
+  currentIndex,
+  duration,
+  currentTime,
+  progress,
+} = storeToRefs(playerStore());
+const {
+  initPlayQueue,
+  handleMuted,
+  removeAll,
+  removeFromPlayQueue,
+  updateTime,
+  createPlayer,
+  togglePlay,
+  nextSong,
+  frontSong,
+  selectFromList,
+  handleClickPlay,
+} = playerStore();
+const fakeDatas = [
+  {
+    cover: "/ai.webp",
+    songURL:
+      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
+  },
+  {
+    cover: "/ysg2.jpg",
+    songURL:
+      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250720132105_audio.mp3",
+  },
+  {
+    cover: "/ysg1.jpg",
+    songURL:
+      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
+  },
+  {
+    cover: "/mod.webp",
+    songURL:
+      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
+  },
+  {
+    cover: "/mod.webp",
+    songURL:
+      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
+  },
+  {
+    cover: "/mod.webp",
+    songURL:
+      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
+  },
+  {
+    cover: "/mod.webp",
+    songURL:
+      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
+  },
+  {
+    cover: "/mod.webp",
+    songURL:
+      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
+  },
+  {
+    cover: "/mod.webp",
+    songURL:
+      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
+  },
+  {
+    cover: "/mod.webp",
+    songURL:
+      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
+  },
+  {
+    cover: "/mod.webp",
+    songURL:
+      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
+  },
+  {
+    cover: "/mod.webp",
+    songURL:
+      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
+  },
+];
+console.log(playQueue.value);
+const updateTimer = useIntervalFn(
+  () => {
     updateTime();
-  }, 500, { immediate: false });
-  watch(isPlay, () => {
-    if (isPlay.value === true) {
-      updateTimer.resume();
-    } else {
-      updateTimer.pause();
-    }
-  })
-  onMounted(() => {
-    initPlayQueue(fakeDatas);
-    //复用变量但创建新实例  
-    createPlayer();
-  });
+  },
+  500,
+  { immediate: false },
+);
+watch(isPlay, () => {
+  if (isPlay.value === true) {
+    updateTimer.resume();
+  } else {
+    updateTimer.pause();
+  }
+});
+onMounted(() => {
+  initPlayQueue(fakeDatas);
+  //复用变量但创建新实例
+  createPlayer();
+});
 
-
-
-  /*
+/*
   1.创建Howl实例 y
   2.初始化播放队列 y
   3.控制播放暂停，以及歌曲开始与结束 y
@@ -119,99 +128,115 @@
   7.点击播放:先暂停，加载 y
   */
 
-  //datas
-  const img_list = ref([
-    {
-      url: "/ysg2.jpg",
-      alt: "ysg2",
-    },
-    {
-      url: "/ysg.jpg",
-      alt: "ysg",
-    },
-    {
-      url: "/ysg1.jpg",
-      alt: "ysg1",
-    },
-  ]);
+//datas
+const img_list = ref([
+  {
+    url: "/ysg2.jpg",
+    alt: "ysg2",
+  },
+  {
+    url: "/ysg.jpg",
+    alt: "ysg",
+  },
+  {
+    url: "/ysg1.jpg",
+    alt: "ysg1",
+  },
+]);
 
-  // 唯一适合用shallowRef
-  const lyrics = shallowRef([
-    "「…我想成为万千萤火中的一盏。」",
-    "「天总会亮的。无论黑夜多么漫长，白昼终将到来。」",
-    "「在遥远的过去，和遥远的未来，一定也有无数人做出了和我一样的选择。我们…从不孤单。」",
-  ]);
+// 唯一适合用shallowRef
+const lyrics = shallowRef([
+  "「…我想成为万千萤火中的一盏。」",
+  "「天总会亮的。无论黑夜多么漫长，白昼终将到来。」",
+  "「在遥远的过去，和遥远的未来，一定也有无数人做出了和我一样的选择。我们…从不孤单。」",
+]);
 
-  // 模式选择
-  const modeList = ref(["loop", "shuffle", "repeat"]);
-  const switchMode = useDebounceFn(() => {
-    const currentIndex = modeList.value.indexOf(mode.value);
-    const nextIndex = (currentIndex + 1) % modeList.value.length;
-    mode.value = modeList.value[nextIndex] as string;
-  }, 300);
-  // 播放列表
-  const isOffc = ref(false);
-  const placement = ref<Placement>("end");
-  const toggleMusicList = () => {
-    isOffc.value = !isOffc.value;
+// 模式选择
+const modeList = ref(["loop", "shuffle", "repeat"]);
+const switchMode = useDebounceFn(() => {
+  const currentIndex = modeList.value.indexOf(mode.value);
+  const nextIndex = (currentIndex + 1) % modeList.value.length;
+  mode.value = modeList.value[nextIndex] as string;
+}, 300);
+// 播放列表
+const isOffc = ref(false);
+const placement = ref<Placement>("end");
+const toggleMusicList = () => {
+  isOffc.value = !isOffc.value;
+  onTop.value = false;
+  expand.hide();
+};
+// 详细界面
+const expand = useToggle("music-player-inner");
+const [onTop, toggleTop] = vuseToggle();
+
+const toggleHidden = () => {
+  isHidden.value = !isHidden.value;
+  if (isHidden.value === true) {
+    isOffc.value = false;
     onTop.value = false;
-    expand.hide();
-  };
-  // 详细界面
-  const expand = useToggle("music-player-inner");
-  const [onTop,toggleTop] = vuseToggle()
-
-  const toggleHidden = () => {
-    isHidden.value = !isHidden.value
-    if(isHidden.value === true){
-      isOffc.value = false;
-      onTop.value = false
-    }
   }
-  const toggleExpand = () => {
-    toggleTop()
-    expand.toggle();
-    isOffc.value = false;
-  };
+};
+const toggleExpand = () => {
+  toggleTop();
+  expand.toggle();
+  isOffc.value = false;
+};
 
-  const testX = () => {
-    console.log("你好");
-  };
+const testX = () => {
+  console.log("你好");
+};
 
-  const handleCloseOffCanvas = (e: MouseEvent) => {
-    const offc = document.getElementById("offc") as HTMLElement;
-    // 如果offc包括自己
-    if (offc?.contains(e.target as Node)) return;
-    isOffc.value = false;
-  };
+const handleCloseOffCanvas = (e: MouseEvent) => {
+  const offc = document.getElementById("offc") as HTMLElement;
+  // 如果offc包括自己
+  if (offc?.contains(e.target as Node)) return;
+  isOffc.value = false;
+};
 
-  watch(isOffc, (offcanvas_show) => {
-    if (offcanvas_show) {
-      // 后面改用vueuse的EventListener
-      document.addEventListener("click", handleCloseOffCanvas);
-    } else {
-      document.removeEventListener("click", handleCloseOffCanvas);
-    }
-  });
-  onUnmounted(() => {
+watch(isOffc, (offcanvas_show) => {
+  if (offcanvas_show) {
+    // 后面改用vueuse的EventListener
+    document.addEventListener("click", handleCloseOffCanvas);
+  } else {
     document.removeEventListener("click", handleCloseOffCanvas);
-  });
-
+  }
+});
+onUnmounted(() => {
+  document.removeEventListener("click", handleCloseOffCanvas);
+});
 </script>
 
 <template>
   <div class="hidden-player" v-if="isHidden">
-    <BButton size="sm" variant="outline-dark" @click="toggleHidden()">展开播放器</BButton>
+    <BButton size="sm" variant="outline-dark" @click="toggleHidden()"
+      >展开播放器</BButton
+    >
   </div>
-  <div :class="{ ontop: onTop }" class="music-player border d-flex align-items-center justify-content-center gap-5"
-    v-else>
+  <div
+    :class="{ ontop: onTop }"
+    class="music-player border d-flex align-items-center justify-content-center gap-5"
+    v-else
+  >
     <div class="controls-1 d-flex gap-3 align-items-center">
       <div class="front r-icon" @click.stop="frontSong()">
         <Icon icon="bi:skip-start" width="25" height="25" />
       </div>
       <div class="togglePlay r-icon" @click.stop="togglePlay()">
-        <Icon v-if="!isPlay" icon="bi:play-circle" width="35" height="35" title="播放" />
-        <Icon v-else icon="bi:pause-circle" width="35" height="35" title="暂停" />
+        <Icon
+          v-if="!isPlay"
+          icon="bi:play-circle"
+          width="35"
+          height="35"
+          title="播放"
+        />
+        <Icon
+          v-else
+          icon="bi:pause-circle"
+          width="35"
+          height="35"
+          title="暂停"
+        />
       </div>
       <div class="next r-icon" @click.stop="nextSong()">
         <Icon icon="bi:skip-end" width="25" height="25" />
@@ -234,9 +259,24 @@
         <template #target>
           <div class="volume-icons r-icon" @click.stop="handleMuted">
             <div v-if="!muted">
-              <Icon icon="bi:volume-down" v-if="volume < 50 && volume > 0" width="30" height="30" />
-              <Icon icon="bi:volume-up" v-if="volume >= 50" width="30" height="30" />
-              <Icon icon="bi:volume-off" v-if="volume == 0" width="30" height="30" />
+              <Icon
+                icon="bi:volume-down"
+                v-if="volume < 50 && volume > 0"
+                width="30"
+                height="30"
+              />
+              <Icon
+                icon="bi:volume-up"
+                v-if="volume >= 50"
+                width="30"
+                height="30"
+              />
+              <Icon
+                icon="bi:volume-off"
+                v-if="volume == 0"
+                width="30"
+                height="30"
+              />
             </div>
             <div v-else>
               <Icon icon="bi:volume-mute" width="30" height="30" />
@@ -252,13 +292,25 @@
       </BPopover>
     </div>
 
-    <div class="r-progressBar d-flex align-items-center gap-3 user-select-none" @click.stop="">
-      <div class="thumbail-album rounded border r-icon" @click.stop="toggleExpand()">
+    <div
+      class="r-progressBar d-flex align-items-center gap-3 user-select-none"
+      @click.stop=""
+    >
+      <div
+        class="thumbail-album rounded border r-icon"
+        @click.stop="toggleExpand()"
+      >
         <img class="thumbail-img" :src="playQueue[currentIndex]?.cover" />
       </div>
       <span>{{ currentTime }}</span>
-      <BFormInput @input="handleClickPlay(progress)" class="progress" v-model="progress" type="range" max="100"
-        min="0" />
+      <BFormInput
+        @input="handleClickPlay(progress)"
+        class="progress"
+        v-model="progress"
+        type="range"
+        max="100"
+        min="0"
+      />
       <span>{{ duration }}</span>
     </div>
     <div class="controls-3 d-flex gap-4 align-items-center">
@@ -274,24 +326,46 @@
       <BButton size="sm" @click="toggleHidden()">最小化播放器</BButton>
     </div>
 
-    <BOffcanvas width="30rem" body-scrolling lazy no-backdrop shadow="lg" :placement="placement" v-model="isOffc"
-      id="offc" class="px-1">
+    <BOffcanvas
+      width="30rem"
+      body-scrolling
+      lazy
+      no-backdrop
+      shadow="lg"
+      :placement="placement"
+      v-model="isOffc"
+      id="offc"
+      class="px-1"
+    >
       <template #header>
         <div class="oc-header d-flex flex-column justify-content-center">
-          <div class="oc-header-top w-100 d-flex flex-row align-items-center justify-content-between">
+          <div
+            class="oc-header-top w-100 d-flex flex-row align-items-center justify-content-between"
+          >
             <div class="title fw-bold h5 flex-grow-1">播放列表</div>
-            <BButton @click.stop="toggleMusicList"
-              class="header-close d-inline-flex align-items-center justify-content-center" variant="outline-dark">
+            <BButton
+              @click.stop="toggleMusicList"
+              class="header-close d-inline-flex align-items-center justify-content-center"
+              variant="outline-dark"
+            >
               <Icon icon="bi:x-lg" width="16" height="16" />
             </BButton>
           </div>
 
           <div class="oc-btns mt-3">
-            <BButton @click.stop="removeAll()" size="sm" variant="outline-secondary"
-              class="clear d-inline-flex align-items-center gap-1 me-1">
+            <BButton
+              @click.stop="removeAll()"
+              size="sm"
+              variant="outline-secondary"
+              class="clear d-inline-flex align-items-center gap-1 me-1"
+            >
               <Icon icon="bi:trash" width="16" height="16" /> 清空列表
             </BButton>
-            <BButton size="sm" variant="outline-secondary" class="collect d-inline-flex align-items-center gap-1">
+            <BButton
+              size="sm"
+              variant="outline-secondary"
+              class="collect d-inline-flex align-items-center gap-1"
+            >
               <Icon icon="bi:plus-square" width="16" height="16" />
               收藏全部
             </BButton>
@@ -300,20 +374,43 @@
       </template>
       <template #default>
         <div class="scroll-list">
-          <div v-for="song in playQueue" :key="`reks${song}`"
-            class="list-item position-relative p-3 border rounded-1 mt-3 d-flex justify-content-between align-items-center shadow-sm">
-            <div class="meta d-flex flex-row align-items-center justify-content-center position-absolute">
-              <div class="btns d-flex flex-row align-items-center justify-content-center gap-4">
-                <BButton variant="light" size="sm" @click.stop="selectFromList(playQueue.indexOf(song))">
+          <div
+            v-for="song in playQueue"
+            :key="`reks${song}`"
+            class="list-item position-relative p-3 border rounded-1 mt-3 d-flex justify-content-between align-items-center shadow-sm"
+          >
+            <div
+              class="meta d-flex flex-row align-items-center justify-content-center position-absolute"
+            >
+              <div
+                class="btns d-flex flex-row align-items-center justify-content-center gap-4"
+              >
+                <BButton
+                  variant="light"
+                  size="sm"
+                  @click.stop="selectFromList(playQueue.indexOf(song))"
+                >
                   <Icon icon="bi:play-circle" width="16" height="16" />
                 </BButton>
                 <BButton variant="light" size="sm" @click.stop="testX()">
                   <Icon icon="bi:heart" width="16" height="16" />
                 </BButton>
-                <BButton variant="light" size="sm" @click.stop="removeFromPlayQueue(playQueue.indexOf(song))">
+                <BButton
+                  variant="light"
+                  size="sm"
+                  @click.stop="removeFromPlayQueue(playQueue.indexOf(song))"
+                >
                   <Icon icon="bi:trash" width="16" height="16" />
                 </BButton>
-                <BDropdown :auto-close="true" no-caret no-flip offset="25" placement="left" variant="light" size="sm">
+                <BDropdown
+                  :auto-close="true"
+                  no-caret
+                  no-flip
+                  offset="25"
+                  placement="left"
+                  variant="light"
+                  size="sm"
+                >
                   <template #button-content>
                     <Icon icon="bi:three-dots" width="16" height="16" />
                   </template>
@@ -323,7 +420,9 @@
                       评论
                     </BDropdownItem>
                     <BDropdownDivider></BDropdownDivider>
-                    <BDropdownItem @click.stop="removeFromPlayQueue(playQueue.indexOf(song))">
+                    <BDropdownItem
+                      @click.stop="removeFromPlayQueue(playQueue.indexOf(song))"
+                    >
                       <Icon icon="bi:trash" width="16" height="16" />
                       删除
                     </BDropdownItem>
@@ -347,8 +446,17 @@
       </template>
       <template #footer> </template>
     </BOffcanvas>
-    <BModal @backdrop="toggleExpand()" size="xl" id="music-player-inner" no-header-close backdrop scrollable centered
-      no-footer lazy>
+    <BModal
+      @backdrop="toggleExpand()"
+      size="xl"
+      id="music-player-inner"
+      no-header-close
+      backdrop
+      scrollable
+      centered
+      no-footer
+      lazy
+    >
       <template #header>
         <BButton size="sm" variant="outline-dark" @click="toggleExpand()">
           <Icon icon="bi:chevron-bar-down"></Icon>
@@ -356,8 +464,14 @@
       </template>
       <div class="rs-controls-1 d-flex align-items-center flex-row gap-2">
         <div class="img-list user-select-none">
-          <BImg v-for="img in img_list" @click="console.log('nihaoshijie')" :src="img.url" :alt="img.alt" rounded
-            width="250" />
+          <BImg
+            v-for="img in img_list"
+            @click="console.log('nihaoshijie')"
+            :src="img.url"
+            :alt="img.alt"
+            rounded
+            width="250"
+          />
         </div>
 
         <div class="rs-song-info d-flex flex-column user-select-none p-3">
@@ -512,7 +626,8 @@
       background-color: rgb(218, 85, 85);
       border: 1px solid white;
       margin-top: -6px;
-      border-image: linear-gradient(#df5634, #ffb7b7) 0 fill / 8 22 9 0 / 0px 0px 0 2000px;
+      border-image: linear-gradient(#df5634, #ffb7b7) 0 fill / 8 22 9 0 / 0px
+        0px 0 2000px;
       will-change: background;
       transition: all 0.3s ease;
     }

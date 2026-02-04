@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import "@wangeditor-next/editor/dist/css/style.css";
 import { storeToRefs } from "pinia";
-import { onMounted, onBeforeUnmount } from "vue";
+import { onMounted, onBeforeUnmount, watch } from "vue";
 import { Editor, Toolbar } from "@wangeditor-next/editor-for-vue";
 import type { IEditorConfig, IToolbarConfig } from "@wangeditor-next/editor";
 import { Icon } from "@iconify/vue";
@@ -11,11 +11,13 @@ import { upload_img } from "../Hooks/Editor";
 import { upload_blog } from "../Hooks/Blog";
 import { createToast } from "../Utils/reks-toast";
 import router from "../Router";
-import MusicForm from "../Widgets/MusicForm.vue";
-
+import MusicForm from "./MusicForm.vue";
 
 const postType = defineModel({ default: "blog" });
 const toast = useToast();
+
+
+const {show: pickAudio} = useToggle("audioPick");
 
 // 状态管理
 const { editor, valueHTML, pub_tags, pub_title } = storeToRefs(editorStore());
@@ -101,6 +103,7 @@ const handlePreview = () => {
 };
 
 /** 提交发布 */
+// TODO:兼容两种形式的上传，一种是音频上传，一种是博客上传，handleSubmit使用传参的形式
 const handleSubmit = async () => {
   // 表单验证
   if (!pub_title.value.trim()) {
@@ -195,8 +198,16 @@ onBeforeUnmount(() => {
       />
     </section>
 
+    <section class="audio-secetion mt-2" v-if="postType == 'mblog'">
+      <BButton @click="pickAudio()">选择音频</BButton>
+    </section>
+
+    <BModal title="选择音频" id="audioPick" no-footer>
+      <MusicForm />
+    </BModal>
+
     <!-- 规定确认 -->
-    <section class="agreement-section">
+    <!-- <section class="agreement-section">
       <div class="form-check">
         <input
           id="gridCheck1"
@@ -209,10 +220,10 @@ onBeforeUnmount(() => {
           <router-link to="/rule">相关规定</router-link>
         </label>
       </div>
-    </section>
+    </section> -->
 
     <!-- 操作按钮 -->
-    <section class="actions-section">
+    <section class="actions-section" v-if="postType !== 'audio'">
       <BPopover placement="bottom">
         <template #target>
           <BButton variant="success" class="float-end">发布</BButton>
