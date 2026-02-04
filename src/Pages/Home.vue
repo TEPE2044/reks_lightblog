@@ -13,7 +13,7 @@
       </div>
 
       <div class="profilecard">
-        <ProfileCard />
+        <FastLogin />
       </div>
     </BContainer>
     <BContainer class="home-content mt-4">
