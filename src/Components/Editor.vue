@@ -11,13 +11,12 @@ import { upload_img } from "../Hooks/Editor";
 import { upload_blog } from "../Hooks/Blog";
 import { createToast } from "../Utils/reks-toast";
 import router from "../Router";
-import MusicForm from "./MusicForm.vue";
+import MusicForm from "../Widgets/MusicForm.vue";
+import RadioSelector from "./RadioSelector.vue";
 
 const postType = defineModel({ default: "blog" });
 const toast = useToast();
 
-
-const {show: pickAudio} = useToggle("audioPick");
 
 // 状态管理
 const { editor, valueHTML, pub_tags, pub_title } = storeToRefs(editorStore());
@@ -199,12 +198,9 @@ onBeforeUnmount(() => {
     </section>
 
     <section class="audio-secetion mt-2" v-if="postType == 'mblog'">
-      <BButton @click="pickAudio()">选择音频</BButton>
+      <RadioSelector/>
     </section>
 
-    <BModal title="选择音频" id="audioPick" no-footer>
-      <MusicForm />
-    </BModal>
 
     <!-- 规定确认 -->
     <!-- <section class="agreement-section">
