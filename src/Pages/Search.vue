@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
+
 import { onMounted, ref } from "vue";
 import type { PageWrapper } from "../Utils/reks-interface";
 const lazyText = ref("");
@@ -34,7 +34,7 @@ onMounted(() => {
           variant="outline-success"
           class="d-flex align-items-center gap-1"
         >
-          <Icon icon="bi:search" /> 搜索</BButton
+        <i-bi-search/> 搜索</BButton
         >
       </BInputGroup>
     </div>

@@ -4,7 +4,6 @@ import { storeToRefs } from "pinia";
 import { onMounted, onBeforeUnmount } from "vue";
 import { Editor, Toolbar } from "@wangeditor-next/editor-for-vue";
 import type { IEditorConfig, IToolbarConfig } from "@wangeditor-next/editor";
-import { Icon } from "@iconify/vue";
 import { useToast, useToggle } from "bootstrap-vue-next";
 import { editorStore } from "../Store/editor";
 import { upload_img } from "../Hooks/Editor";
@@ -228,10 +227,10 @@ onBeforeUnmount(() => {
           <strong>确认发布?</strong>
         </template>
         <BButton size="sm" variant="success" class="me-2" @click="handleSubmit">
-          <Icon icon="bi-send" /> 发布
+          <i-bi-send/> 发布
         </BButton>
         <BButton size="sm" variant="primary">
-          <Icon icon="bi-box" /> 暂存
+          <i-bi-box/> 暂存
         </BButton>
       </BPopover>
       <BButton variant="primary" class="float-end me-2" @click="handlePreview">

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
 import { ref, shallowRef, onMounted, watch, onUnmounted } from "vue";
 import {
   useDebounceFn,
@@ -220,66 +219,36 @@ onUnmounted(() => {
   >
     <div class="controls-1 d-flex gap-3 align-items-center">
       <div class="front r-icon" @click.stop="frontSong()">
-        <Icon icon="bi:skip-start" width="25" height="25" />
+        <i-bi-skip-start style="font-size: 1.5rem" />
       </div>
       <div class="togglePlay r-icon" @click.stop="togglePlay()">
-        <Icon
-          v-if="!isPlay"
-          icon="bi:play-circle"
-          width="35"
-          height="35"
-          title="播放"
-        />
-        <Icon
-          v-else
-          icon="bi:pause-circle"
-          width="35"
-          height="35"
-          title="暂停"
-        />
+        <i-bi-play-circle v-if="!isPlay" style="font-size: 2rem" title="播放" />
+        <i-bi-pause-circle v-else style="font-size: 2rem" title="暂停" />
       </div>
       <div class="next r-icon" @click.stop="nextSong()">
-        <Icon icon="bi:skip-end" width="25" height="25" />
+        <i-bi-skip-end style="font-size: 1.5rem" />
       </div>
     </div>
     <div class="controls-2 d-flex gap-3 align-items-center">
       <div class="mode r-icon" @click.stop="switchMode()">
-        <div class="loop r-icon" v-if="mode === 'loop'">
-          <Icon icon="bi:repeat" width="25" height="25" />
-        </div>
-        <div class="shuffle r-icon" v-if="mode === 'shuffle'">
-          <Icon icon="bi:shuffle" width="25" height="25" />
-        </div>
-        <div class="repeat r-icon" v-if="mode === 'repeat'">
-          <Icon icon="bi:repeat-1" width="25" height="25" />
-        </div>
+        <i-bi-repeat v-if="mode === 'loop'" style="font-size: 1.5rem" />
+        <i-bi-shuffle v-if="mode === 'shuffle'" style="font-size: 1.5rem" />
+        <i-bi-repeat-1 v-if="mode === 'repeat'" style="font-size: 1.5rem" />
       </div>
 
       <BPopover class="volume">
         <template #target>
           <div class="volume-icons r-icon" @click.stop="handleMuted">
             <div v-if="!muted">
-              <Icon
-                icon="bi:volume-down"
+              <i-bi-volume-down
                 v-if="volume < 50 && volume > 0"
-                width="30"
-                height="30"
+                style="font-size: 1.8rem"
               />
-              <Icon
-                icon="bi:volume-up"
-                v-if="volume >= 50"
-                width="30"
-                height="30"
-              />
-              <Icon
-                icon="bi:volume-off"
-                v-if="volume == 0"
-                width="30"
-                height="30"
-              />
+              <i-bi-volume-up v-if="volume >= 50" style="font-size: 1.8rem" />
+              <i-bi-volume-off v-if="volume == 0" style="font-size: 1.8rem" />
             </div>
             <div v-else>
-              <Icon icon="bi:volume-mute" width="30" height="30" />
+              <i-bi-volume-mute style="font-size: 1.8rem" />
             </div>
           </div>
         </template>
@@ -315,13 +284,13 @@ onUnmounted(() => {
     </div>
     <div class="controls-3 d-flex gap-4 align-items-center">
       <div class="like r-icon" @click.stop="">
-        <Icon icon="bi:heart" width="20" height="20" />
+        <i-bi-heart style="font-size: 1.2rem" />
       </div>
       <div class="comment r-icon" @click.stop="">
-        <Icon icon="bi:chat-text" width="20" height="20" />
+        <i-bi-chat-text style="font-size: 1.2rem" />
       </div>
       <div class="music-queue r-icon" @click.stop="toggleMusicList()">
-        <Icon icon="bi:music-note-list" width="20" height="20" />
+        <i-bi-music-note-list style="font-size: 1.2rem" />
       </div>
       <BButton size="sm" @click="toggleHidden()">最小化播放器</BButton>
     </div>
@@ -348,7 +317,7 @@ onUnmounted(() => {
               class="header-close d-inline-flex align-items-center justify-content-center"
               variant="outline-dark"
             >
-              <Icon icon="bi:x-lg" width="16" height="16" />
+              <i-bi-x-lg style="font-size: 1rem" />
             </BButton>
           </div>
 
@@ -359,14 +328,14 @@ onUnmounted(() => {
               variant="outline-secondary"
               class="clear d-inline-flex align-items-center gap-1 me-1"
             >
-              <Icon icon="bi:trash" width="16" height="16" /> 清空列表
+              <i-bi-trash style="font-size: 1rem" /> 清空列表
             </BButton>
             <BButton
               size="sm"
               variant="outline-secondary"
               class="collect d-inline-flex align-items-center gap-1"
             >
-              <Icon icon="bi:plus-square" width="16" height="16" />
+              <i-bi-plus-square style="font-size:1rem;" />
               收藏全部
             </BButton>
           </div>
@@ -390,17 +359,17 @@ onUnmounted(() => {
                   size="sm"
                   @click.stop="selectFromList(playQueue.indexOf(song))"
                 >
-                  <Icon icon="bi:play-circle" width="16" height="16" />
+                  <i-bi-play-circle style="font-size:1rem;" />
                 </BButton>
                 <BButton variant="light" size="sm" @click.stop="testX()">
-                  <Icon icon="bi:heart" width="16" height="16" />
+                  <i-bi-heart       style="font-size:1rem;" />
                 </BButton>
                 <BButton
                   variant="light"
                   size="sm"
                   @click.stop="removeFromPlayQueue(playQueue.indexOf(song))"
                 >
-                  <Icon icon="bi:trash" width="16" height="16" />
+                  <i-bi-trash       style="font-size:1rem;" />
                 </BButton>
                 <BDropdown
                   :auto-close="true"
@@ -412,18 +381,18 @@ onUnmounted(() => {
                   size="sm"
                 >
                   <template #button-content>
-                    <Icon icon="bi:three-dots" width="16" height="16" />
+                   <i-bi-three-dots  style="font-size:1rem;" />
                   </template>
                   <template #default>
                     <BDropdownItem>
-                      <Icon icon="bi:chat-left-dots" width="16" height="16" />
+                      <i-bi-chat-left-dots style="font-size:1rem;" />
                       评论
                     </BDropdownItem>
                     <BDropdownDivider></BDropdownDivider>
                     <BDropdownItem
                       @click.stop="removeFromPlayQueue(playQueue.indexOf(song))"
                     >
-                      <Icon icon="bi:trash" width="16" height="16" />
+                      <i-bi-trash       style="font-size:1rem;" />
                       删除
                     </BDropdownItem>
                   </template>
@@ -459,7 +428,7 @@ onUnmounted(() => {
     >
       <template #header>
         <BButton size="sm" variant="outline-dark" @click="toggleExpand()">
-          <Icon icon="bi:chevron-bar-down"></Icon>
+          <i-bi-chevron-bar-down style="font-size: 1.2rem" />
         </BButton>
       </template>
       <div class="rs-controls-1 d-flex align-items-center flex-row gap-2">

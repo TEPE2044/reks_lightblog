@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
 import Editor from "../Components/Editor.vue";
 import { ref, watch } from "vue";
 import { useToast } from "bootstrap-vue-next";
@@ -9,10 +8,10 @@ import { storeToRefs } from "pinia";
 import { musicStore } from "../Store/music";
 
 const selections = ref([
-  { name: "随心写", icon: "bi-file-earmark-richtext", postType: "blog" },
-  { name: "音乐博客", icon: "bi:file-earmark-play", postType: "mblog" },
-  { name: "音频", icon: "bi-file-earmark-music", postType: "audio" },
-  { name: "专栏", icon: "bi-file-earmark-post", postType: "pro" },
+  { name: "随心写", icon: "i-bi-file-earmark-richtext", postType: "blog" },
+  { name: "音乐博客", icon: "i-bi-file-earmark-play", postType: "mblog" },
+  { name: "音频", icon: "i-bi-file-earmark-music", postType: "audio" },
+  { name: "专栏", icon: "i-bi-file-earmark-post", postType: "pro" },
 ]);
 
 const toast = useToast();
@@ -37,8 +36,8 @@ watch(postType, () => {
   set(trackDesc, "");
   set(audioFile, null);
   set(wantUpload, "uex");
-  console.log("----upload")
-  console.log(wantUpload.value)
+  console.log("----upload");
+  console.log(wantUpload.value);
 });
 </script>
 <template>
@@ -54,7 +53,7 @@ watch(postType, () => {
           @click="selectType(index)"
         >
           <div class="sname">{{ s.name }}</div>
-          <Icon :icon="s.icon" />
+          <component :is="s.icon" style="font-size:1.4rem;" />
         </BButton>
       </div>
     </div>

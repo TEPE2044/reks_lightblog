@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
+
 </script>
 
 <template>
@@ -22,13 +22,13 @@ import { Icon } from "@iconify/vue";
 
       <div class="controls d-inline-flex align-items-center gap-3">
         <div class="cion">
-          <Icon icon="bi:play-circle" width="30" height="30" />
+          <i-bi-play-circle/>
         </div>
         <div class="cion">
-          <Icon icon="bi:plus-circle" width="30" height="30" />
+          <i-bi-plus-circle/>
         </div>
         <div class="cion mt-1">
-          <Icon icon="bi-heart" width="30" height="30" />
+          <i-bi-heart/>
         </div>
       </div>
     </div>

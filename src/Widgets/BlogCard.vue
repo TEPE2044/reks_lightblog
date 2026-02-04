@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
+
 import { ref } from "vue";
 // const datas = defineProps<{ images:[],title:string,desc:string }>()
 const type = ref("mb");
@@ -87,10 +87,10 @@ const type = ref("mb");
     <template #footer>
       <div class="controls d-inline-flex align-items-center gap-3">
         <div class="cion">
-          <Icon icon="bi:hand-thumbs-up" width="25" height="25" />
+          <i-bi-hand-thumbs-up/>
         </div>
         <div class="cion mt-1">
-          <Icon icon="bi-heart" width="25" height="25" />
+          <i-bi-heart/>
         </div>
       </div>
     </template>
