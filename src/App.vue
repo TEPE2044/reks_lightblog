@@ -3,8 +3,8 @@ import { BApp } from "bootstrap-vue-next";
 import Header from "./Components/Header.vue";
 import MainLayout from "./Layouts/MainLayout.vue";
 import Footer from "./Components/Footer.vue";
-import Auth from "./Widgets/Auth.vue";
-import MusicPlayer from "./Widgets/MusicPlayer.vue";
+import Auth from "./Components/Auth.vue";
+import MusicPlayer from "./Components/MusicPlayer.vue";
 
 </script>
 <!-- App.vue -->

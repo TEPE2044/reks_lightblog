@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import "@wangeditor-next/editor/dist/css/style.css";
 import { storeToRefs } from "pinia";
-import { onMounted, onBeforeUnmount, ref } from "vue";
+import { onMounted, onBeforeUnmount } from "vue";
 import { Editor, Toolbar } from "@wangeditor-next/editor-for-vue";
 import type { IEditorConfig, IToolbarConfig } from "@wangeditor-next/editor";
 import { Icon } from "@iconify/vue";
@@ -10,16 +10,16 @@ import { editorStore } from "../Store/editor";
 import { upload_img } from "../Hooks/Editor";
 import { upload_blog } from "../Hooks/Blog";
 import { createToast } from "../Utils/reks-toast";
+import router from "../Router";
+import MusicForm from "../Widgets/MusicForm.vue";
+
 
 const postType = defineModel({ default: "blog" });
+const toast = useToast();
 
 // 状态管理
 const { editor, valueHTML, pub_tags, pub_title } = storeToRefs(editorStore());
 const { handleCreated, handleChange } = editorStore();
-
-// variales
-
-const audioFile = ref<File | null>(null);
 
 // modal
 const { show: showPreview } = useToggle("preview");
@@ -60,9 +60,15 @@ const editorConfig: Partial<IEditorConfig> = {
       // 成功/失败回调（如果使用服务端上传时启用）
       onSuccess: (insertFn: any, res) => {
         insertFn(res.data.url, res.data.alt || "", res.data.url);
+        router.push("/");
+        createToast(toast, "图片上传成功", "标题为空", "success");
       },
-      onFailed: () => {},
-      onError: () => {},
+      onFailed: () => {
+        createToast(toast, "图片上传失败", "占位信息", "danger");
+      },
+      onError: () => {
+        createToast(toast, "图片上传失败", "占位信息", "danger");
+      },
       base64LimitSize: 0,
       // 自定义上传
       customUpload: async (file: File, insertFn: any) => {
@@ -85,7 +91,6 @@ const editorConfig: Partial<IEditorConfig> = {
 };
 
 // ==================== 方法 ====================
-const toast = useToast();
 /** 打开预览 */
 const handlePreview = () => {
   if (!pub_title.value.trim()) {
@@ -93,12 +98,6 @@ const handlePreview = () => {
     return;
   }
   showPreview();
-};
-
-/** 处理音频上传 */
-const handleAudioUpload = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  audioFile.value = target.files?.[0] || null;
 };
 
 /** 提交发布 */
@@ -144,24 +143,15 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="editor-container mx-auto">
-    <!-- <div class="typed" v-if="postType === 'mblog'">
-      音乐博客
-    </div> -->
-    <!-- 原创/转载选择，有争议 -->
-    <!-- <section class="post-type-section">
-      <p class="text-muted mb-2">是否原创?（这很重要，请谨慎选择）</p>
-      <div class="btn-group" role="group">
-        <input id="original" v-model="postType" type="radio" class="btn-check" value="0" />
-        <label class="btn btn-outline-primary" for="original">原创</label>
+    <!-- 音频上传 -->
+    <section class="audio-section" v-if="postType == 'audio'">
+      <MusicForm />
+    </section>
 
-        <input id="repost" v-model="postType" type="radio" class="btn-check" value="1" />
-        <label class="btn btn-outline-primary" for="repost">转载</label>
-      </div>
-    </section> -->
-
-    <!-- 标题输入 -->
-    <section class="title-section">
-      <div class="form-floating">
+    <!-- 博客 -->
+    <section class="editor-section" v-if="postType !== 'audio'">
+      <!-- 标题输入 -->
+      <div class="form-floating mb-2">
         <input
           id="uploadTitle"
           v-model="pub_title"
@@ -170,40 +160,10 @@ onBeforeUnmount(() => {
           minlength="1"
           maxlength="20"
           required
-          placeholder="从标题开始吧"
+          placeholder="有何感想？"
         />
-        <label for="uploadTitle">从标题开始吧</label>
+        <label for="uploadTitle">从标题开始</label>
       </div>
-    </section>
-
-    <section class="audio-cover" v-if="postType === 'audio'">
-      <div class="form-floating mb-3">
-        <textarea
-          class="form-control"
-          id="uploadContent"
-          
-          style="height: 8rem; resize: none"
-          required
-        ></textarea>
-        <!-- v-model="description" -->
-        <label for="uploadContent" >描述</label>
-      </div>
-
-      <p class="mt-2">上传电台封面</p>
-      <div class="input-group">
-        <input
-          type="file"
-          id="uploadIcon"
-          class="form-control"
-          @change=""
-          accept="image/png,image/jpeg"
-          required
-        />
-      </div>
-    </section>
-
-    <!-- 编辑器区域 -->
-    <section class="editor-section" v-if="postType !== 'audio'">
       <Toolbar
         class="editor-toolbar"
         :editor="editor"
@@ -233,24 +193,6 @@ onBeforeUnmount(() => {
         limit-tags-text="最多只能设置5个标签噢"
         placeholder="设置标签(使用回车确定标签)"
       />
-    </section>
-
-    <!-- 音频上传 -->
-    <section
-      class="audio-section"
-      v-if="postType === 'mblog' || postType === 'audio'"
-    >
-      <p class="section-title">上传音频</p>
-      <div class="input-group">
-        <input
-          id="uploadAudio"
-          type="file"
-          class="form-control"
-          accept="audio/mp3,audio/wav"
-          required
-          @change="handleAudioUpload"
-        />
-      </div>
     </section>
 
     <!-- 规定确认 -->
@@ -363,11 +305,6 @@ section {
 }
 
 // ==================== 标题输入 ====================
-.title-section {
-  .form-floating {
-    margin-top: 1rem;
-  }
-}
 
 // ==================== 编辑器 ====================
 .editor-section {

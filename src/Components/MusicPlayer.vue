@@ -12,7 +12,7 @@
   import type { Placement } from "bootstrap-vue-next";
   import { playerStore } from "../Store/player";
   import { storeToRefs } from "pinia";
-  const { playQueue, isPlay, muted, volume, mode, currentIndex, duration, currentTime, progress } = storeToRefs(
+  const { playQueue, isHidden,isPlay, muted, volume, mode, currentIndex, duration, currentTime, progress } = storeToRefs(
     playerStore()
   );
   const {
@@ -160,7 +160,7 @@
   // 详细界面
   const expand = useToggle("music-player-inner");
   const [onTop,toggleTop] = vuseToggle()
-  const isHidden = ref(false)
+
   const toggleHidden = () => {
     isHidden.value = !isHidden.value
     if(isHidden.value === true){
