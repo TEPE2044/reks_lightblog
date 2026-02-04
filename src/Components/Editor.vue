@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import "@wangeditor-next/editor/dist/css/style.css";
 import { storeToRefs } from "pinia";
-import { onMounted, onBeforeUnmount, watch } from "vue";
+import { onMounted, onBeforeUnmount } from "vue";
 import { Editor, Toolbar } from "@wangeditor-next/editor-for-vue";
 import type { IEditorConfig, IToolbarConfig } from "@wangeditor-next/editor";
 import { Icon } from "@iconify/vue";
