@@ -42,11 +42,10 @@ const handleAudioUpload = (e: Event) => {
     set(trackTitle, temp?.name);
   }
 };
-
+  // TODO:新建合辑、新建音频
   
 </script>
 <template>
-  TODO:新建合辑、新建音频
     <div class="music-form">
         <!-- 原创/转载选择 -->
         <div class="btn-group mt-3 mb-2" id="isor" role="group">

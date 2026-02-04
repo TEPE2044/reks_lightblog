@@ -6,8 +6,8 @@
     <div class="navbar" >
         <BContainer>
             <BNavbarNav class="main-nav flex-row gap-4 align-items-center">
-                <BNavItem class="section" id="home-item" to="/home">
-                    <BLink to="/home">首页</BLink>
+                <BNavItem class="section" id="home-item" to="/">
+                    <BLink to="/">首页</BLink>
                 </BNavItem>
                 <BNavItem class="section" id="community-item" to="/hub">
                     <BLink to="/hub">社区</BLink>

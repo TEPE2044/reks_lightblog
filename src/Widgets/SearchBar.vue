@@ -53,7 +53,7 @@ $expanded-width:$flexible-width + 0.4rem;
     }
   }
   .search-icon {
-    transform: translateX(830%) translateY(-3.5%);
+    transform: translateX(690%) translateY(-3.5%);
     cursor: pointer;
   }
 }

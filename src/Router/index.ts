@@ -1,85 +1,95 @@
-import {createRouter, createWebHashHistory} from 'vue-router'
+import { createRouter, createWebHashHistory } from "vue-router";
 
 const router = createRouter({
-    history: createWebHashHistory(),
-    routes: [
+  history: createWebHashHistory(),
+  // 路由滚动行为：默认进入页面回到顶部；返回/前进恢复历史位置；带 hash 时定位锚点
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition;
+    }
+    if (to.hash) {
+      return { el: to.hash };
+    }
+    return { left: 0, top: 0 };
+  },
+  routes: [
+    {
+      path: "/",
+      name: "home",
+      component: () => import("../Pages/Home.vue"),
+    },
+    {
+      path: "/hub",
+      name: "hub",
+      component: () => import("../Pages/Hub.vue"),
+      alias: "/hub",
+      children: [
         {
-            path: '/',
-            name: 'home',
-            component: () => import('../Pages/Home.vue'),
-            alias: '/home',
-            // fix 使用别名，避免重定向带来的路径问题
-            children: [
-                {
-                    path: '',
-                    name:'main',
-                    // fix 使用命名路由重定向，避免相对路径歧义
-                    redirect: {name: 'home-main'}
-                },
-                {
-                    path: 'main',
-                    name: 'home-main',
-                    component: () => import('../Pages/News.vue')
-                },
-                {
-                    path: 'subscribe',
-                    name: 'home-subscribe',
-                    component: () => import('../Pages/Subscribe.vue')
-                }
-            ]
+          path: "",
+          name: "main",
+          // fix 使用命名路由重定向，避免相对路径歧义
+          redirect: { name: "hub-main" },
         },
         {
-            path: '/hub',
-            name: 'hub',
-            component: () => import('../Pages/Hub.vue')
+          path: "main",
+          name: "hub-main",
+          component: () => import("../Pages/News.vue"),
         },
         {
-            path: '/search',
-            name: 'search',
-            component: () => import('../Pages/Search.vue')
-        },{
-            path: '/upload',
-            name: 'upload',
-            component: () => import('../Pages/Upload.vue')
+          path: "subscribe",
+          name: "hub-subscribe",
+          component: () => import("../Pages/Subscribe.vue"),
+        },
+      ],
+    },
+    {
+      path: "/search",
+      name: "search",
+      component: () => import("../Pages/Search.vue"),
+    },
+    {
+      path: "/upload",
+      name: "upload",
+      component: () => import("../Pages/Upload.vue"),
+    },
+    {
+      path: "/centre",
+      name: "centre",
+      component: () => import("../Pages/Centre.vue"),
+      children: [
+        {
+          path: "my-blog",
+          name: "my-blog",
+          redirect: { name: "my-blog" },
         },
         {
-            path: '/centre',
-            name: 'centre',
-            component: () => import('../Pages/Centre.vue'),
-            children:[
-                {
-                    path: 'my-blog',
-                    name:'my-blog',
-                    redirect: {name: 'my-blog'}
-                },
-                {
-                    path:'my-blog',
-                    name:'my-blog',
-                    component:() => import("../Widgets/MyBlog.vue")
-                },
-                {
-                    path:'my-fav',
-                    name:'my-fav',
-                    component:() => import("../Widgets/MyFav.vue")
-                },
-                {
-                    path: 'edit-profile',
-                    name: 'edit-profile',
-                    component: () => import('../Widgets/EditProfile.vue')
-                },
-                {
-                    path:'safe-setting',
-                    name:'safe-setting',
-                    component:() => import('../Components/SafeSetting.vue')
-                }
-            ]
+          path: "my-blog",
+          name: "my-blog",
+          component: () => import("../Widgets/MyBlog.vue"),
         },
         {
-            path:'/help',
-            name: 'help',
-            component: () => import('../Pages/Help.vue')
-        }
-    ]
-})
+          path: "my-fav",
+          name: "my-fav",
+          component: () => import("../Widgets/MyFav.vue"),
+        },
+        {
+          path: "edit-profile",
+          name: "edit-profile",
+          component: () => import("../Widgets/EditProfile.vue"),
+        },
+        {
+          path: "safe-setting",
+          name: "safe-setting",
+          component: () => import("../Components/SafeSetting.vue"),
+        },
+      ],
+    },
+    {
+      path: "/help",
+      name: "help",
+      component: () => import("../Pages/Help.vue"),
+    },
+  ],
+});
 
-export default router
+export default router;

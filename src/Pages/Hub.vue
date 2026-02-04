@@ -2,13 +2,17 @@
   <div class="hub">
     <HubHeader />
 
-    <div class="hang border-2 mt-4">
-      <ShowCase />
+    <div class="hang border-3 rounded-3 overflow-hidden mt-4 mb-4">
+      <HubCaro />
     </div>
+
+    <Recommand />
   </div>
 </template>
 
 <script setup lang="ts">
+
+
 </script>
 
 <style lang="scss" scoped>

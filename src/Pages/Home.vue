@@ -17,13 +17,13 @@
       </div>
     </BContainer>
     <BContainer class="home-content mt-4">
-        <ShowCase/>
-        <ShowCase/>
-      <div class="recommand">
-         <Recommand />
-      </div>
-     
+      <ShowCase />
     </BContainer>
+    <BContainer class="home-hotlist mt-4">
+      <HotList />
+    </BContainer>
+
+
   </div>
 </template>
 
@@ -38,10 +38,12 @@
       "profilecard caro";
     grid-template-columns: 1fr 4fr;
     gap: 20px;
+
     @media (max-width: 1000px) {
       display: flex;
       flex-direction: column;
     }
+
     .activities-caro {
       grid-area: caro;
     }
