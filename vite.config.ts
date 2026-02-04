@@ -13,6 +13,8 @@ export default defineConfig({
       autoInstall: true,
     }),
     Components({
+      dirs: ['src/Components','src/Layouts','src/Pages','src/Widgets'],
+      extensions: ['vue'],
       resolvers: [
         BootstrapVueNextResolver(),
         IconsResolver({

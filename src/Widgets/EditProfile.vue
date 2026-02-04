@@ -46,7 +46,6 @@
 
 <script setup lang="ts">
 import { userStore } from "../Store/user";
-import Avatar from "./Avatar.vue";
 const user = userStore();
 const default_gender:number = user.userInfo.sex
 // const default_gender:number = user.userInfo.gender

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useTemplateRef } from "vue";
 import { useEventListener } from "@vueuse/core";
-import MusicCase from "./MusicCase.vue";
 
 
 const showcase = useTemplateRef('showcase')

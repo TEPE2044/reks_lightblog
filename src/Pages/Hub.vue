@@ -9,8 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import HubHeader from "../Components/HubHeader.vue";
-import ShowCase from "../Widgets/ShowCase.vue";
 </script>
 
 <style lang="scss" scoped>
