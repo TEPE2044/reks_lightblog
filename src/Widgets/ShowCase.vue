@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useTemplateRef } from "vue";
-import MusicCard from "./MusicCard.vue";
 import { useEventListener } from "@vueuse/core";
 
 
@@ -15,7 +14,7 @@ useEventListener(showcase, 'wheel', (e: WheelEvent) => {
     <div class="scroll-bar w-100 mb-4 p-4">
       <div class="case-title h5">电台上新</div>
       <div ref="showcase" class="case py-4 mt-4">
-        <MusicCard v-for="is in 10" :key="is" />
+        <MusicCase v-for="is in 10" :key="is" />
       </div>
     </div>
   </div>
@@ -36,7 +35,7 @@ useEventListener(showcase, 'wheel', (e: WheelEvent) => {
     display: flex;
     flex-wrap: nowrap;
     gap: 1rem;
-    height: g.$caro-height;
+    height: 240px;
     overflow-x: auto;
 
     /* WebKit 核心 */

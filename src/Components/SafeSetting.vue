@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
 import { useToggle } from "bootstrap-vue-next";
 import { ref, computed } from "vue";
 
@@ -29,14 +28,14 @@ const getRecoverCode = () => {
       <BCol
         class="safe-box d-flex align-items-center justify-content-center gap-3 offset"
       >
-        <Icon icon="bi:key" width="30" height="30" />
+         <i-bi-key style="font-size:1.5rem;" />
         <BButton variant="outline-primary" @click="espw.toggle()"
           >设置密码</BButton
         >
       </BCol>
       <BCol
         class="safe-box d-flex align-items-center justify-content-center gap-3 offset-1"
-        ><Icon icon="bi:envelope" width="30" height="30" />
+        ><i-bi-envelope style="font-size:1.5rem;" />
         <BButton variant="outline-success" @click="ese.toggle()">
           设置邮箱</BButton
         >
@@ -44,7 +43,7 @@ const getRecoverCode = () => {
 
       <BCol
         class="safe-box d-flex align-items-center justify-content-center gap-3 offset-1"
-        ><Icon icon="bi:telephone" width="30" height="30" />
+        ><i-bi-telephone style="font-size:1.5rem;" />
         <BButton variant="outline-primary">更换手机号</BButton>
       </BCol>
     </BRow>
@@ -53,18 +52,18 @@ const getRecoverCode = () => {
     <BRow class="safe-options p-4" cols="4" align-h="center" gutter-y="5">
       <BCol
         class="safe-box d-flex align-items-center justify-content-center gap-4"
-        ><Icon icon="bi:person-gear" width="30" height="30" />
+        ><i-bi-person-gear style="font-size:1.5rem;" />
         <BButton variant="outline-secondary">访问控制</BButton>
       </BCol>
       <BCol
         class="safe-box d-flex align-items-center justify-content-center gap-4 offset-1"
       >
-        <Icon icon="bi:journal-text" width="30" height="30" />
+        <i-bi-journal-text style="font-size:1.5rem;" />
         <BButton variant="outline-primary">用户日志</BButton>
       </BCol>
       <BCol
         class="safe-box d-flex align-items-center justify-content-center gap-4 offset-1"
-        ><Icon icon="bi:person-dash" width="30" height="30" />
+        ><i-bi-person-dash style="font-size:1.5rem;" />
         <BButton variant="outline-danger">注销账号</BButton>
       </BCol>
     </BRow>

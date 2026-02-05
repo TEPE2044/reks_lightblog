@@ -1,10 +1,5 @@
 <script setup lang="ts">
 import { BApp } from "bootstrap-vue-next";
-import Header from "./Components/Header.vue";
-import MainLayout from "./Layouts/MainLayout.vue";
-import Footer from "./Components/Footer.vue";
-import Auth from "./Widgets/Auth.vue";
-import MusicPlayer from "./Widgets/MusicPlayer.vue";
 
 </script>
 <!-- App.vue -->

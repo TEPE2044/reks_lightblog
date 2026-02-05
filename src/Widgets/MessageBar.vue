@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Icon } from "@iconify/vue";
+
 import { shallowRef } from "vue";
 import { userStore } from "../Store/user";
 import { useToggle } from "bootstrap-vue-next";
@@ -12,7 +12,8 @@ const emd = useToggle("easy-login-box");
     class="message-bar rounded d-flex justify-content-around align-items-center p-2 gap-2"
   >
     <BButton @click="sys = !sys" class="position-relative" variant="light">
-      <Icon icon="bi:bell" />
+      <i-bi-bell/>
+  
       <BBadge
         v-show="sys"
         dot-indicator
@@ -21,7 +22,7 @@ const emd = useToggle("easy-login-box");
       />
     </BButton>
     <BButton @click="sys = !sys" class="position-relative" variant="light">
-      <Icon icon="bi:envelope" />
+      <i-bi-envelope/>
       <BBadge
         v-show="sys"
         dot-indicator
@@ -31,7 +32,7 @@ const emd = useToggle("easy-login-box");
     </BButton>
 
     <BButton @click="emd.show()" class="position-relative" variant="light" v-if="!user.isLoggedIn">
-      <Icon icon="bi:person-circle" />
+      <i-bi-person-circle/>
     </BButton>
 
     <BDropdown
@@ -44,7 +45,7 @@ const emd = useToggle("easy-login-box");
       no-caret
     >
       <template #button-content>
-        <Icon icon="bi:person-circle" />
+        <i-bi-person-circle/>
       </template>
       <div class="rs-dropdown-card">
         <div

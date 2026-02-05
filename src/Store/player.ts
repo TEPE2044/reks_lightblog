@@ -15,10 +15,8 @@ export const playerStore = defineStore("player", () => {
   const duration = ref<string>("");
   const currentTime = ref<string>("");
   const progress = ref<number>(0);
-  const isHidden = ref(false);
-  const toggleHidden = () => {
-    isHidden.value = !isHidden.value;
-  };
+  const isHidden = ref<boolean>(false)
+
 
   watch(mode, () => {
     if (player) {
@@ -30,53 +28,53 @@ export const playerStore = defineStore("player", () => {
 
   /* 播放列表 
   增删
-  1. playList 列表
-  2. playListLength 列表长度
+  1. playQueue 列表
+  2. playQueueLength 列表长度
   3. nowIndex 当前播放位置
   4. 删除后进行下一首
   */
 
-  const playList = ref<Array<QueueItem>>([]);
-  const playListLength = computed(() => playList.value.length);
+  const playQueue = ref<Array<QueueItem>>([]);
+  const playQueueLength = computed(() => playQueue.value.length);
   const currentIndex = ref<number>(0);
   // 不重复增加
   // 下一首播放？ 需要考虑不同情况
   // 如果现在是最后一首咋办:那就用push
   // 非最后一首的情况都用splice(currentIndex,0,data)，splice第二个是删除的个数
-  const addIntoPlayList = (data: QueueItem, currentIndex: number) => {
+  const addIntoPlayQueue = (data: QueueItem, currentIndex: number) => {
     // 没法用included，includes比较的是对象引用，而data每次都是新创建的对象（即使内容一样），引用地址不同
-    let isExisted = playList.value.some(
+    let isExisted = playQueue.value.some(
       (song) => song.songURL === data.songURL,
     );
     console.log(isExisted);
     if (isExisted === false) {
-      if (currentIndex === playListLength.value - 1) {
-        playList.value.push(data);
+      if (currentIndex === playQueueLength.value - 1) {
+        playQueue.value.push(data);
       } else {
-        playList.value.splice(currentIndex + 1, 0, data);
+        playQueue.value.splice(currentIndex + 1, 0, data);
       }
-      console.log(playList.value);
+      console.log(playQueue.value);
     }
   };
   // 删除
-  const removeFromPlayList = (idx: number) => {
+  const removeFromPlayQueue = (idx: number) => {
     // 如果删除的是当前播放的歌曲，播放下一首
     // 如果删除的是最后一首，并且是当前播放的歌曲，播放前一首
     if (idx === currentIndex.value) {
       currentIndex.value = currentIndex.value + 1;
-      if (currentIndex.value === playListLength.value - 1) {
+      if (currentIndex.value === playQueueLength.value - 1) {
         currentIndex.value = currentIndex.value - 1;
       }
     }
-    playList.value = playList.value.filter(
-      (song) => song !== playList.value[idx],
+    playQueue.value = playQueue.value.filter(
+      (song) => song !== playQueue.value[idx],
     );
-    console.log(playList.value);
+    console.log(playQueue.value);
   };
   // 删除全部
   const removeAll = () => {
-    playList.value = [];
-    console.log(playList.value);
+    playQueue.value = [];
+    console.log(playQueue.value);
   };
 
   // 播放状态
@@ -101,7 +99,7 @@ export const playerStore = defineStore("player", () => {
   const createPlayer = () => {
     player?.unload();
     player = new Howl({
-      src: [playList.value[currentIndex.value]?.songURL as string],
+      src: [playQueue.value[currentIndex.value]?.songURL as string],
       autoplay: false,
       volume: volume.value / 100,
       onload: () => {
@@ -129,8 +127,8 @@ export const playerStore = defineStore("player", () => {
     return player;
   };
   // 初始化播放列表
-  const initPlayList = (data: Array<QueueItem>) => {
-    playList.value = data;
+  const initPlayQueue = (data: Array<QueueItem>) => {
+    playQueue.value = data;
     currentIndex.value = 0;
     duration.value = "00:00";
     currentTime.value = "00:00";
@@ -159,6 +157,7 @@ export const playerStore = defineStore("player", () => {
     }
   };
 
+
   const updateTime = () => {
     const current = Math.round(player?.seek() as number) as number;
     const total = Math.round(player?.duration() as number) as number;
@@ -170,11 +169,11 @@ export const playerStore = defineStore("player", () => {
 
   // 如果有下一首，获取下一首的进行播放,先卸载unload，然后src重新设置
   const nextSong = () => {
-    currentIndex.value = (currentIndex.value + 1) % playListLength.value;
+    currentIndex.value = (currentIndex.value + 1) % playQueueLength.value;
     switchSong();
   };
   const frontSong = () => {
-    currentIndex.value = (currentIndex.value - 1) % playListLength.value;
+    currentIndex.value = (currentIndex.value - 1) % playQueueLength.value;
     switchSong();
   };
 
@@ -204,7 +203,7 @@ export const playerStore = defineStore("player", () => {
   };
 
   return {
-    playList,
+    playQueue,
     isPlay,
     isReady,
     volume,
@@ -215,12 +214,11 @@ export const playerStore = defineStore("player", () => {
     currentTime,
     progress,
     isHidden,
-    toggleHidden,
-    initPlayList,
+    initPlayQueue,
     updateTime,
     handleMuted,
-    addIntoPlayList,
-    removeFromPlayList,
+    addIntoPlayQueue,
+    removeFromPlayQueue,
     removeAll,
     createPlayer,
     togglePlay,

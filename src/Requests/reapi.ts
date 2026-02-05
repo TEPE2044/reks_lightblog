@@ -1,6 +1,6 @@
 import axios from "axios";
 import { userStore } from "../Store/user";
-
+import router from "../Router";
 
 const reapi = axios.create({
   baseURL: "https://v1.rekindlers.top/api/v1/",
@@ -30,6 +30,7 @@ reapi.interceptors.response.use(
       const user = userStore();
       user.userLogout();
       alert("身份验证失败，请重新登录");
+      router.replace('/')
     }
     return Promise.reject(err);
   }

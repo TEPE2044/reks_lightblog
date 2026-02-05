@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import Recommand from '../Layouts/Recommand.vue';
-import Caro from '../Widgets/Caro.vue';
-import ProfileCard from '../Widgets/FastLogin.vue';
-import ShowCase from '../Widgets/ShowCase.vue';
+
 
 
 
@@ -16,17 +13,17 @@ import ShowCase from '../Widgets/ShowCase.vue';
       </div>
 
       <div class="profilecard">
-        <ProfileCard />
+        <FastLogin />
       </div>
     </BContainer>
     <BContainer class="home-content mt-4">
-        <ShowCase/>
-        <ShowCase/>
-      <div class="recommand">
-         <Recommand />
-      </div>
-     
+      <ShowCase />
     </BContainer>
+    <BContainer class="home-hotlist mt-4">
+      <HotList />
+    </BContainer>
+
+
   </div>
 </template>
 
@@ -41,10 +38,12 @@ import ShowCase from '../Widgets/ShowCase.vue';
       "profilecard caro";
     grid-template-columns: 1fr 4fr;
     gap: 20px;
+
     @media (max-width: 1000px) {
       display: flex;
       flex-direction: column;
     }
+
     .activities-caro {
       grid-area: caro;
     }

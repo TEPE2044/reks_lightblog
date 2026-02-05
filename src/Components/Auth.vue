@@ -283,6 +283,7 @@ watchEffect(() => {
       </div>
 
       <div class="box box-show w-75 mx-auto" v-if="isShow">
+        <!-- TODO:后续要单独封装，使用pinia管理 -->
         <Vcode :show="isShow" type="inside" @success="onSuccess" />
         <BButton
           class="d-flex justify-content-center align-items-center mt-4"

@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import MessageBar from "../Widgets/MessageBar.vue";
-import SearchBar from "../Widgets/SearchBar.vue";
-
 // interface ToolItem {
 //     content: string;
 //     classname: string;
@@ -35,14 +32,14 @@ import SearchBar from "../Widgets/SearchBar.vue";
               <img src="/reks.svg" alt="profile" class="rounded-circle" width="35" height="auto" />
             </div>
             <div class="logo">
-              <router-link class="logo-font" to="/home">ReKindlers</router-link>
+              <router-link class="logo-font" to="/">ReKindlers</router-link>
             </div>
           </div>
 
         </div>
         <!--      右侧Header-->
         <div class="header-right d-flex flex-row align-items-center gap-4">
-          <div class="search-bar offset-1">
+          <div class="search-bar">
             <SearchBar />
           </div>
           <div class="signIn-btn">
