@@ -178,7 +178,7 @@ const submitPhoneData = useDebounceFn(async () => {
   } catch (e) {
     loading.value = false;
     console.error("登录失败:", e);
-    createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
+    createToast(toast, "登录失败",(e as any)?.response.data.detail, "danger");
   }finally{
     loading.value = false;
   }

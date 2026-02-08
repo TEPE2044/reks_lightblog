@@ -40,4 +40,9 @@ interface ApiProduct {
   discontinued?: boolean;
 }
 
-export type { PhoneData, AccountData, QueueItem, ToastVariant,PageWrapper,ApiProduct };
+interface PasswordGroup{
+  psw:string,
+  auth_psw:string
+}
+
+export type { PhoneData, AccountData, QueueItem, ToastVariant,PageWrapper,ApiProduct,PasswordGroup };
