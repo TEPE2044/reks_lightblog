@@ -2,6 +2,7 @@ import axios from "axios";
 import { userStore } from "../Store/user";
 import router from "../Router";
 
+
 const reapi = axios.create({
   baseURL: "http://localhost:12404/api/v1/",
   timeout: 15000,
@@ -31,6 +32,9 @@ reapi.interceptors.response.use(
       user.userLogout();
       alert("身份验证失败，请重新登录");
       router.replace('/')
+    }
+    if(err.response?.status === 429){
+      alert("请求次数已达上限！请勿重复请求")
     }
     return Promise.reject(err);
   }
