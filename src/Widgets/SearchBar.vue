@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import router from '../Router';
 
 const searchContent = ref("");
+const searchReadonly = ref(true);
 
 const handleSearch = () => {
   // TODO:跳转到搜索结果页并且返回搜索内容，携带搜索内容，可使用标签分类
@@ -17,12 +18,23 @@ const handleSearch = () => {
 </script>
 
 <template>
-  <div class="search-bar position-relative d-flex align-items-center">
-    <input type="text" @keydown.enter="handleSearch" class="search-input position-absolute" v-model="searchContent" placeholder="索引万物" />
+  <form class="search-bar position-relative d-flex align-items-center">
+    <input
+      type="text"
+      autofocus="false"
+      autocomplete="off"
+      name="search"
+      :readonly="searchReadonly"
+      @focus="searchReadonly = false"
+      @keydown.enter.stop="handleSearch"
+      class="search-input position-absolute"
+      v-model="searchContent"
+      placeholder="索引万物"
+    />
     <div class="search-icon" @click="handleSearch">
       <i-bi-search/>
     </div>
-  </div>
+  </form>
 
 </template>
 
