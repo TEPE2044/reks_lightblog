@@ -1,26 +1,14 @@
 <script setup lang="ts">
 import Editor from "../Components/Editor.vue";
-import { ref, watch, markRaw } from "vue";
+import { ref, watch } from "vue";
 import { useToast } from "bootstrap-vue-next";
 import { createToast } from "../Utils/reks-toast";
 import { set } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { musicStore } from "../Store/music";
-import BiFileEarmarkRichtext from "~icons/bi/file-earmark-richtext";
-import BiFileEarmarkPlay from "~icons/bi/file-earmark-play";
-import BiFileEarmarkMusic from "~icons/bi/file-earmark-music";
-import BiFileEarmarkRichtextPost from "~icons/bi/file-earmark-post";
+import  { type UploadIcon,uploadIconMap } from "../Utils/reks-icon-map";
 
-const iconMap = {
-  blog: markRaw(BiFileEarmarkRichtext),
-  mblog: markRaw(BiFileEarmarkPlay),
-  audio: markRaw(BiFileEarmarkMusic),
-  pro: markRaw(BiFileEarmarkRichtextPost),
-} as const;
-
-type IconKey = keyof typeof iconMap;
-
-const selections = ref<{ name: string; iconKey: IconKey; postType: string }[]>([
+const selections = ref<{ name: string; iconKey: UploadIcon; postType: string }[]>([
   { name: "随心写", iconKey: "blog", postType: "blog" },
   { name: "音乐博客", iconKey: "mblog", postType: "mblog" },
   { name: "音频", iconKey: "audio", postType: "audio" },
@@ -66,7 +54,7 @@ watch(postType, () => {
           @click="selectType(index)"
         >
           <div class="sname">{{ s.name }}</div>
-          <component :is="iconMap[s.iconKey]" style="font-size: 1.4rem" />
+          <component :is="uploadIconMap[s.iconKey]" style="font-size: 1.4rem" />
         </BButton>
       </div>
     </div>
