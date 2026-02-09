@@ -10,10 +10,11 @@ import { upload_img } from "../Hooks/Editor";
 import { upload_blog } from "../Hooks/Blog";
 import { createToast } from "../Utils/reks-toast";
 import router from "../Router";
+import { userStore } from "../Store/user";
 
 const postType = defineModel({ default: "blog" });
 const toast = useToast();
-
+const { userInfo } = storeToRefs(userStore());
 
 // 状态管理
 const { editor, valueHTML, pub_tags, pub_title } = storeToRefs(editorStore());
@@ -195,9 +196,8 @@ onBeforeUnmount(() => {
     </section>
 
     <section class="audio-secetion mt-2" v-if="postType == 'mblog'">
-      <RadioSelector/>
+      <RadioSelector />
     </section>
-
 
     <!-- 规定确认 -->
     <!-- <section class="agreement-section">
@@ -225,11 +225,9 @@ onBeforeUnmount(() => {
           <strong>确认发布?</strong>
         </template>
         <BButton size="sm" variant="success" class="me-2" @click="handleSubmit">
-          <i-bi-send/> 发布
+          <i-bi-send /> 发布
         </BButton>
-        <BButton size="sm" variant="primary">
-          <i-bi-box/> 暂存
-        </BButton>
+        <BButton size="sm" variant="primary"> <i-bi-box /> 暂存 </BButton>
       </BPopover>
       <BButton variant="primary" class="float-end me-2" @click="handlePreview">
         预览
@@ -261,10 +259,10 @@ onBeforeUnmount(() => {
 
       <footer class="preview-footer">
         <div class="author-info">
-          <BAvatar size="50" />
+          <BAvatar size="50" :src="userInfo?.avatar || null" />
           <div class="author-details">
-            <div class="author-name">梦璃東</div>
-            <div class="author-sign">梦璃東有梦</div>
+            <div class="author-name">{{ userInfo?.username }}</div>
+            <div class="author-sign">{{ userInfo?.sign || ''}}</div>
           </div>
         </div>
         <BButton variant="outline-secondary" size="sm">+ 关注</BButton>
