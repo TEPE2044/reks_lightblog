@@ -50,8 +50,8 @@ const router = createRouter({
       component: () => import("../Pages/Centre.vue"),
       children: [
         {
-          path: "my-blog",
-          name: "my-blog",
+          path: "",
+          name: "my",
           redirect: { name: "my-blog" },
         },
         {
