@@ -4,7 +4,7 @@ import { useToggle as vuseToggle } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { musicStore } from "../Store/music";
 import type { ApiProduct } from "../Utils/reks-interface";
-
+import { iwantsomedata } from "../Utils/reks-test";
 
 const { wantUpload } = storeToRefs(musicStore());
 
@@ -14,6 +14,7 @@ const options = [
 ];
 
 const [confirm, toggleConfirm] = vuseToggle();
+
 
 // Simulated API response
 const apiProducts: ApiProduct[] = [
@@ -42,6 +43,7 @@ const selectedProductCode = ref<string>();
       <div>
         <BInputGroup>
           <BFormInput
+            @focus="iwantsomedata()"
             v-model="selectedProductCode"
             type="text"
             list="product-list"
