@@ -12,7 +12,7 @@
         <Caro />
       </div>
 
-      <div class="profilecard">
+      <div class="fastlogin">
         <FastLogin />
       </div>
     </BContainer>
@@ -35,7 +35,7 @@
     margin-top: 7.3rem;
     display: grid;
     grid-template-areas:
-      "profilecard caro";
+      "fastlogin caro";
     grid-template-columns: 1fr 4fr;
     gap: 20px;
 
@@ -48,8 +48,8 @@
       grid-area: caro;
     }
 
-    .profilecard {
-      grid-area: profilecard;
+    .fastlogin {
+      grid-area: fastlogin;
     }
   }
 }
