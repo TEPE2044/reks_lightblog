@@ -6,6 +6,7 @@ export const userStore = defineStore("user", () => {
   const rcode = ref<string>("");
   const payload = ref<string>("");
   const userInfo = ref<any>(null);
+  const tempAvatar = ref<File | null>(null);
 
   const isLoggedIn = ref(!!localStorage.getItem("token"));
 
@@ -60,6 +61,7 @@ export const userStore = defineStore("user", () => {
     payload,
     isLoggedIn,
     userInfo,
+    tempAvatar,
     storeUserInfo,
     userLogin,
     userLogout,

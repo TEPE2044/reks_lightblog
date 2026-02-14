@@ -45,4 +45,9 @@ interface PasswordGroup{
   auth_psw:string
 }
 
-export type { PhoneData, AccountData, QueueItem, ToastVariant,PageWrapper,ApiProduct,PasswordGroup };
+interface UserProfile {
+  username: string;
+  gender: number;
+  signature: string;
+}
+export type { PhoneData, AccountData, QueueItem, ToastVariant,PageWrapper,ApiProduct,PasswordGroup,UserProfile };

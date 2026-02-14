@@ -51,7 +51,7 @@ const emd = useToggle("easy-login-box");
         <div
           class="avatar mt-2 d-flex flex justify-content-center align-items-center"
         >
-          <BAvatar src="/ysg.jpg" size="lg"/>
+          <BAvatar :src="user.userInfo.avatar || ''" size="lg"/>
         </div>
         <div class="info d-flex flex justify-content-center align-items-center">
           <p class="name mt-3 mb-1">梦璃東</p>

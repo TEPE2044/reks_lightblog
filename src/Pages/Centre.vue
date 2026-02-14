@@ -20,7 +20,7 @@ const navs = [
           <BAvatar
             size="100px"
             style="box-shadow: grey 2px 3px 2px 1px"
-            :src="user.userInfo?.avatar || ''"
+            :src="user.userInfo.avatar || ''"
           />
         </div>
         <div class="info">
@@ -28,7 +28,7 @@ const navs = [
             {{ user.userInfo?.username || "无名" }}
           </div>
           <div class="sign text-secondary">
-            {{ user.userInfo?.signature || "这个人很懒" }}
+            {{ user.userInfo?.sign || "" }}
           </div>
         </div>
       </div>

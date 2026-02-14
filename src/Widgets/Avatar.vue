@@ -21,6 +21,9 @@ const selectAvatar = () => {
 const user = userStore();
 const toast = useToast();
 const viewportRef = ref<InstanceType<typeof Viewport>>();
+
+
+
 const src = ref("");
 const fileSize = ref(0);
 const size = ref(0);
@@ -30,7 +33,7 @@ const handleSelect = () => {
     if (isCancelError(err)) return;
 
     if (getErrorMessage(err)) {
-      createToast(toast, "无法识别的文件", "你确定这是图片？", "danger");
+      createToast(toast, "错误文件", "文件过大或者 你确定这是图片？", "danger");
       console.error(err);
       return;
     }
@@ -46,6 +49,7 @@ const handleCropper = async () => {
       }
       src.value = URL.createObjectURL(file);
       fileSize.value = file.size;
+      user.tempAvatar = file;
     }
   } catch (error) {
     // 错误处理
@@ -78,7 +82,7 @@ const handleLoad = (e: Event) => {
     </div>
 
     <BAvatar v-else :src="src" size="100px" @load="handleLoad" />
-    <BButton class="ms-4" @click="handleClear">清除</BButton>
+    <BButton class="ms-4" @click="handleClear" :disabled="!src">清除</BButton>
     <BModal
       id="avatar-me"
       @ok="handleCropper"
