@@ -9,13 +9,14 @@ export const query_my_blog = async() => {
     return res;
 }
 
-export const upload_blog = async(title:string,content:string,tags:string[]) => {
+export const upload_blog = async(title:string,content:string,cover:string[],tags:string[]) => {
     const res = await reapi({
         url:'/blog/my-blog/new',
         method:"POST",
         data:{
             title:title,
             content:content,
+            cover:cover,
             tags:tags
         }
     })

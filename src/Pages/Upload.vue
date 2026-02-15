@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import Editor from "../Components/Editor.vue";
-import { ref, watch } from "vue";
+import { onUnmounted, ref, watch } from "vue";
 import { useToast } from "bootstrap-vue-next";
-import { createToast } from "../Utils/reks-toast";
 import { set } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { musicStore } from "../Store/music";
@@ -12,7 +11,6 @@ const selections = ref<{ name: string; iconKey: UploadIcon; postType: string }[]
   { name: "随心写", iconKey: "blog", postType: "blog" },
   { name: "音乐博客", iconKey: "mblog", postType: "mblog" },
   { name: "音频", iconKey: "audio", postType: "audio" },
-  { name: "专栏", iconKey: "pro", postType: "pro" },
 ]);
 
 const toast = useToast();
@@ -20,10 +18,6 @@ const toast = useToast();
 const postType = ref(selections.value[0]?.postType);
 
 const selectType = (ntype: number) => {
-  if (ntype === 3) {
-    createToast(toast, "敬请期待", "暂未开放", "warning");
-    return;
-  }
   postType.value = selections.value[ntype]?.postType;
   //console.log(postType.value)
 };
@@ -40,6 +34,11 @@ watch(postType, () => {
   console.log("----upload");
   console.log(wantUpload.value);
 });
+onUnmounted(() =>{
+  window.onbeforeunload = function(event) {
+    event.preventDefault();
+  };
+})
 </script>
 <template>
   <div class="upload">

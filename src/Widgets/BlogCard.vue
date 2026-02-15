@@ -2,13 +2,14 @@
 
 import { ref } from "vue";
 // const datas = defineProps<{ images:[],title:string,desc:string }>()
-const type = ref("mb");
+// type 0是音乐博客，1普通博客
+const type = ref(1);
 
 </script>
 
 <template>
   <BCard class="blog-card" v-skeleton="false">
-    <template #header v-if="type === 'mb'">
+    <template #header v-if="type === 0">
       <!-- 长方形容器 -->
       <div
         style="
@@ -94,67 +95,6 @@ const type = ref("mb");
         </div>
       </div>
     </template>
-  </BCard>
-  <BCard class="blog-card mt-4" v-skeleton="false">
-    <div class="rs-body">
-      <div ref="card-item" class="rs-card-img-list" v-skeleton-item>
-        <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
-        <img class="rs-img" src="/ai.webp" alt="Music Card Demo" />
-        <img class="rs-img" src="/melo.webp" alt="Music Card Demo" />
-      </div>
-    </div>
-
-    <div class="rs-card-content mt-4" v-skeleton-item @click="">
-      <div class="rs-title h5" title="Hello,ReKindlers">
-        <strong>Hello,ReKindlers</strong>
-      </div>
-      <div class="rs-desc mt-2">Since 2024</div>
-    </div>
-  </BCard>
-  <BCard class="blog-card mt-4" v-skeleton="false">
-    <div class="rs-body">
-      <div ref="card-item" class="rs-card-img-list" v-skeleton-item>
-        <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
-      </div>
-    </div>
-
-    <div class="rs-card-content mt-4" v-skeleton-item @click="">
-      <div class="rs-title h5" title="Hello,ReKindlers">
-        <strong>Hello,ReKindlers</strong>
-      </div>
-      <div class="rs-desc mt-2">Since 2024</div>
-    </div>
-  </BCard>
-  <BCard class="blog-card mt-4" v-skeleton="false">
-    <div class="rs-body">
-      <div ref="card-item" class="rs-card-img-list" v-skeleton-item>
-        <img class="rs-img" src="/ai.webp" alt="Music Card Demo" />
-        <img class="rs-img" src="/melo.webp" alt="Music Card Demo" />
-      </div>
-    </div>
-
-    <div class="rs-card-content mt-4" v-skeleton-item @click="">
-      <div class="rs-title h5" title="Hello,ReKindlers">
-        <strong>Hello,ReKindlers</strong>
-      </div>
-      <div class="rs-desc mt-2">Since 2024</div>
-    </div>
-  </BCard>
-
-  <BCard class="blog-card mt-4" v-skeleton="false">
-    <div class="rs-body">
-      <div ref="card-item" class="rs-card-img-list" v-skeleton-item>
-        <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
-        <img class="rs-img" src="/ai.webp" alt="Music Card Demo" />
-      </div>
-    </div>
-
-    <div class="rs-card-content mt-4" v-skeleton-item @click="">
-      <div class="rs-title h5" title="Hello,ReKindlers">
-        <strong>Hello,ReKindlers</strong>
-      </div>
-      <div class="rs-desc mt-2">Since 2024</div>
-    </div>
   </BCard>
 </template>
 

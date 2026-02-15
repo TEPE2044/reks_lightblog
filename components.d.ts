@@ -43,6 +43,7 @@ declare module 'vue' {
     BImg: typeof import('bootstrap-vue-next/components/BImg')['BImg']
     BInputGroup: typeof import('bootstrap-vue-next/components/BInputGroup')['BInputGroup']
     BLink: typeof import('bootstrap-vue-next/components/BLink')['BLink']
+    Blog: typeof import('./src/Pages/Blog.vue')['default']
     BlogCard: typeof import('./src/Widgets/BlogCard.vue')['default']
     BModal: typeof import('bootstrap-vue-next/components/BModal')['BModal']
     BNav: typeof import('bootstrap-vue-next/components/BNav')['BNav']
@@ -117,6 +118,7 @@ declare module 'vue' {
     Search: typeof import('./src/Pages/Search.vue')['default']
     SearchBar: typeof import('./src/Widgets/SearchBar.vue')['default']
     ShowCase: typeof import('./src/Widgets/ShowCase.vue')['default']
+    Store: typeof import('./src/Pages/Store.vue')['default']
     Subscribe: typeof import('./src/Pages/Subscribe.vue')['default']
     Upload: typeof import('./src/Pages/Upload.vue')['default']
   }

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import "@wangeditor-next/editor/dist/css/style.css";
 import { storeToRefs } from "pinia";
-import { onMounted, onBeforeUnmount } from "vue";
+import { onMounted, onBeforeUnmount} from "vue";
 import { Editor, Toolbar } from "@wangeditor-next/editor-for-vue";
 import type { IEditorConfig, IToolbarConfig } from "@wangeditor-next/editor";
 import { useToast, useToggle } from "bootstrap-vue-next";
@@ -17,7 +17,7 @@ const toast = useToast();
 const { userInfo } = storeToRefs(userStore());
 
 // 状态管理
-const { editor, valueHTML, pub_tags, pub_title } = storeToRefs(editorStore());
+const { editor, valueHTML, pub_tags, pub_title, coverImages } = storeToRefs(editorStore());
 const { handleCreated, handleChange } = editorStore();
 
 // modal
@@ -78,11 +78,14 @@ const editorConfig: Partial<IEditorConfig> = {
           const res = await upload_img(form);
           if (res.errno === 0) {
             insertFn(res.data.url, res.data.alt || "", res.data.url);
+            createToast(toast, "上传成功", "图片上传成功", "success");
           } else {
+
             alert(res.message || "上传失败");
           }
         } catch (error) {
           console.error("图片上传失败:", error);
+          createToast(toast, "上传失败", "图片上传失败", "danger");
         }
       },
     },
@@ -116,7 +119,8 @@ const handleSubmit = async () => {
     const res = await upload_blog(
       pub_title.value,
       valueHTML.value,
-      pub_tags.value,
+      coverImages.value,
+      pub_tags.value
     );
     console.log("发布成功:", res);
     createToast(toast, "发布成功", "发布成功！期待上热门哦", "success");
@@ -152,47 +156,19 @@ onBeforeUnmount(() => {
     <section class="editor-section" v-if="postType !== 'audio'">
       <!-- 标题输入 -->
       <div class="form-floating mb-2">
-        <input
-          id="uploadTitle"
-          v-model="pub_title"
-          type="text"
-          class="form-control"
-          minlength="1"
-          maxlength="20"
-          required
-          placeholder="有何感想？"
-        />
+        <input id="uploadTitle" v-model="pub_title" type="text" class="form-control" minlength="1" maxlength="20"
+          required placeholder="有何感想？" />
         <label for="uploadTitle">从标题开始</label>
       </div>
-      <Toolbar
-        class="editor-toolbar"
-        :editor="editor"
-        :default-config="toolbarConfig"
-        mode="default"
-      />
-      <Editor
-        v-model="valueHTML"
-        class="editor-content"
-        :default-config="editorConfig"
-        mode="default"
-        @on-created="handleCreated"
-        @on-change="handleChange"
-      />
+      <Toolbar class="editor-toolbar" :editor="editor" :default-config="toolbarConfig" mode="default" />
+      <Editor v-model="valueHTML" class="editor-content" :default-config="editorConfig" mode="default"
+        @on-created="handleCreated" @on-change="handleChange" />
     </section>
 
-    <!-- 标签输入 -->
     <section class="tags-section" v-if="postType !== 'audio'">
       <p class="section-title">上传标签</p>
-      <BFormTags
-        v-model="pub_tags"
-        input-id="tags-basic"
-        :limit="5"
-        duplicate-tag-text="重复标签"
-        remove-on-delete
-        add-button-text="Add"
-        limit-tags-text="最多只能设置5个标签噢"
-        placeholder="设置标签(使用回车确定标签)"
-      />
+      <BFormTags v-model="pub_tags" input-id="tags-basic" :limit="5" duplicate-tag-text="重复标签" remove-on-delete
+        add-button-text="Add" limit-tags-text="最多只能设置5个标签噢" placeholder="设置标签(使用回车确定标签)" />
     </section>
 
     <section class="audio-secetion mt-2" v-if="postType == 'mblog'">
@@ -236,14 +212,7 @@ onBeforeUnmount(() => {
   </div>
 
   <!-- 预览模态框 -->
-  <BModal
-    id="preview"
-    size="lg"
-    scrollable
-    no-close-on-backdrop
-    no-backdrop
-    no-footer
-  >
+  <BModal id="preview" size="lg" scrollable no-close-on-backdrop no-backdrop no-footer>
     <article class="preview-content">
       <h2 class="preview-title">{{ pub_title }}</h2>
 
@@ -262,7 +231,7 @@ onBeforeUnmount(() => {
           <BAvatar size="50" :src="userInfo?.avatar || null" />
           <div class="author-details">
             <div class="author-name">{{ userInfo?.username }}</div>
-            <div class="author-sign">{{ userInfo?.sign || ''}}</div>
+            <div class="author-sign">{{ userInfo?.sign || '' }}</div>
           </div>
         </div>
         <BButton variant="outline-secondary" size="sm">+ 关注</BButton>

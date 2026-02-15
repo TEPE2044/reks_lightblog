@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import BlogCard from '../Widgets/BlogCard.vue';
+import { onMounted } from "vue";
+import { query_my_blog } from "../Hooks/Blog";
+onMounted(async() => {
+  const res = await query_my_blog()
+  console.log("我的博客列表", res);
+})
 </script>
 
 <template>
