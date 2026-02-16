@@ -1,20 +1,15 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { query_my_blog } from "../Hooks/Blog";
-import type { BlogData } from "../Utils/reks-interface";
+import { ref } from "vue";
 
-const blogs = ref<BlogData[]>([]);
-onMounted(async () => {
-  const res = await query_my_blog()
-  console.log("我的博客列表", res);
-  blogs.value = res.blogs;
-})
+const empty = ref(true);
 </script>
 
 <template>
-
-  <div class="ns">
-    <BlogCard v-for="blog in blogs" :key="blog.id" :blog="blog" />
+  <div class="ns-empty" v-if="empty">
+    <Empty/>
+  </div>
+  <div class="ns" v-if="!empty">
+    <!-- <BlogCard v-for="blog in blogs" :key="blog.id" :blog="blog" /> -->
   </div>
 
 </template>
