@@ -59,6 +59,7 @@ interface BlogData{
   type: number;
 }
 
+// Record无需包装
 
 
 export type { PhoneData, AccountData, QueueItem, ToastVariant,PageWrapper,ApiProduct,PasswordGroup,UserProfile,BlogData };

@@ -4,10 +4,21 @@ import { query_my_blog } from "../Hooks/Blog";
 import type { BlogData } from "../Utils/reks-interface";
 
 const blogs = ref<BlogData[]>([]);
+const loading = ref(true)
 onMounted(async () => {
+  // 先读缓存
+  const cached = localStorage.getItem('blogs')
+  if (cached) {
+    blogs.value = JSON.parse(cached)
+    loading.value = false  // 立即显示，无需等待
+    console.log(loading.value)
+  }
+  
+  // 再请求新数据
   const res = await query_my_blog()
-  console.log("我的博客列表", res);
-  blogs.value = res.data.blogs;
+  blogs.value = res.data.blogs
+  localStorage.setItem('blogs', JSON.stringify(res.data.blogs))
+  loading.value = false
 })
 </script>
 

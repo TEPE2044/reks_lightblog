@@ -49,11 +49,6 @@ const router = createRouter({
       component: () => import("../Pages/Upload.vue"),
     },
     {
-      path: "/store",
-      name: "store",
-      component: () => import("../Pages/Store.vue"),
-    },
-    {
       path: "/centre",
       name: "centre",
       component: () => import("../Pages/Centre.vue"),
@@ -89,6 +84,11 @@ const router = createRouter({
       path: "/help",
       name: "help",
       component: () => import("../Pages/Help.vue"),
+    },
+    {
+      path: "/store",
+      name: "store",
+      component: () => import("../Pages/Store.vue"),
     },
   ],
 });

@@ -1,18 +1,20 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import type { BlogData } from "../Utils/reks-interface";
 
 // type 0是音乐博客，1普通博客
-const blogProps = defineProps<{blog:BlogData}>();
+const blogProps = defineProps<{ blog: BlogData}>();
 const b = blogProps.blog;
+// Record<number, boolean> 用于跟踪每张图片的加载状态，键是图片索引，值是布尔值表示是否加载完成
+const imgLoaded = ref<Record<number, boolean>>({});
 
 </script>
 
 <template>
-  <BCard class="blog-card mb-2" v-skeleton="false">
+  <BCard class="blog-card mb-2">
     <template #header v-if="b.type === 0">
       <!-- 长方形容器 -->
-      <div
-        style="
+      <div style="
           display: flex;
           align-items: center;
           height: 80px;
@@ -20,29 +22,19 @@ const b = blogProps.blog;
           background: #fff;
           border-radius: 6px;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-        "
-      >
+        ">
         <!-- 左侧封面 -->
-        <div
-          style="
+        <div style="
             position: relative;
             width: 64px;
             height: 64px;
             border-radius: 4px;
             overflow: hidden;
             cursor: pointer;
-          "
-          @click=""
-        >
-          <img
-            src="/ai.webp"
-            style="width: 100%; height: 100%; object-fit: cover"
-            alt="album"
-          />
+          " @click="">
+          <img src="/ai.webp" style="width: 100%; height: 100%; object-fit: cover" alt="album" />
           <!-- 播放按钮 -->
-          <div
-            class="play-btn"
-            style="
+          <div class="play-btn" style="
               position: absolute;
               inset: 0;
               background: rgba(0, 0, 0, 0.45);
@@ -51,8 +43,7 @@ const b = blogProps.blog;
               justify-content: center;
               opacity: 0;
               transition: opacity 0.2s;
-            "
-          >
+            ">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff">
               <path d="M8 5v14l11-7z" />
             </svg>
@@ -72,8 +63,10 @@ const b = blogProps.blog;
     </template>
 
     <div class="rs-body">
-      <div ref="card-item" class="rs-card-img-list" v-skeleton-item >
-        <img class="rs-img" :src="img" :alt="`alt+${img}`" v-for="img in b.cover"/>
+      <div class="rs-card-img-list" v-skeleton-item>
+        <div v-for="(img, idx) in b.cover" :key="idx" class="rs-img-wrapper" v-skeleton="!imgLoaded[idx]">
+          <img class="rs-img" :src="img" :alt="`alt+${img}`" @load="imgLoaded[idx] = true" v-show="imgLoaded[idx]" />
+        </div>
       </div>
     </div>
 
@@ -86,21 +79,28 @@ const b = blogProps.blog;
     <template #footer>
       <div class="controls d-inline-flex align-items-center gap-3">
         <div class="cion">
-          <i-bi-hand-thumbs-up/>
+          <i-bi-hand-thumbs-up />
         </div>
         <div class="cion mt-1">
-          <i-bi-heart/>
+          <i-bi-heart />
         </div>
       </div>
     </template>
   </BCard>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
+.rs-img-wrapper {
+  min-height: 150px; // 防止骨架屏塌陷
+  background: #f0f0f0; // 骨架屏底色
+  border-radius: 4px;
+}
+
 .rs-time {
   font-size: 12px;
   color: #999;
 }
+
 .blog-card {
   break-inside: avoid;
   max-width: 300px;
