@@ -7,7 +7,7 @@ const blogs = ref<BlogData[]>([]);
 onMounted(async () => {
   const res = await query_my_blog()
   console.log("我的博客列表", res);
-  blogs.value = res.data.blogs;
+  blogs.value = res.blogs;
 })
 </script>
 

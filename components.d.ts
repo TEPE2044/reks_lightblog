@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    App: typeof import('./src/App.vue')['default']
     Auth: typeof import('./src/Components/Auth.vue')['default']
     Avatar: typeof import('./src/Widgets/Avatar.vue')['default']
     BAccordion: typeof import('bootstrap-vue-next/components/BAccordion')['BAccordion']

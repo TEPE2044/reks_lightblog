@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { BlogData } from "../Utils/reks-interface";
+import { query_blog_by_id } from "../Hooks/Blog";
+
 
 // type 0是音乐博客，1普通博客
 const blogProps = defineProps<{ blog: BlogData}>();
 const b = blogProps.blog;
 // Record<number, boolean> 用于跟踪每张图片的加载状态，键是图片索引，值是布尔值表示是否加载完成
 const imgLoaded = ref<Record<number, boolean>>({});
+
+const readBlog = async(id:number) => {
+  const res = await query_blog_by_id(id)
+  console.log(res)
+  
+}
 
 </script>
 
@@ -70,7 +78,7 @@ const imgLoaded = ref<Record<number, boolean>>({});
       </div>
     </div>
 
-    <div class="rs-card-content mt-4" v-skeleton-item @click="">
+    <div class="rs-card-content mt-4" v-skeleton-item @click="readBlog(b.id)">
       <div class="rs-title h5" :title="b.title">
         <strong>{{ b.title }}</strong>
       </div>

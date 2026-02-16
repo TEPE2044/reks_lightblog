@@ -6,7 +6,15 @@ export const query_my_blog = async() => {
         url:'/blog/my-blog',
         method:"GET"
     })
-    return res;
+    return res.data;
+}
+
+export const query_blog_by_id = async(id:number) => {
+    const res = await reapi({
+        url:`/blog/${id}`,
+        method:"GET"
+    })
+    return res.data;
 }
 
 export const upload_blog = async(title:string,content:string,cover:string[],tags:string[]) => {

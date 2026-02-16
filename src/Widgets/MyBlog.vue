@@ -16,8 +16,8 @@ onMounted(async () => {
   
   // 再请求新数据
   const res = await query_my_blog()
-  blogs.value = res.data.blogs
-  localStorage.setItem('blogs', JSON.stringify(res.data.blogs))
+  blogs.value = res.blogs
+  localStorage.setItem('blogs', JSON.stringify(res.blogs))
   loading.value = false
 })
 </script>
