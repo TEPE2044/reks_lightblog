@@ -17,7 +17,7 @@ const props = defineProps({
 
 <style lang="scss" scoped>
 .empty-card {
-  padding: 2rem 1.6rem;
+  padding: 4.5rem 1.6rem;
   text-align: center;
 }
 
