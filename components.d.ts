@@ -11,6 +11,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    404: typeof import('./src/Pages/404.vue')['default']
     App: typeof import('./src/App.vue')['default']
     Auth: typeof import('./src/Components/Auth.vue')['default']
     Avatar: typeof import('./src/Widgets/Avatar.vue')['default']
