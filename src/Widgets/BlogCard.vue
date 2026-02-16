@@ -1,15 +1,15 @@
 <script setup lang="ts">
+import type { BlogData } from "../Utils/reks-interface";
 
-import { ref } from "vue";
-// const datas = defineProps<{ images:[],title:string,desc:string }>()
 // type 0是音乐博客，1普通博客
-const type = ref(1);
+const blogProps = defineProps<{blog:BlogData}>();
+const b = blogProps.blog;
 
 </script>
 
 <template>
-  <BCard class="blog-card" v-skeleton="false">
-    <template #header v-if="type === 0">
+  <BCard class="blog-card mb-2" v-skeleton="false">
+    <template #header v-if="b.type === 0">
       <!-- 长方形容器 -->
       <div
         style="
@@ -72,18 +72,16 @@ const type = ref(1);
     </template>
 
     <div class="rs-body">
-      <div ref="card-item" class="rs-card-img-list" v-skeleton-item>
-        <img class="rs-img" src="/ysg.jpg" alt="Music Card Demo" />
-        <img class="rs-img" src="/ai.webp" alt="Music Card Demo" />
-        <img class="rs-img" src="/melo.webp" alt="Music Card Demo" />
+      <div ref="card-item" class="rs-card-img-list" v-skeleton-item >
+        <img class="rs-img" :src="img" :alt="`alt+${img}`" v-for="img in b.cover"/>
       </div>
     </div>
 
     <div class="rs-card-content mt-4" v-skeleton-item @click="">
-      <div class="rs-title h5" title="Hello,ReKindlers">
-        <strong>Hello,ReKindlers</strong>
+      <div class="rs-title h5" :title="b.title">
+        <strong>{{ b.title }}</strong>
       </div>
-      <div class="rs-desc mt-2">Since 2024</div>
+      <div class="rs-time mt-2">发布于{{ b.created_at }}</div>
     </div>
     <template #footer>
       <div class="controls d-inline-flex align-items-center gap-3">
@@ -99,6 +97,10 @@ const type = ref(1);
 </template>
 
 <style lang="scss" scoped>
+.rs-time {
+  font-size: 12px;
+  color: #999;
+}
 .blog-card {
   break-inside: avoid;
   max-width: 300px;

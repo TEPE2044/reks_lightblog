@@ -55,7 +55,7 @@ const navs = [
             {{ nav.name }}
           </BNavItem>
           <BNavItem @click="" exact
-            >退出登录</BNavItem
+            >返回主页</BNavItem
           >
         </BNav>
       </div>

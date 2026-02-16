@@ -17,17 +17,7 @@ const [confirm, toggleConfirm] = vuseToggle();
 
 
 // Simulated API response
-const apiProducts: ApiProduct[] = [
-  { productCode: "PROD-001", productName: "Widget A", category: "Hardware" },
-  { productCode: "Man-Dick", productName: "sdget B", category: "Sex Toy" },
-  { productCode: "PROD-002", productName: "Gadget B", category: "Electronics" },
-  {
-    productCode: "PROD-003",
-    productName: "Tool C",
-    category: "Hardware",
-    discontinued: true,
-  },
-];
+const apiProducts: ApiProduct[] = [];
 // TypeScript knows selectedProductCode is a string (matching productCode field type)
 const selectedProductCode = ref<string>();
 </script>

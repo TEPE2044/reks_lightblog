@@ -1,6 +1,5 @@
 <template>
     <div class="store">
-        敬请期待
     </div>
 </template>
 

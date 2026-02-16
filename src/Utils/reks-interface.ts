@@ -50,4 +50,15 @@ interface UserProfile {
   gender: number;
   signature: string;
 }
-export type { PhoneData, AccountData, QueueItem, ToastVariant,PageWrapper,ApiProduct,PasswordGroup,UserProfile };
+
+interface BlogData{
+  id: number;
+  cover: string[];
+  title: string;
+  created_at: Date;
+  type: number;
+}
+
+
+
+export type { PhoneData, AccountData, QueueItem, ToastVariant,PageWrapper,ApiProduct,PasswordGroup,UserProfile,BlogData };
