@@ -8,7 +8,6 @@ import { BButton, useToast } from "bootstrap-vue-next";
 import { ref, computed } from "vue";
 import { upload_img } from "../Hooks/Editor";
 import { upload_music,upload_music_form } from "../Hooks/Music";
-import { C } from "vue-router/dist/router-CWoNjPRp.mjs";
 const { isOriginal, name, desc, audioFile, coverFile,coverURL,audioURL } =
   storeToRefs(musicStore());
 
