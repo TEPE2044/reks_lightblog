@@ -1,21 +1,28 @@
 <script setup lang="ts">
-import { useTemplateRef } from "vue";
-import { useEventListener } from "@vueuse/core";
+// import { useTemplateRef } from "vue";
+// import { useEventListener } from "@vueuse/core";
+import Empty from "../Components/Empty.vue";
 
 
-const showcase = useTemplateRef('showcase')
-useEventListener(showcase, 'wheel', (e: WheelEvent) => {
-  e.preventDefault()
-  if (showcase.value) showcase.value.scrollLeft += e.deltaY
-}, { passive: false })
+// const showcase = useTemplateRef('showcase')
+// useEventListener(showcase, 'wheel', (e: WheelEvent) => {
+//   e.preventDefault()
+//   if (showcase.value) showcase.value.scrollLeft += e.deltaY
+// }, { passive: false })
+
+
+
 </script>
 <template>
   <div class="showcase">
     <div class="scroll-bar w-100 mb-4 p-4">
       <div class="case-title h5">电台上新</div>
-      <div ref="showcase" class="case py-4 mt-4">
-        <MusicCase v-for="is in 10" :key="is" />
-      </div>
+      <Empty title="暂无内容"/>
+      <!-- <div ref="showcase" class="case py-4 mt-4">
+        
+        <!-- <MusicCase v-for="is in 10" :key="is" /> -->
+        <!-- <BlogCard v-for="blog in blogs" :key="blog.id" :blog="blog" /> -->
+      <!-- </div> -->
     </div>
   </div>
 </template>

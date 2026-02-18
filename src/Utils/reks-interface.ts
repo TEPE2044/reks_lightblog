@@ -68,3 +68,15 @@ export interface MusicData{
   audioURL:string|undefined  
 }
 
+export interface MusicResponse{
+  audio:string
+  cover:string
+  created_at:Date
+  desc:string,
+  id:number,
+  name:string,
+  original:boolean,
+  rid:number,
+  state:number
+}
+

@@ -7,8 +7,8 @@ import { createToast } from "../Utils/reks-toast";
 import { BButton, useToast } from "bootstrap-vue-next";
 import { ref, computed } from "vue";
 import { upload_img } from "../Hooks/Editor";
-import { upload_music,upload_music_form } from "../Hooks/Music";
-const { isOriginal, name, desc, audioFile, coverFile,coverURL,audioURL } =
+import { upload_music, upload_music_form } from "../Hooks/Music";
+const { isOriginal, name, desc, audioFile, coverFile, coverURL, audioURL } =
   storeToRefs(musicStore());
 
 const toast = useToast();
@@ -59,45 +59,67 @@ const handleAudioUpload = (e: Event) => {
 const upload_new_music = async (data: MusicData) => {
   if (!data.name) {
     createToast(toast, "上传失败", "未上传任何数据", "warning");
-    return
+    return;
   }
-  // 先上传图片，再上传音频，再传表单
+
+  // 用于存储上传成功的URL
+  let coverUrl = "";
+  let audioUrl = "";
+
   try {
-    const form = new FormData();
-    form.append("img", coverFile.value as File);
-    const res = await upload_img(form);
-    if (res.errno === 0) {
-      coverURL.value = res.data.url
-      createToast(toast, "上传成功", "图片上传成功", "success");
+    // 1. 上传图片
+    const imgForm = new FormData();
+    imgForm.append("img", coverFile.value as File);
+    const imgRes = await upload_img(imgForm);
+
+    if (imgRes.errno !== 0) {
+      throw new Error(imgRes.message || "图片上传失败");
     }
-  } catch (error) {
-    console.error("图片上传失败:", error);
-    createToast(toast, "上传失败", "图片上传失败", "danger");
-  }
+    coverUrl = imgRes.data.url;
+    coverURL.value = coverUrl; // 同步更新ref
+    createToast(toast, "上传成功", "图片上传成功", "success");
 
-  try {
-    const form = new FormData();
-    form.append("audio", audioFile.value as File);
-    const res = await upload_music(form)
-    console.log(res)
-    audioURL.value = res?.link
-    console.log(audioURL.value)
+    // 2. 上传音频
+    const audioForm = new FormData();
+    audioForm.append("audio", audioFile.value as File);
+    const audioRes = await upload_music(audioForm);
+
+    if (!audioRes?.link) {
+      throw new Error("音频上传返回数据异常");
+    }
+    audioUrl = audioRes.link;
+    audioURL.value = audioUrl; // 同步更新ref
     createToast(toast, "上传成功", "音频上传成功", "success");
-  } catch (e) {
-    console.error("音频上传失败:", e);
-  }
 
-  try{
-    const res = await upload_music_form(data)
-    console.log(res)
+    // 3. 组装完整数据并上传表单
+    const completeData = {
+      ...data,
+      cover: coverUrl,    // 根据后端字段名调整，可能是 cover/coverUrl/imgUrl
+      url: audioUrl,      // 根据后端字段名调整，可能是 url/audioUrl/link
+    };
+
+    const formRes = await upload_music_form(completeData);
+
+    if (formRes.errno !== 0) {
+      throw new Error(formRes.message || "表单提交失败");
+    }
+
     createToast(toast, "上传成功", "音乐上传成功", "success");
-  }catch(e){
-    console.error("音乐上传失败",e)
+
+    // 可选：上传成功后重置表单或跳转
+    // resetForm();
+
+  } catch (error) {
+    console.error("上传流程失败:", error);
+    createToast(
+      toast,
+      "上传失败",
+      error instanceof Error ? error.message : "未知错误",
+      "danger"
+    );
+    return; // 阻止后续执行
   }
-
-
-}
-
+};
 </script>
 <template>
   <div class="music-form">
@@ -133,8 +155,7 @@ const upload_new_music = async (data: MusicData) => {
 
           <div class="mb-3">
             <label for="uploadContent" class="form-label">简介</label>
-            <textarea v-model="desc" class="form-control" id="uploadContent" rows="4"
-              style="resize: none"></textarea>
+            <textarea v-model="desc" class="form-control" id="uploadContent" rows="4" style="resize: none"></textarea>
           </div>
 
           <div class="mb-3">
@@ -143,7 +164,8 @@ const upload_new_music = async (data: MusicData) => {
           </div>
 
           <div class="d-flex align-items-center gap-3">
-            <BButton variant="primary" @click.stop="upload_new_music({isOriginal,name,desc,coverURL,audioURL})">确认上传</BButton>
+            <BButton variant="primary" @click.stop="upload_new_music({ isOriginal, name, desc, coverURL, audioURL })">确认上传
+            </BButton>
             <div v-if="coverPreview" class="border rounded" style="width:64px; height:64px; overflow:hidden;">
               <img :src="coverPreview" alt="cover" style="width:100%; height:100%; object-fit:cover" />
             </div>
