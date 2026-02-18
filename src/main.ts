@@ -12,9 +12,10 @@ import Skeleton from "@x-ui-vue3/skeleton";
 
 const pinia = createPinia();
 const app = createApp(App);
-app.use(router).use(pinia).use(Skeleton).mount("#app");
+app.use(router).use(pinia).use(Skeleton);
 const user = userStore();
 await user.restoreFromLocal();
+app.mount("#app");
 
 // 导航后复位 #app 容器滚动，仅在目标路由声明需要时生效
 router.afterEach((to, from) => {

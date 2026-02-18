@@ -9,7 +9,7 @@
     </div>
 
     <div class="clover">
-      <div class="clover-box shadow-sm border border-2 rounded hot-content" v-for="tab in 6" :key="`4clover_${tab}`">
+      <div class="clover-box shadow-sm border border-2 rounded hot-content" v-for="tab in 4" :key="`4clover_${tab}`">
         <img class="clover-img" src="/ysg2.jpg" alt="">
         <div class="clover-overlay">
           <div class="clover-tag">热门</div>
@@ -66,11 +66,11 @@
   }
 
   .clover {
-    max-height: 320px;
+    max-height: 350px;
     display: grid;
-    gap: 0.8rem;
+    gap: 1rem;
     grid-template-rows: 1fr 1fr;
-    grid-template-columns: 290px repeat(2, 180px);
+    grid-template-columns: 300px 220px;
 
     >div {
       cursor: pointer;

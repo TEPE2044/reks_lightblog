@@ -60,7 +60,7 @@ const emd = useToggle("easy-login-box");
       <BDropdownDivider />
       <BDropdownItem class="text-center" to="/centre">我的空间</BDropdownItem>
       <BDropdownItem class="text-center" to="/store">积分商城</BDropdownItem>
-      <BDropdownItem class="text-center" to="/upload">投稿管理</BDropdownItem>
+      <BDropdownItem class="text-center" to="/upload">我要投稿</BDropdownItem>
       <BDropdownDivider />
       <BDropdownItem class="text-center" @click="user.userLogout">退出登录</BDropdownItem>
     </BDropdown>

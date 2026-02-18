@@ -16,23 +16,28 @@ onMounted(async () => {
     loading.value = false  // 立即显示，无需等待
     console.log(loading.value)
   }
-  
+
   // 再请求新数据
   const res = await query_my_blog()
-  blogs.value = res.blogs
-  if(blogs.value.length === 0) {
+  blogs.value = res?.blogs
+  if (res == null) {
+    setEmpty(true)
+  }
+  if (blogs.value?.length === 0) {
     setEmpty(true)
   } else {
     setEmpty(false)
   }
-  localStorage.setItem('blogs', JSON.stringify(res.blogs))
+  localStorage.setItem('blogs', JSON.stringify(res?.blogs))
   loading.value = false
 })
+
+
 </script>
 
 <template>
-  <div class="myblog-empty" v-if="empty && !loading">
-    <Empty title="您还没有发布过博客哦~"/>
+  <div class="myblog-empty" v-if="empty">
+    <Empty title="您还没有发布过博客哦~" />
   </div>
   <div class="myblog" v-if="!empty && !loading">
     <BlogCard v-for="blog in blogs" :key="blog.id" :blog="blog" />

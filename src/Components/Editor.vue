@@ -242,7 +242,7 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 // ==================== 变量 ====================
-$editor-width: 600px;
+$editor-width: 800px;
 $border-color: #d3d3d3;
 $border-radius: 5px;
 
@@ -287,7 +287,7 @@ section {
 
   .editor-content {
     min-height: 301px;
-    max-height: 400px;
+    max-height: 650px;
     overflow-y: auto;
     border-top: 1px solid $border-color;
     border-bottom: 2px solid gainsboro;
@@ -298,7 +298,7 @@ section {
   // 统一宽度
   :deep(.w-e-toolbar),
   :deep(.w-e-text-container) {
-    width: $editor-width !important;
+    width: 100%;
   }
 }
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { BlogData } from "../Utils/reks-interface";
-import { query_blog_by_id } from "../Hooks/Blog";
+import router from "../Router";
 
 
 // type 0是音乐博客，1普通博客
@@ -10,11 +10,16 @@ const b = blogProps.blog;
 // Record<number, boolean> 用于跟踪每张图片的加载状态，键是图片索引，值是布尔值表示是否加载完成
 const imgLoaded = ref<Record<number, boolean>>({});
 
-const readBlog = async(id:number) => {
-  const res = await query_blog_by_id(id)
-  console.log(res)
-  
-}
+const readBlog = async (id: number) => {
+  try {
+    const target = `/blog/${id}`;
+    if (router.currentRoute.value.fullPath === target) return;
+    await router.push({ name: "blog", params: { id: String(id) } });
+  } catch (e) {
+    // 忽略导航失败（例如重复导航）
+    console.warn("导航到博客页失败:", e);
+  }
+};
 
 </script>
 
@@ -32,14 +37,14 @@ const readBlog = async(id:number) => {
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         ">
         <!-- 左侧封面 -->
-        <div style="
+          <div style="
             position: relative;
             width: 64px;
             height: 64px;
             border-radius: 4px;
             overflow: hidden;
             cursor: pointer;
-          " @click="">
+          ">
           <img src="/ai.webp" style="width: 100%; height: 100%; object-fit: cover" alt="album" />
           <!-- 播放按钮 -->
           <div class="play-btn" style="

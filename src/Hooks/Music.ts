@@ -1,8 +1,16 @@
-import reapi from "../Requests/reapi"
+import reapi from "../Requests/reapi";
 import type { MusicData } from "../Utils/reks-interface";
 
-export const upload_music = async(form:FormData) => {
-    const { data: res } = await reapi({
+export const query_my_music = async () => {
+  const { data: res } = await reapi({
+    url: "/music/my-music",
+    method: "GET",
+  });
+  return res;
+};
+
+export const upload_music = async (form: FormData) => {
+  const { data: res } = await reapi({
     url: "/music/upload/audio",
     method: "POST",
     data: form,
@@ -10,14 +18,14 @@ export const upload_music = async(form:FormData) => {
       "Content-Type": "multipart/form-data",
     },
   });
-  return res
-}
+  return res;
+};
 
-export const upload_music_form = async(data:MusicData) => {
-    const { data: res } = await reapi({
+export const upload_music_form = async (data: MusicData) => {
+  const { data: res } = await reapi({
     url: "/music/my-music/new",
     method: "POST",
     data: data,
   });
-  return res.data
-}
+  return res.data;
+};

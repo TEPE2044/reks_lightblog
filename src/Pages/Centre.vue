@@ -4,6 +4,7 @@ const user = userStore();
 
 const navs = [
   { name: "我的博客", path: { name: "my-blog" } },
+  { name: "我的音乐", path: { name: "my-music" } },
   { name: "我的收藏", path: { name: "my-fav" } },
   { name: "我的信息", path: { name: "edit-profile" } },
   { name: "账号安全", path: { name: "safe-setting" } },

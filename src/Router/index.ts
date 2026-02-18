@@ -1,8 +1,6 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import { userStore } from "../Store/user";
 import { storeToRefs } from "pinia";
-import { createToast } from "../Utils/reks-toast";
-import { useToast } from "bootstrap-vue-next";
 const router = createRouter({
   history: createWebHashHistory(),
   // 路由滚动行为：默认进入页面回到顶部；返回/前进恢复历史位置；带 hash 时定位锚点
@@ -73,6 +71,11 @@ const router = createRouter({
           component: () => import("../Widgets/MyFav.vue"),
         },
         {
+          path:'my-music',
+          name:"my-music",
+          component:() => import("../Widgets/MyMusic.vue")
+        },
+        {
           path: "edit-profile",
           name: "edit-profile",
           component: () => import("../Widgets/EditProfile.vue"),
@@ -106,7 +109,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   // to: 要去的页面   from: 从哪来   next: 放行函数
-
+  console.log(from.path)
   const {rcode, payload, isLoggedIn} = storeToRefs(userStore());
   if (!rcode.value && !payload.value && !isLoggedIn.value && to.path === "/") {
     // TODO: 完善提示组件，提示用户登录后才能访问主页
