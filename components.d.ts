@@ -79,6 +79,7 @@ declare module 'vue' {
     IBiChevronBarDown: typeof import('~icons/bi/chevron-bar-down')['default']
     IBiEm: typeof import('~icons/bi/em')['default']
     IBiEnvelope: typeof import('~icons/bi/envelope')['default']
+    IBiFileMusic: typeof import('~icons/bi/file-music')['default']
     IBiHandThumbsUp: typeof import('~icons/bi/hand-thumbs-up')['default']
     IBiHeart: typeof import('~icons/bi/heart')['default']
     IBiJournalText: typeof import('~icons/bi/journal-text')['default']

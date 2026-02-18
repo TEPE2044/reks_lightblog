@@ -7,7 +7,7 @@
         <BCarousel class="inner" controls ride="carousel">
             <BCarouselSlide v-for="value in 3" :key="`old${value}`">
                 <template #img>
-                    <BImg src="/ysg.jpg" alt="image slot" />
+                    <BImg src="/ys.jpg" alt="image slot" />
                 </template>
             </BCarouselSlide>
         </BCarousel>
@@ -16,7 +16,7 @@
 
 <style lang="scss" scoped>
 .hub-caro {
-    height: 150px;
+    height: 300px;
 
     .inner {
         height: 100%;

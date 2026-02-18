@@ -9,11 +9,9 @@ import  { type UploadIcon,uploadIconMap } from "../Utils/reks-icon-map";
 
 const selections = ref<{ name: string; iconKey: UploadIcon; postType: string }[]>([
   { name: "随心写", iconKey: "blog", postType: "blog" },
-  { name: "音乐博客", iconKey: "mblog", postType: "mblog" },
   { name: "音频", iconKey: "audio", postType: "audio" },
+  { name: "音乐博客", iconKey: "mblog", postType: "mblog" },
 ]);
-
-const toast = useToast();
 
 const postType = ref(selections.value[0]?.postType);
 
@@ -22,13 +20,13 @@ const selectType = (ntype: number) => {
   //console.log(postType.value)
 };
 
-const { isOriginal, trackTitle, trackDesc, audioFile, wantUpload } =
+const { isOriginal, name, desc, audioFile, wantUpload } =
   storeToRefs(musicStore());
 
 watch(postType, () => {
   set(isOriginal, false);
-  set(trackTitle, "");
-  set(trackDesc, "");
+  set(name, "");
+  set(desc, "");
   set(audioFile, null);
   set(wantUpload, "uex");
   console.log("----upload");
@@ -71,6 +69,7 @@ onUnmounted(() =>{
 }
 .upload {
   margin-top: 7.3rem;
+  min-height: 600px;
   @extend %reks-card-box;
   display: grid;
   grid-template-columns: 1fr 8fr;
