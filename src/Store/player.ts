@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
 import { Howl } from "howler";
 import { formatPlayerTime } from "../Utils/reks-format-time";
-import type { QueueItem } from "../Utils/reks-interface";
+import type { QueueItem } from "../Utils/reks-interface"
 
 // 全局播放器实例
 // bug-fix:修复了下一首播放时，组件拿不到最新的player实例的问题
@@ -16,7 +16,6 @@ export const playerStore = defineStore("player", () => {
   const currentTime = ref<string>("");
   const progress = ref<number>(0);
   const isHidden = ref<boolean>(false)
-
 
   watch(mode, () => {
     if (player) {
@@ -54,7 +53,9 @@ export const playerStore = defineStore("player", () => {
         playQueue.value.splice(currentIndex + 1, 0, data);
       }
       console.log(playQueue.value);
+      return true
     }
+    return false
   };
   // 删除
   const removeFromPlayQueue = (idx: number) => {

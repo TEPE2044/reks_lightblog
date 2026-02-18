@@ -1,24 +1,35 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import type { MusicResponse } from '../Utils/reks-interface';
-
+import { playerStore } from '../Store/player';
+import { storeToRefs } from 'pinia';
+import { createToast } from "../Utils/reks-toast";
+import { useToast } from "bootstrap-vue-next";
+const { addIntoPlayQueue } = playerStore()
+const { currentIndex } = storeToRefs(playerStore())
 const props = defineProps<{ music: MusicResponse }>();
 const m = props.music;
+const toast = useToast()
+
 
 const imageLoad = ref(false);
+
+const caseAdd = () => {
+  const res = addIntoPlayQueue({ cover: m?.cover, songURL: m?.audio }, currentIndex.value)
+  if (res) {
+    createToast(toast, "添加成功", "歌曲添加成功", "success")
+  } else {
+    createToast(toast, "重复添加", "歌曲重复添加", "success")
+  }
+}
 </script>
 
 <template>
   <BCard no-body no-header class="music-card position-relative" v-skeleton-item>
     <!-- 封面区域 -->
     <div class="cover-wrapper" v-skeleton="!imageLoad">
-      <img 
-        :src="m?.cover" 
-        :alt="`cover of ${m?.name || 'unknown'}`"
-        @load="imageLoad = true"
-        v-show="imageLoad"
-        class="cover-img"
-      />
+      <img :src="m?.cover" :alt="`cover of ${m?.name || 'unknown'}`" @load="imageLoad = true" v-show="imageLoad"
+        class="cover-img" />
     </div>
 
     <!-- 悬停层 -->
@@ -39,7 +50,7 @@ const imageLoad = ref(false);
           <i-bi-play-circle-fill class="fs-2" />
         </button>
         <button class="control-btn">
-          <i-bi-plus-circle class="fs-4" />
+          <i-bi-plus-circle class="fs-4" @click="caseAdd()" />
         </button>
         <button class="control-btn">
           <i-bi-heart class="fs-4" />
@@ -63,12 +74,12 @@ const imageLoad = ref(false);
 
   &:hover {
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-    
+
     .meta {
       opacity: 1;
       visibility: visible;
     }
-    
+
     .cover-img {
       transform: scale(1.05);
       filter: brightness(0.7);
@@ -102,7 +113,6 @@ const imageLoad = ref(false);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
-  z-index: 10;
 }
 
 .header {
@@ -110,7 +120,7 @@ const imageLoad = ref(false);
     font-size: 1.1rem;
     max-width: 200px;
   }
-  
+
   .author {
     font-size: 0.875rem;
   }
@@ -141,7 +151,7 @@ const imageLoad = ref(false);
   .music-card {
     aspect-ratio: 1 / 1;
   }
-  
+
   .title {
     font-size: 0.95rem;
   }

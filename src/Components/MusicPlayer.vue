@@ -34,68 +34,6 @@ const {
   selectFromList,
   handleClickPlay,
 } = playerStore();
-const fakeDatas = [
-  {
-    cover: "/ai.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/ysg2.jpg",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250720132105_audio.mp3",
-  },
-  {
-    cover: "/ysg1.jpg",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-];
 console.log(playQueue.value);
 const updateTimer = useIntervalFn(
   () => {
@@ -112,7 +50,7 @@ watch(isPlay, () => {
   }
 });
 onMounted(() => {
-  initPlayQueue(fakeDatas);
+  // initPlayQueue();
   //复用变量但创建新实例
   createPlayer();
 });
