@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 import { computed, ref, watch } from "vue";
 import { Howl } from "howler";
 import { formatPlayerTime } from "../Utils/reks-format-time";
-import type { QueueItem } from "../Utils/reks-interface"
+import type { QueueItem } from "../Utils/reks-interface";
 
 // 全局播放器实例
 // bug-fix:修复了下一首播放时，组件拿不到最新的player实例的问题
@@ -15,7 +15,7 @@ export const playerStore = defineStore("player", () => {
   const duration = ref<string>("");
   const currentTime = ref<string>("");
   const progress = ref<number>(0);
-  const isHidden = ref<boolean>(false)
+  const isHidden = ref<boolean>(false);
 
   watch(mode, () => {
     if (player) {
@@ -43,19 +43,24 @@ export const playerStore = defineStore("player", () => {
   const addIntoPlayQueue = (data: QueueItem, currentIndex: number) => {
     // 没法用included，includes比较的是对象引用，而data每次都是新创建的对象（即使内容一样），引用地址不同
     let isExisted = playQueue.value.some(
-      (song) => song.songURL === data.songURL,
+      (song) => song.songURL === data.songURL
     );
     console.log(isExisted);
     if (isExisted === false) {
+      if (playQueueLength.value === 0) {
+        playQueue.value.push(data);
+        player?.unload();
+        createPlayer();
+      }
       if (currentIndex === playQueueLength.value - 1) {
         playQueue.value.push(data);
       } else {
         playQueue.value.splice(currentIndex + 1, 0, data);
       }
       console.log(playQueue.value);
-      return true
+      return true;
     }
-    return false
+    return false;
   };
   // 删除
   const removeFromPlayQueue = (idx: number) => {
@@ -68,7 +73,7 @@ export const playerStore = defineStore("player", () => {
       }
     }
     playQueue.value = playQueue.value.filter(
-      (song) => song !== playQueue.value[idx],
+      (song) => song !== playQueue.value[idx]
     );
     console.log(playQueue.value);
   };
@@ -158,7 +163,6 @@ export const playerStore = defineStore("player", () => {
     }
   };
 
-
   const updateTime = () => {
     const current = Math.round(player?.seek() as number) as number;
     const total = Math.round(player?.duration() as number) as number;
@@ -191,10 +195,18 @@ export const playerStore = defineStore("player", () => {
 
   //TODO:点击播放分成两种
   // 一种是列表里的点击播放，一种是别的地方点击播放，第一种点击播放非常好办，只需要获取idx就行；
-  // 第二种需要先判断当前播放列表里有没有这首歌，没有就添加，有就获取索引，然后播放
+
   const selectFromList = (idx: number) => {
     currentIndex.value = idx;
     switchSong();
+  };
+
+  // 第二种需要先判断当前播放列表里有没有这首歌，没有就添加，有就获取索引，然后播放
+  const selectOutSide = (data: QueueItem) => {
+    const is_add = addIntoPlayQueue(data, currentIndex.value);
+    if (is_add === true) {
+      switchSong();
+    }
   };
 
   const handleClickPlay = (value: number) => {
@@ -226,6 +238,7 @@ export const playerStore = defineStore("player", () => {
     nextSong,
     frontSong,
     selectFromList,
-    handleClickPlay
+    selectOutSide,
+    handleClickPlay,
   };
 });

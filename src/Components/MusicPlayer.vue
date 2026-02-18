@@ -120,9 +120,6 @@ const toggleExpand = () => {
   isOffc.value = false;
 };
 
-const testX = () => {
-  console.log("你好");
-};
 
 const handleCloseOffCanvas = (e: MouseEvent) => {
   const offc = document.getElementById("offc") as HTMLElement;
@@ -299,15 +296,12 @@ onUnmounted(() => {
                 >
                   <i-bi-play-circle style="font-size:1rem;" />
                 </BButton>
-                <BButton variant="light" size="sm" @click.stop="testX()">
-                  <i-bi-heart       style="font-size:1rem;" />
-                </BButton>
                 <BButton
                   variant="light"
                   size="sm"
                   @click.stop="removeFromPlayQueue(playQueue.indexOf(song))"
                 >
-                  <i-bi-trash       style="font-size:1rem;" />
+                  <i-bi-trash style="font-size:1rem;" />
                 </BButton>
                 <BDropdown
                   :auto-close="true"
@@ -343,8 +337,8 @@ onUnmounted(() => {
                 <BAvatar square :src="song.cover" />
               </div>
               <div class="info d-inline-flex flex-column align-items-start">
-                <span class="title h5">CeruleanBlue</span>
-                <span class="author text-secondary">Klute</span>
+                <span class="title h5">{{ song.title  }}</span>
+                <span class="author text-secondary">{{ song.author }}</span>
               </div>
             </div>
             <div class="right text-secondary">06:01</div>

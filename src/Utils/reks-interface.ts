@@ -12,6 +12,8 @@ export interface AccountData {
 export interface QueueItem {
   cover: string;
   songURL: string;
+  title:string;
+  author:string
 }
 
 export interface PageWrapper{
@@ -78,5 +80,7 @@ export interface MusicResponse{
   original:boolean,
   rid:number,
   state:number
+  username:string
+  avatar:string
 }
 

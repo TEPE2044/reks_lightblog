@@ -5,7 +5,8 @@ import { playerStore } from '../Store/player';
 import { storeToRefs } from 'pinia';
 import { createToast } from "../Utils/reks-toast";
 import { useToast } from "bootstrap-vue-next";
-const { addIntoPlayQueue } = playerStore()
+
+const { addIntoPlayQueue,selectOutSide } = playerStore()
 const { currentIndex } = storeToRefs(playerStore())
 const props = defineProps<{ music: MusicResponse }>();
 const m = props.music;
@@ -15,11 +16,21 @@ const toast = useToast()
 const imageLoad = ref(false);
 
 const caseAdd = () => {
-  const res = addIntoPlayQueue({ cover: m?.cover, songURL: m?.audio }, currentIndex.value)
+  const res = addIntoPlayQueue({ cover: m?.cover, songURL: m?.audio,title:m?.name,author:m?.username }, currentIndex.value)
   if (res) {
     createToast(toast, "添加成功", "歌曲添加成功", "success")
   } else {
     createToast(toast, "重复添加", "歌曲重复添加", "success")
+  }
+}
+
+const casePlay = () =>{
+  try{
+    selectOutSide({ cover: m?.cover, songURL: m?.audio,title:m?.name,author:m?.username })
+    createToast(toast, "播放成功", `正在播放 ${m?.username} - ${m?.name}`, "success")
+  }catch(e){
+    createToast(toast, "播放失败", "未知原因", "danger")
+    console.error(e)
   }
 }
 </script>
@@ -35,19 +46,19 @@ const caseAdd = () => {
     <!-- 悬停层 -->
     <div class="meta d-flex flex-column position-absolute p-3">
       <div class="header d-flex align-items-center gap-3 mb-auto">
-        <BAvatar size="40" src="/ysg.jpg" />
+        <BAvatar size="40" :src="m?.avatar" />
         <div class="info flex-grow-1">
           <div class="title fw-semibold text-white text-truncate">
             {{ m?.name || 'Unknown' }}
           </div>
-          <p class="author text-white-50 mb-0 small">Jacky View</p>
+          <p class="author text-white-50 mb-0 small">{{m?.username}}</p>
         </div>
         <BButton size="sm" variant="light">+ 关注</BButton>
       </div>
 
       <div class="controls d-flex align-items-center justify-content-center gap-4 mt-auto">
         <button class="control-btn">
-          <i-bi-play-circle-fill class="fs-2" />
+          <i-bi-play-circle-fill class="fs-2" @click.stop="casePlay()"/>
         </button>
         <button class="control-btn">
           <i-bi-plus-circle class="fs-4" @click="caseAdd()" />
