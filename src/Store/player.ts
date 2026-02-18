@@ -51,6 +51,7 @@ export const playerStore = defineStore("player", () => {
         playQueue.value.push(data);
         player?.unload();
         createPlayer();
+        return true
       }
       if (currentIndex === playQueueLength.value - 1) {
         playQueue.value.push(data);
