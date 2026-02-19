@@ -7,7 +7,6 @@ import type { QueueItem } from "../Utils/reks-interface";
 // bug-fix:修复了下一首播放时，组件拿不到最新的player实例的问题
 let player: Howl | null = null;
 
-
 export const playerStore = defineStore("player", () => {
   //播放模式
   const mode = ref<string>("loop");
@@ -24,7 +23,6 @@ export const playerStore = defineStore("player", () => {
       }
     }
   });
-
 
   /* 播放列表 
   增删
@@ -52,7 +50,7 @@ export const playerStore = defineStore("player", () => {
         playQueue.value.push(data);
         player?.unload();
         createPlayer();
-        return true
+        return true;
       }
       if (currentIndex === playQueueLength.value - 1) {
         playQueue.value.push(data);
@@ -171,30 +169,38 @@ export const playerStore = defineStore("player", () => {
     currentTime.value = formatPlayerTime(current);
     duration.value = formatPlayerTime(total);
     progress.value = (current / total) * 100;
-    console.log(total, current);
+    // console.log(total, current);
   };
 
-  // 如果有下一首，获取下一首的进行播放,先卸载unload，然后src重新设置
+  // 下一首
   const nextSong = () => {
     currentIndex.value = (currentIndex.value + 1) % playQueueLength.value;
     switchSong();
   };
+
+  // 上一首
   const frontSong = () => {
-    currentIndex.value = (currentIndex.value - 1) % playQueueLength.value;
+    if(currentIndex.value === 0){
+      currentIndex.value = playQueueLength.value - 1 
+    }else{
+      currentIndex.value = (currentIndex.value - 1) % playQueueLength.value;
+    }
     switchSong();
   };
 
   // bug 切换歌曲的时候进度条和时间没有重置
   const switchSong = () => {
-    duration.value = "00:00";
-    currentTime.value = "00:00";
-    progress.value = 0;
     player?.unload();
     createPlayer();
     player?.play();
     isPlay.value = true;
-  };
+    duration.value = "00:00";
+    currentTime.value = "00:00";
+    progress.value = 0;
 
+    console.log("----3")
+    console.log(currentIndex.value)
+  };
 
   //TODO:点击播放分成两种
   // 一种是列表里的点击播放，一种是别的地方点击播放，第一种点击播放非常好办，只需要获取idx就行；
@@ -217,7 +223,6 @@ export const playerStore = defineStore("player", () => {
     player?.seek((value / 100) * total);
     updateTime();
   };
-
 
   return {
     playQueue,

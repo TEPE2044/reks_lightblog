@@ -6,7 +6,7 @@ export const query_my_music = async () => {
     url: "/music/my-music",
     method: "GET",
   });
-  console.warn(res)
+  // console.warn(res)
   return res;
 };
 

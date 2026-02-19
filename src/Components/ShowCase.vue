@@ -35,7 +35,7 @@ onMounted(async () => {
   }
   localStorage.setItem('musicList', JSON.stringify(res))
   loading.value = false
-  console.log(res)
+  // console.log(res)
 })
 
 

@@ -15,8 +15,6 @@ export const detailStore = defineStore("detail", () => {
         dtitle.value = data.title
         dauthor.value = data.author
         dcover.value = data.cover
-
-        console.log("要到犯了")
     }
 
     return {
