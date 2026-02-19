@@ -22,7 +22,6 @@ const {
   progress,
 } = storeToRefs(playerStore());
 const {
-  initPlayQueue,
   handleMuted,
   removeAll,
   removeFromPlayQueue,
@@ -88,6 +87,27 @@ const lyrics = shallowRef([
   "「在遥远的过去，和遥远的未来，一定也有无数人做出了和我一样的选择。我们…从不孤单。」",
 ]);
 
+// 评论数据与操作
+const commentList = ref([
+  { id: 1, author: "游客", avatar: "/ysg.jpg", time: "刚刚", content: "好音乐！" },
+]);
+const newComment = ref("");
+const postComment = () => {
+  if (!newComment.value.trim()) return;
+  commentList.value.unshift({
+    id: Date.now(),
+    author: "我",
+    avatar: "/ysg1.jpg",
+    time: Date.now().toString(),
+    content: newComment.value.trim(),
+  });
+  newComment.value = "";
+};
+// TODO:只能删除自己的评论
+const deleteComment = (id: number) => {
+  commentList.value = commentList.value.filter((c) => c.id !== id);
+};
+
 // 模式选择
 const modeList = ref(["loop", "shuffle", "repeat"]);
 const switchMode = useDebounceFn(() => {
@@ -103,6 +123,11 @@ const toggleMusicList = () => {
   onTop.value = false;
   expand.hide();
 };
+// 评论界面
+const comments = useToggle("comment-area")
+const toggleComment = () =>{
+  comments.toggle()
+}
 // 详细界面
 const expand = useToggle("music-player-inner");
 const [onTop, toggleTop] = vuseToggle();
@@ -119,7 +144,6 @@ const toggleExpand = () => {
   expand.toggle();
   isOffc.value = false;
 };
-
 
 const handleCloseOffCanvas = (e: MouseEvent) => {
   const offc = document.getElementById("offc") as HTMLElement;
@@ -221,7 +245,7 @@ onUnmounted(() => {
       <div class="like r-icon" @click.stop="">
         <i-bi-heart style="font-size: 1.2rem" />
       </div>
-      <div class="comment r-icon" @click.stop="">
+      <div class="comment r-icon" @click.stop="toggleComment()">
         <i-bi-chat-text style="font-size: 1.2rem" />
       </div>
       <div class="music-queue r-icon" @click.stop="toggleMusicList()">
@@ -316,7 +340,7 @@ onUnmounted(() => {
                    <i-bi-three-dots  style="font-size:1rem;" />
                   </template>
                   <template #default>
-                    <BDropdownItem>
+                    <BDropdownItem @click.stop="toggleComment()">
                       <i-bi-chat-left-dots style="font-size:1rem;" />
                       评论
                     </BDropdownItem>
@@ -347,6 +371,45 @@ onUnmounted(() => {
       </template>
       <template #footer> </template>
     </BOffcanvas>
+    <BModal size="xl" backdrop scrollable lazy no-footer :title="`评论区(${commentList.length})`" centered id="comment-area">
+      <div class="comment-area p-3">
+        <div class="comment-list mb-3">
+            <div v-if="commentList.length === 0" class="comment-empty d-flex flex-column align-items-center justify-content-center p-4 text-secondary">
+              <i-bi-chat-dots style="font-size:2rem" />
+              <div class="mt-2">还没有评论，快来抢沙发 ~</div>
+            </div>
+            <div v-else>
+              <div
+                v-for="c in commentList"
+                :key="c.id"
+                class="comment-item d-flex gap-3 p-2 align-items-start"
+              >
+                <BAvatar :src="c.avatar" square class="comment-avatar" />
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <div class="fw-bold">{{ c.author }}</div>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="text-secondary small">{{ c.time }}</div>
+                      <BButton size="sm" variant="outline-danger" class="delete-comment" @click.stop="deleteComment(c.id)">删除</BButton>
+                    </div>
+                  </div>
+                  <div class="comment-content text-wrap">{{ c.content }}</div>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div class="comment-input d-flex gap-2 align-items-start">
+          <BAvatar src="/ysg1.jpg" square class="comment-avatar-sm" />
+          <div class="flex-grow-1">
+            <BFormTextarea v-model="newComment" rows="3" placeholder="写下你的评论..." />
+            <div class="d-flex justify-content-end mt-2">
+              <BButton size="sm" class="ms-2" variant="primary" @click="postComment()">发送</BButton>
+            </div>
+          </div>
+        </div>
+      </div>
+    </BModal>
     <BModal
       @backdrop="toggleExpand()"
       size="xl"
@@ -538,5 +601,63 @@ onUnmounted(() => {
       background: rgb(178, 34, 34);
     }
   }
+}
+
+.comment-area {
+  /* 固定整体高度，评论列表可滚动，输入区固定在底部 */
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+
+  .comment-list {
+    flex: 1 1 auto;
+    overflow: auto;
+    padding-right: 0.25rem;
+
+    .comment-item {
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.6);
+    }
+  }
+
+  .comment-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .comment-avatar-sm {
+    width: 36px;
+    height: 36px;
+  }
+
+  .comment-content {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .comment-input {
+    flex: 0 0 auto;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    padding-top: 0.75rem;
+    background: transparent;
+
+    /* 禁止 textarea 拖动/缩放，并固定高度（焊死） */
+    textarea,
+    .form-control {
+      resize: none;
+      height: 72px !important;
+      max-height: 72px !important;
+      min-height: 72px !important;
+    }
+  }
+}
+
+.comment-empty {
+  min-height: 140px;
+}
+
+.delete-comment {
+  padding: 0.15rem 0.5rem;
+  font-size: 0.8rem;
 }
 </style>

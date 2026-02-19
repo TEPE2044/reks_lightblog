@@ -74,6 +74,7 @@ declare module 'vue' {
     HubHeader: typeof import('./src/Components/HubHeader.vue')['default']
     IBiBell: typeof import('~icons/bi/bell')['default']
     IBiBox: typeof import('~icons/bi/box')['default']
+    IBiChatDots: typeof import('~icons/bi/chat-dots')['default']
     IBiChatLeftDots: typeof import('~icons/bi/chat-left-dots')['default']
     IBiChatText: typeof import('~icons/bi/chat-text')['default']
     IBiChevronBarDown: typeof import('~icons/bi/chevron-bar-down')['default']

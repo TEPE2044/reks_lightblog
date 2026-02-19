@@ -171,7 +171,7 @@ const readBlog = async (id: number) => {
   // max-width: $card-max-width;
 
   .rs-title {
-    width: 300px;
+    width: 270px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
