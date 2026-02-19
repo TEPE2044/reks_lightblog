@@ -106,6 +106,7 @@ declare module 'vue' {
     IBiTelephone: typeof import('~icons/bi/telephone')['default']
     IBiThreeDots: typeof import('~icons/bi/three-dots')['default']
     IBiTrash: typeof import('~icons/bi/trash')['default']
+    IBiUpload: typeof import('~icons/bi/upload')['default']
     IBiVolumeDown: typeof import('~icons/bi/volume-down')['default']
     IBiVolumeMute: typeof import('~icons/bi/volume-mute')['default']
     IBiVolumeOff: typeof import('~icons/bi/volume-off')['default']

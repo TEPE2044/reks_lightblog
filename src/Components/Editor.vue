@@ -171,9 +171,9 @@ onBeforeUnmount(() => {
         add-button-text="Add" limit-tags-text="最多只能设置5个标签噢" placeholder="设置标签(使用回车确定标签)" />
     </section>
 
-    <section class="audio-secetion mt-2" v-if="postType == 'mblog'">
+    <!-- <section class="audio-secetion mt-2" v-if="postType == 'mblog'">
       <RadioSelector />
-    </section>
+    </section> -->
 
     <!-- 规定确认 -->
     <!-- <section class="agreement-section">

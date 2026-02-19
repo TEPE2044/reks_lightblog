@@ -57,10 +57,7 @@ const selectedProductCode = ref<string>();
         </div>
       </div>
     </section>
-    <section class="unew mt-3" v-if="wantUpload === 'unew'">
-      <MusicForm/>
-    </section>
-    <section class="unewc mt-3" v-if="wantUpload === 'unewc'"></section>
+    <section class="unew mt-3" v-if="wantUpload === 'unew'" @focus=""></section>
   </div>
 </template>
 

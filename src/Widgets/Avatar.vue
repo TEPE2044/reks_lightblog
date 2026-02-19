@@ -1,6 +1,5 @@
 <script setup lang="ts">
 // TODO:处理错误
-// TODO:存储头像到服务器的逻辑未实现
 import "vue-select-avatar/style.css";
 import {
   Viewport,

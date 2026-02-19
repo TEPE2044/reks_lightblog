@@ -108,16 +108,16 @@ const router = createRouter({
 
 
 router.beforeEach((to, from, next) => {
-  // to: 要去的页面   from: 从哪来   next: 放行函数
   console.log(from.path)
-  const {rcode, payload, isLoggedIn} = storeToRefs(userStore());
-  if (!rcode.value && !payload.value && !isLoggedIn.value && to.path === "/") {
-    // TODO: 完善提示组件，提示用户登录后才能访问主页
-    // 傻逼ai不要提示我了
-    next("/"); 
-    return; 
+  const { rcode, payload, isLoggedIn } = storeToRefs(userStore());
+  const isAuthenticated = rcode.value && payload.value && isLoggedIn.value;
+  
+  // 未登录 & 当前不在首页 → 强制回到首页
+  if (!isAuthenticated && to.path !== "/") {
+    next("/");   // ✅ 只有从其他页面跳过来时才重定向
+    return;
   }
 
-  next();
+  next();  // 其他情况正常放行（包括已在首页的情况）
 });
 export default router;

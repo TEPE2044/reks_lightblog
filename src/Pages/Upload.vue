@@ -9,7 +9,6 @@ import  { type UploadIcon,uploadIconMap } from "../Utils/reks-icon-map";
 const selections = ref<{ name: string; iconKey: UploadIcon; postType: string }[]>([
   { name: "随心写", iconKey: "blog", postType: "blog" },
   { name: "音频", iconKey: "audio", postType: "audio" },
-  { name: "音乐博客", iconKey: "mblog", postType: "mblog" },
 ]);
 
 const postType = ref(selections.value[0]?.postType);
@@ -39,6 +38,7 @@ watch(postType, () => {
 // })
 </script>
 <template>
+  <!-- 优化项 TODO:换成upload/blog upload/music upload/mblog 的路由形式 -->
   <div class="upload">
     <div class="sidebar">
       <div class="selection d-flex flex-column gap-3">
