@@ -9,6 +9,8 @@ import { useToggle } from "bootstrap-vue-next";
 import type { Placement } from "bootstrap-vue-next";
 import { playerStore } from "../Store/player";
 import { storeToRefs } from "pinia";
+import { detailStore } from "../Store/detail";
+
 const {
   playQueue,
   isHidden,
@@ -48,6 +50,8 @@ watch(isPlay, () => {
     updateTimer.pause();
   }
 });
+// 详情
+const {dtitle,dauthor,dcover} = storeToRefs(detailStore())
 onMounted(() => {
   // initPlayQueue();
   //复用变量但创建新实例
@@ -64,21 +68,6 @@ onMounted(() => {
   7.点击播放:先暂停，加载 y
   */
 
-//datas
-const img_list = ref([
-  {
-    url: "/ysg2.jpg",
-    alt: "ysg2",
-  },
-  {
-    url: "/ysg.jpg",
-    alt: "ysg",
-  },
-  {
-    url: "/ysg1.jpg",
-    alt: "ysg1",
-  },
-]);
 
 // 唯一适合用shallowRef
 const lyrics = shallowRef([
@@ -160,6 +149,19 @@ watch(isOffc, (offcanvas_show) => {
     document.removeEventListener("click", handleCloseOffCanvas);
   }
 });
+// import type { Detail } from "../Utils/reks-interface";
+// const detailProps = defineProps<{ detail:Detail}>()
+// const d = detailProps.detail
+const {get_detail} = detailStore()
+watch(currentIndex,() =>{
+  console.log("-----路过")
+  console.log(playQueue.value[currentIndex.value])
+  const temp = playQueue.value[currentIndex.value]
+  get_detail({title:temp?.title,author:temp?.author,cover:temp?.cover} as any)
+})
+
+
+
 onUnmounted(() => {
   document.removeEventListener("click", handleCloseOffCanvas);
 });
@@ -228,7 +230,7 @@ onUnmounted(() => {
         class="thumbail-album rounded border r-icon"
         @click.stop="toggleExpand()"
       >
-        <img class="thumbail-img" :src="playQueue[currentIndex]?.cover" />
+        <img class="thumbail-img" :src="dcover" />
       </div>
       <span>{{ currentTime }}</span>
       <BFormInput
@@ -429,20 +431,17 @@ onUnmounted(() => {
       <div class="rs-controls-1 d-flex align-items-center flex-row gap-2">
         <div class="img-list user-select-none">
           <BImg
-            v-for="img in img_list"
-            @click="console.log('nihaoshijie')"
-            :src="img.url"
-            :alt="img.alt"
+            :src="dcover || ''"
+            :alt="`{alt of ${dcover}}`"
             rounded
             width="250"
           />
         </div>
 
-        <div class="rs-song-info d-flex flex-column user-select-none p-3">
-          <div class="rs-title fw-bold h5">明灯愿</div>
+        <div class="rs-song-info user-select-none p-3">
+          <div class="rs-title fw-bold h5">{{ dtitle || '无题'}}</div>
           <div class="rs-info d-flex gap-4 text-secondary mb-5">
-            <span>歌手：叶瞬光</span>
-            <!-- <span>专辑：青冥剑</span> -->
+            <span>作者：{{ dauthor || '无名氏'}}</span>
           </div>
           <div class="lyrics d-flex flex-column align-items-start gap-4">
             <span v-for="ls in lyrics">{{ ls }}</span>
@@ -472,32 +471,32 @@ onUnmounted(() => {
   }
 }
 
+
 .img-list {
-  display: flex;
-  flex-direction: row;
 
-  img:nth-child(even) {
-    z-index: 2;
-    will-change: transform;
-    filter: brightness(1.2);
-    transform: scale(1.2);
-  }
 
-  img:nth-child(odd) {
-    will-change: transform;
-  }
+  // img:nth-child(even) {
+  //   z-index: 2;
+  //   will-change: transform;
+  //   filter: brightness(1.2);
+  //   transform: scale(1.2);
+  // }
 
-  img:first-child {
-    transform: translateX(50px) scale(0.9);
-    filter: saturate(0.9);
-    z-index: 1;
-  }
+  // img:nth-child(odd) {
+  //   will-change: transform;
+  // }
 
-  img:last-child {
-    transform: translateX(-50px) scale(0.9);
-    filter: saturate(0.9);
-    z-index: 1;
-  }
+  // img:first-child {
+  //   transform: translateX(50px) scale(0.9);
+  //   filter: saturate(0.9);
+  //   z-index: 1;
+  // }
+
+  // img:last-child {
+  //   transform: translateX(-50px) scale(0.9);
+  //   filter: saturate(0.9);
+  //   z-index: 1;
+  // }
 }
 
 .scroll-list {

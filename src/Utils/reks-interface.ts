@@ -90,3 +90,10 @@ export interface MusicResponse{
   avatar:string
 }
 
+
+export interface Detail{
+  title:string
+  author:string
+  cover:string
+  // desc
+}

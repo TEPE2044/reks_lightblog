@@ -1,3 +1,5 @@
+// 这个他妈的是上传用的
+
 import { defineStore } from "pinia";
 import { ref } from "vue";
 export const musicStore = defineStore('music',() => {

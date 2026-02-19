@@ -3,10 +3,10 @@ import { computed, ref, watch } from "vue";
 import { Howl } from "howler";
 import { formatPlayerTime } from "../Utils/reks-format-time";
 import type { QueueItem } from "../Utils/reks-interface";
-
 // 全局播放器实例
 // bug-fix:修复了下一首播放时，组件拿不到最新的player实例的问题
 let player: Howl | null = null;
+
 
 export const playerStore = defineStore("player", () => {
   //播放模式
@@ -24,6 +24,7 @@ export const playerStore = defineStore("player", () => {
       }
     }
   });
+
 
   /* 播放列表 
   增删
@@ -194,6 +195,7 @@ export const playerStore = defineStore("player", () => {
     isPlay.value = true;
   };
 
+
   //TODO:点击播放分成两种
   // 一种是列表里的点击播放，一种是别的地方点击播放，第一种点击播放非常好办，只需要获取idx就行；
 
@@ -216,8 +218,10 @@ export const playerStore = defineStore("player", () => {
     updateTime();
   };
 
+
   return {
     playQueue,
+    playQueueLength,
     isPlay,
     isReady,
     volume,
