@@ -62,9 +62,7 @@ const upload_new_music = async (data: MusicData) => {
     return;
   }
 
-  // 用于存储上传成功的URL
-  let coverUrl = "";
-  let audioUrl = "";
+
 
   try {
     // 1. 上传图片
@@ -75,8 +73,11 @@ const upload_new_music = async (data: MusicData) => {
     if (imgRes.errno !== 0) {
       throw new Error(imgRes.message || "图片上传失败");
     }
-    coverUrl = imgRes.data.url;
-    coverURL.value = coverUrl; // 同步更新ref
+    coverURL.value = imgRes.data.url; // 同步更新ref
+
+    console.log("----1")
+    console.log(coverURL.value) // ok
+
     createToast(toast, "上传成功", "图片上传成功", "success");
 
     // 2. 上传音频
@@ -87,22 +88,24 @@ const upload_new_music = async (data: MusicData) => {
     if (!audioRes?.link) {
       throw new Error("音频上传返回数据异常");
     }
-    audioUrl = audioRes.link;
-    audioURL.value = audioUrl; // 同步更新ref
+    audioURL.value = audioRes.link; // 同步更新ref
+
+    console.log("----2")
+    console.log(audioURL.value)  // ok
+
     createToast(toast, "上传成功", "音频上传成功", "success");
 
     // 3. 组装完整数据并上传表单
     const completeData = {
       ...data,
-      cover: coverUrl,    // 根据后端字段名调整，可能是 cover/coverUrl/imgUrl
-      url: audioUrl,      // 根据后端字段名调整，可能是 url/audioUrl/link
+      coverURL: coverURL.value,    
+      audioURL: audioURL.value,      
     };
+    
+    console.log(completeData)
 
     const formRes = await upload_music_form(completeData);
-
-    if (formRes.errno !== 0) {
-      throw new Error(formRes.message || "表单提交失败");
-    }
+    console.log(formRes)
 
     createToast(toast, "上传成功", "音乐上传成功", "success");
 
@@ -164,7 +167,7 @@ const upload_new_music = async (data: MusicData) => {
           </div>
 
           <div class="d-flex align-items-center gap-3">
-            <BButton variant="primary" @click.stop="upload_new_music({ isOriginal, name, desc, coverURL, audioURL })">确认上传
+            <BButton variant="primary" @click.stop="upload_new_music({ isOriginal, name, desc,})">确认上传
             </BButton>
             <div v-if="coverPreview" class="border rounded" style="width:64px; height:64px; overflow:hidden;">
               <img :src="coverPreview" alt="cover" style="width:100%; height:100%; object-fit:cover" />

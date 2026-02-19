@@ -61,13 +61,19 @@ export interface BlogData{
   type: number;
 }
 
-
-export interface MusicData{
+export interface MusicTwice{
   isOriginal:boolean
   name:string
   desc:string
   coverURL:string|undefined  
   audioURL:string|undefined  
+}
+
+
+export interface MusicData{
+  isOriginal:boolean
+  name:string
+  desc:string
 }
 
 export interface MusicResponse{

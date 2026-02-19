@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Editor from "../Components/Editor.vue";
-import { onUnmounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { set } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { musicStore } from "../Store/music";
@@ -31,11 +31,12 @@ watch(postType, () => {
   console.log("----upload");
   console.log(wantUpload.value);
 });
-onUnmounted(() =>{
-  window.onbeforeunload = function(event) {
-    event.preventDefault();
-  };
-})
+// TODO:会造成严重卡顿
+// onUnmounted(() =>{
+//   window.onbeforeunload = function(event) {
+//     event.preventDefault();
+//   };
+// })
 </script>
 <template>
   <div class="upload">
