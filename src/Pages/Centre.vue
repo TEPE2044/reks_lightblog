@@ -4,6 +4,7 @@ const user = userStore();
 
 const navs = [
   { name: "我的博客", path: { name: "my-blog" } },
+  { name: "我的音乐", path: { name: "my-music" } },
   { name: "我的收藏", path: { name: "my-fav" } },
   { name: "我的信息", path: { name: "edit-profile" } },
   { name: "账号安全", path: { name: "safe-setting" } },
@@ -20,7 +21,7 @@ const navs = [
           <BAvatar
             size="100px"
             style="box-shadow: grey 2px 3px 2px 1px"
-            :src="user.userInfo?.avatar || ''"
+            :src="user.userInfo.avatar || ''"
           />
         </div>
         <div class="info">
@@ -28,7 +29,7 @@ const navs = [
             {{ user.userInfo?.username || "无名" }}
           </div>
           <div class="sign text-secondary">
-            {{ user.userInfo?.signature || "这个人很懒" }}
+            {{ user.userInfo?.sign || "" }}
           </div>
         </div>
       </div>
@@ -55,7 +56,7 @@ const navs = [
             {{ nav.name }}
           </BNavItem>
           <BNavItem @click="" exact
-            >退出登录</BNavItem
+            >返回主页</BNavItem
           >
         </BNav>
       </div>

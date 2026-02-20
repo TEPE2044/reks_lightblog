@@ -1,35 +1,23 @@
 <script setup lang="ts">
-import BlogCard from '../Widgets/BlogCard.vue';
+import { ref } from "vue";
+
+const empty = ref(true);
 </script>
 
 <template>
-
-  <div class="ns">
-    <BlogCard v-for="iu in 2" :key="iu" />
+  <div class="ns-empty" v-if="empty">
+    <Empty/>
+  </div>
+  <div class="ns" v-if="!empty">
+    <!-- <BlogCard v-for="blog in blogs" :key="blog.id" :blog="blog" /> -->
   </div>
 
 </template>
 
 <style lang="scss" scoped>
-.ns{
+.ns {
   column-count: 4;
-  column-gap: 20px;
-  padding: 1.5rem;
-  @media (max-width:1400px) {
-    column-count: 3;
-    padding: 6rem;
-    padding-top: 1rem;
-  }
-  @media (max-width:1024px) {
-    column-count: 2;
-    padding: 5rem;
-    padding-top: 0;
-
-    column-gap: 40px;
-  }
-  @media (max-width:768px) {
-    column-count: 2;
-    padding: 2rem;
-  }
+  column-gap: 10px;
+  padding: 1rem;
 }
 </style>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import "@wangeditor-next/editor/dist/css/style.css";
 import { storeToRefs } from "pinia";
-import { onMounted, onBeforeUnmount } from "vue";
+import { onMounted, onBeforeUnmount} from "vue";
 import { Editor, Toolbar } from "@wangeditor-next/editor-for-vue";
 import type { IEditorConfig, IToolbarConfig } from "@wangeditor-next/editor";
 import { useToast, useToggle } from "bootstrap-vue-next";
@@ -10,13 +10,14 @@ import { upload_img } from "../Hooks/Editor";
 import { upload_blog } from "../Hooks/Blog";
 import { createToast } from "../Utils/reks-toast";
 import router from "../Router";
+import { userStore } from "../Store/user";
 
 const postType = defineModel({ default: "blog" });
 const toast = useToast();
-
+const { userInfo } = storeToRefs(userStore());
 
 // 状态管理
-const { editor, valueHTML, pub_tags, pub_title } = storeToRefs(editorStore());
+const { editor, valueHTML, pub_tags, pub_title, coverImages } = storeToRefs(editorStore());
 const { handleCreated, handleChange } = editorStore();
 
 // modal
@@ -77,11 +78,14 @@ const editorConfig: Partial<IEditorConfig> = {
           const res = await upload_img(form);
           if (res.errno === 0) {
             insertFn(res.data.url, res.data.alt || "", res.data.url);
+            createToast(toast, "上传成功", "图片上传成功", "success");
           } else {
+
             alert(res.message || "上传失败");
           }
         } catch (error) {
           console.error("图片上传失败:", error);
+          createToast(toast, "上传失败", "图片上传失败", "danger");
         }
       },
     },
@@ -115,7 +119,8 @@ const handleSubmit = async () => {
     const res = await upload_blog(
       pub_title.value,
       valueHTML.value,
-      pub_tags.value,
+      coverImages.value,
+      pub_tags.value
     );
     console.log("发布成功:", res);
     createToast(toast, "发布成功", "发布成功！期待上热门哦", "success");
@@ -151,53 +156,24 @@ onBeforeUnmount(() => {
     <section class="editor-section" v-if="postType !== 'audio'">
       <!-- 标题输入 -->
       <div class="form-floating mb-2">
-        <input
-          id="uploadTitle"
-          v-model="pub_title"
-          type="text"
-          class="form-control"
-          minlength="1"
-          maxlength="20"
-          required
-          placeholder="有何感想？"
-        />
+        <input id="uploadTitle" v-model="pub_title" type="text" class="form-control" minlength="1" maxlength="20"
+          required placeholder="有何感想？" />
         <label for="uploadTitle">从标题开始</label>
       </div>
-      <Toolbar
-        class="editor-toolbar"
-        :editor="editor"
-        :default-config="toolbarConfig"
-        mode="default"
-      />
-      <Editor
-        v-model="valueHTML"
-        class="editor-content"
-        :default-config="editorConfig"
-        mode="default"
-        @on-created="handleCreated"
-        @on-change="handleChange"
-      />
+      <Toolbar class="editor-toolbar" :editor="editor" :default-config="toolbarConfig" mode="default" />
+      <Editor v-model="valueHTML" class="editor-content" :default-config="editorConfig" mode="default"
+        @on-created="handleCreated" @on-change="handleChange" />
     </section>
 
-    <!-- 标签输入 -->
     <section class="tags-section" v-if="postType !== 'audio'">
       <p class="section-title">上传标签</p>
-      <BFormTags
-        v-model="pub_tags"
-        input-id="tags-basic"
-        :limit="5"
-        duplicate-tag-text="重复标签"
-        remove-on-delete
-        add-button-text="Add"
-        limit-tags-text="最多只能设置5个标签噢"
-        placeholder="设置标签(使用回车确定标签)"
-      />
+      <BFormTags v-model="pub_tags" input-id="tags-basic" :limit="5" duplicate-tag-text="重复标签" remove-on-delete
+        add-button-text="Add" limit-tags-text="最多只能设置5个标签噢" placeholder="设置标签(使用回车确定标签)" />
     </section>
 
-    <section class="audio-secetion mt-2" v-if="postType == 'mblog'">
-      <RadioSelector/>
-    </section>
-
+    <!-- <section class="audio-secetion mt-2" v-if="postType == 'mblog'">
+      <RadioSelector />
+    </section> -->
 
     <!-- 规定确认 -->
     <!-- <section class="agreement-section">
@@ -225,11 +201,9 @@ onBeforeUnmount(() => {
           <strong>确认发布?</strong>
         </template>
         <BButton size="sm" variant="success" class="me-2" @click="handleSubmit">
-          <i-bi-send/> 发布
+          <i-bi-send /> 发布
         </BButton>
-        <BButton size="sm" variant="primary">
-          <i-bi-box/> 暂存
-        </BButton>
+        <BButton size="sm" variant="primary"> <i-bi-box /> 暂存 </BButton>
       </BPopover>
       <BButton variant="primary" class="float-end me-2" @click="handlePreview">
         预览
@@ -238,14 +212,7 @@ onBeforeUnmount(() => {
   </div>
 
   <!-- 预览模态框 -->
-  <BModal
-    id="preview"
-    size="lg"
-    scrollable
-    no-close-on-backdrop
-    no-backdrop
-    no-footer
-  >
+  <BModal id="preview" size="lg" scrollable no-close-on-backdrop no-backdrop no-footer>
     <article class="preview-content">
       <h2 class="preview-title">{{ pub_title }}</h2>
 
@@ -261,10 +228,10 @@ onBeforeUnmount(() => {
 
       <footer class="preview-footer">
         <div class="author-info">
-          <BAvatar size="50" />
+          <BAvatar size="50" :src="userInfo?.avatar || null" />
           <div class="author-details">
-            <div class="author-name">梦璃東</div>
-            <div class="author-sign">梦璃東有梦</div>
+            <div class="author-name">{{ userInfo?.username }}</div>
+            <div class="author-sign">{{ userInfo?.sign || '' }}</div>
           </div>
         </div>
         <BButton variant="outline-secondary" size="sm">+ 关注</BButton>
@@ -275,7 +242,7 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 // ==================== 变量 ====================
-$editor-width: 600px;
+$editor-width: 800px;
 $border-color: #d3d3d3;
 $border-radius: 5px;
 
@@ -320,7 +287,7 @@ section {
 
   .editor-content {
     min-height: 301px;
-    max-height: 400px;
+    max-height: 650px;
     overflow-y: auto;
     border-top: 1px solid $border-color;
     border-bottom: 2px solid gainsboro;
@@ -331,7 +298,7 @@ section {
   // 统一宽度
   :deep(.w-e-toolbar),
   :deep(.w-e-text-container) {
-    width: $editor-width !important;
+    width: 100%;
   }
 }
 

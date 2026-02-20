@@ -5,12 +5,16 @@ import {
   useIntervalFn,
   useToggle as vuseToggle,
 } from "@vueuse/core";
-import { useToggle } from "bootstrap-vue-next";
+import { useToast, useToggle } from "bootstrap-vue-next";
 import type { Placement } from "bootstrap-vue-next";
 import { playerStore } from "../Store/player";
 import { storeToRefs } from "pinia";
+import { detailStore } from "../Store/detail";
+import { createToast } from "../Utils/reks-toast";
+
 const {
   playQueue,
+  playQueueLength,
   isHidden,
   isPlay,
   muted,
@@ -22,7 +26,6 @@ const {
   progress,
 } = storeToRefs(playerStore());
 const {
-  initPlayQueue,
   handleMuted,
   removeAll,
   removeFromPlayQueue,
@@ -34,68 +37,6 @@ const {
   selectFromList,
   handleClickPlay,
 } = playerStore();
-const fakeDatas = [
-  {
-    cover: "/ai.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/ysg2.jpg",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250720132105_audio.mp3",
-  },
-  {
-    cover: "/ysg1.jpg",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-  {
-    cover: "/mod.webp",
-    songURL:
-      "https://projeck.obs.cn-south-1.myhuaweicloud.com/Radios/1/20250706210102_audio.mp3",
-  },
-];
 console.log(playQueue.value);
 const updateTimer = useIntervalFn(
   () => {
@@ -111,8 +52,10 @@ watch(isPlay, () => {
     updateTimer.pause();
   }
 });
+// 详情
+const { dtitle, dauthor, dcover } = storeToRefs(detailStore())
 onMounted(() => {
-  initPlayQueue(fakeDatas);
+  // initPlayQueue();
   //复用变量但创建新实例
   createPlayer();
 });
@@ -127,21 +70,6 @@ onMounted(() => {
   7.点击播放:先暂停，加载 y
   */
 
-//datas
-const img_list = ref([
-  {
-    url: "/ysg2.jpg",
-    alt: "ysg2",
-  },
-  {
-    url: "/ysg.jpg",
-    alt: "ysg",
-  },
-  {
-    url: "/ysg1.jpg",
-    alt: "ysg1",
-  },
-]);
 
 // 唯一适合用shallowRef
 const lyrics = shallowRef([
@@ -149,6 +77,27 @@ const lyrics = shallowRef([
   "「天总会亮的。无论黑夜多么漫长，白昼终将到来。」",
   "「在遥远的过去，和遥远的未来，一定也有无数人做出了和我一样的选择。我们…从不孤单。」",
 ]);
+
+// 评论数据与操作
+const commentList = ref([
+  { id: 1, author: "游客", avatar: "/ysg.jpg", time: "刚刚", content: "好音乐！" },
+]);
+const newComment = ref("");
+const postComment = () => {
+  if (!newComment.value.trim()) return;
+  commentList.value.unshift({
+    id: Date.now(),
+    author: "我",
+    avatar: "/ysg1.jpg",
+    time: Date.now().toString(),
+    content: newComment.value.trim(),
+  });
+  newComment.value = "";
+};
+// TODO:只能删除自己的评论
+const deleteComment = (id: number) => {
+  commentList.value = commentList.value.filter((c) => c.id !== id);
+};
 
 // 模式选择
 const modeList = ref(["loop", "shuffle", "repeat"]);
@@ -165,6 +114,11 @@ const toggleMusicList = () => {
   onTop.value = false;
   expand.hide();
 };
+// 评论界面
+const comments = useToggle("comment-area")
+const toggleComment = () => {
+  comments.toggle()
+}
 // 详细界面
 const expand = useToggle("music-player-inner");
 const [onTop, toggleTop] = vuseToggle();
@@ -176,14 +130,15 @@ const toggleHidden = () => {
     onTop.value = false;
   }
 };
+const toast = useToast()
 const toggleExpand = () => {
+  if (playQueueLength.value === 0) {
+    createToast(toast, "暂无歌曲", "播发列表为空", "warning")
+    return
+  }
   toggleTop();
   expand.toggle();
   isOffc.value = false;
-};
-
-const testX = () => {
-  console.log("你好");
 };
 
 const handleCloseOffCanvas = (e: MouseEvent) => {
@@ -201,6 +156,18 @@ watch(isOffc, (offcanvas_show) => {
     document.removeEventListener("click", handleCloseOffCanvas);
   }
 });
+// import type { Detail } from "../Utils/reks-interface";
+// const detailProps = defineProps<{ detail:Detail}>()
+// const d = detailProps.detail
+const { get_detail } = detailStore()
+watch(currentIndex, () => {
+  // console.log(playQueue.value[currentIndex.value])
+  const temp = playQueue.value[currentIndex.value]
+  get_detail({ title: temp?.title, author: temp?.author, cover: temp?.cover } as any)
+})
+
+
+
 onUnmounted(() => {
   document.removeEventListener("click", handleCloseOffCanvas);
 });
@@ -208,15 +175,10 @@ onUnmounted(() => {
 
 <template>
   <div class="hidden-player" v-if="isHidden">
-    <BButton size="sm" variant="outline-dark" @click="toggleHidden()"
-      >展开播放器</BButton
-    >
+    <BButton size="sm" variant="outline-dark" @click="toggleHidden()">展开播放器</BButton>
   </div>
-  <div
-    :class="{ ontop: onTop }"
-    class="music-player border d-flex align-items-center justify-content-center gap-5"
-    v-else
-  >
+  <div :class="{ ontop: onTop }" class="music-player border d-flex align-items-center justify-content-center gap-5"
+    v-else>
     <div class="controls-1 d-flex gap-3 align-items-center">
       <div class="front r-icon" @click.stop="frontSong()">
         <i-bi-skip-start style="font-size: 1.5rem" />
@@ -240,10 +202,7 @@ onUnmounted(() => {
         <template #target>
           <div class="volume-icons r-icon" @click.stop="handleMuted">
             <div v-if="!muted">
-              <i-bi-volume-down
-                v-if="volume < 50 && volume > 0"
-                style="font-size: 1.8rem"
-              />
+              <i-bi-volume-down v-if="volume < 50 && volume > 0" style="font-size: 1.8rem" />
               <i-bi-volume-up v-if="volume >= 50" style="font-size: 1.8rem" />
               <i-bi-volume-off v-if="volume == 0" style="font-size: 1.8rem" />
             </div>
@@ -261,32 +220,20 @@ onUnmounted(() => {
       </BPopover>
     </div>
 
-    <div
-      class="r-progressBar d-flex align-items-center gap-3 user-select-none"
-      @click.stop=""
-    >
-      <div
-        class="thumbail-album rounded border r-icon"
-        @click.stop="toggleExpand()"
-      >
-        <img class="thumbail-img" :src="playQueue[currentIndex]?.cover" />
+    <div class="r-progressBar d-flex align-items-center gap-3 user-select-none" @click.stop="">
+      <div class="thumbail-album rounded border r-icon" @click.stop="toggleExpand()">
+        <img class="thumbail-img" :src="dcover || '/imagePlaceholder.webp'" />
       </div>
       <span>{{ currentTime }}</span>
-      <BFormInput
-        @input="handleClickPlay(progress)"
-        class="progress"
-        v-model="progress"
-        type="range"
-        max="100"
-        min="0"
-      />
+      <BFormInput @input="handleClickPlay(progress)" class="progress" v-model="progress" type="range" max="100"
+        min="0" />
       <span>{{ duration }}</span>
     </div>
     <div class="controls-3 d-flex gap-4 align-items-center">
       <div class="like r-icon" @click.stop="">
         <i-bi-heart style="font-size: 1.2rem" />
       </div>
-      <div class="comment r-icon" @click.stop="">
+      <div class="comment r-icon" @click.stop="toggleComment()">
         <i-bi-chat-text style="font-size: 1.2rem" />
       </div>
       <div class="music-queue r-icon" @click.stop="toggleMusicList()">
@@ -295,46 +242,24 @@ onUnmounted(() => {
       <BButton size="sm" @click="toggleHidden()">最小化播放器</BButton>
     </div>
 
-    <BOffcanvas
-      width="30rem"
-      body-scrolling
-      lazy
-      no-backdrop
-      shadow="lg"
-      :placement="placement"
-      v-model="isOffc"
-      id="offc"
-      class="px-1"
-    >
+    <BOffcanvas width="30rem" body-scrolling lazy no-backdrop shadow="lg" :placement="placement" v-model="isOffc"
+      id="offc" class="px-1">
       <template #header>
         <div class="oc-header d-flex flex-column justify-content-center">
-          <div
-            class="oc-header-top w-100 d-flex flex-row align-items-center justify-content-between"
-          >
+          <div class="oc-header-top w-100 d-flex flex-row align-items-center justify-content-between">
             <div class="title fw-bold h5 flex-grow-1">播放列表</div>
-            <BButton
-              @click.stop="toggleMusicList"
-              class="header-close d-inline-flex align-items-center justify-content-center"
-              variant="outline-dark"
-            >
+            <BButton @click.stop="toggleMusicList"
+              class="header-close d-inline-flex align-items-center justify-content-center" variant="outline-dark">
               <i-bi-x-lg style="font-size: 1rem" />
             </BButton>
           </div>
 
           <div class="oc-btns mt-3">
-            <BButton
-              @click.stop="removeAll()"
-              size="sm"
-              variant="outline-secondary"
-              class="clear d-inline-flex align-items-center gap-1 me-1"
-            >
+            <BButton @click.stop="removeAll()" size="sm" variant="outline-secondary"
+              class="clear d-inline-flex align-items-center gap-1 me-1">
               <i-bi-trash style="font-size: 1rem" /> 清空列表
             </BButton>
-            <BButton
-              size="sm"
-              variant="outline-secondary"
-              class="collect d-inline-flex align-items-center gap-1"
-            >
+            <BButton size="sm" variant="outline-secondary" class="collect d-inline-flex align-items-center gap-1">
               <i-bi-plus-square style="font-size:1rem;" />
               收藏全部
             </BButton>
@@ -343,56 +268,28 @@ onUnmounted(() => {
       </template>
       <template #default>
         <div class="scroll-list">
-          <div
-            v-for="song in playQueue"
-            :key="`reks${song}`"
-            class="list-item position-relative p-3 border rounded-1 mt-3 d-flex justify-content-between align-items-center shadow-sm"
-          >
-            <div
-              class="meta d-flex flex-row align-items-center justify-content-center position-absolute"
-            >
-              <div
-                class="btns d-flex flex-row align-items-center justify-content-center gap-4"
-              >
-                <BButton
-                  variant="light"
-                  size="sm"
-                  @click.stop="selectFromList(playQueue.indexOf(song))"
-                >
+          <div v-for="song in playQueue" :key="`reks${song}`"
+            class="list-item position-relative p-3 border rounded-1 mt-3 d-flex justify-content-between align-items-center shadow-sm">
+            <div class="meta d-flex flex-row align-items-center justify-content-center position-absolute">
+              <div class="btns d-flex flex-row align-items-center justify-content-center gap-4">
+                <BButton variant="light" size="sm" @click.stop="selectFromList(playQueue.indexOf(song))">
                   <i-bi-play-circle style="font-size:1rem;" />
                 </BButton>
-                <BButton variant="light" size="sm" @click.stop="testX()">
-                  <i-bi-heart       style="font-size:1rem;" />
+                <BButton variant="light" size="sm" @click.stop="removeFromPlayQueue(playQueue.indexOf(song))">
+                  <i-bi-trash style="font-size:1rem;" />
                 </BButton>
-                <BButton
-                  variant="light"
-                  size="sm"
-                  @click.stop="removeFromPlayQueue(playQueue.indexOf(song))"
-                >
-                  <i-bi-trash       style="font-size:1rem;" />
-                </BButton>
-                <BDropdown
-                  :auto-close="true"
-                  no-caret
-                  no-flip
-                  offset="25"
-                  placement="left"
-                  variant="light"
-                  size="sm"
-                >
+                <BDropdown :auto-close="true" no-caret no-flip offset="25" placement="left" variant="light" size="sm">
                   <template #button-content>
-                   <i-bi-three-dots  style="font-size:1rem;" />
+                    <i-bi-three-dots style="font-size:1rem;" />
                   </template>
                   <template #default>
-                    <BDropdownItem>
+                    <BDropdownItem @click.stop="toggleComment()">
                       <i-bi-chat-left-dots style="font-size:1rem;" />
                       评论
                     </BDropdownItem>
                     <BDropdownDivider></BDropdownDivider>
-                    <BDropdownItem
-                      @click.stop="removeFromPlayQueue(playQueue.indexOf(song))"
-                    >
-                      <i-bi-trash       style="font-size:1rem;" />
+                    <BDropdownItem @click.stop="removeFromPlayQueue(playQueue.indexOf(song))">
+                      <i-bi-trash style="font-size:1rem;" />
                       删除
                     </BDropdownItem>
                   </template>
@@ -405,8 +302,8 @@ onUnmounted(() => {
                 <BAvatar square :src="song.cover" />
               </div>
               <div class="info d-inline-flex flex-column align-items-start">
-                <span class="title h5">CeruleanBlue</span>
-                <span class="author text-secondary">Klute</span>
+                <span class="title h5">{{ song.title }}</span>
+                <span class="author text-secondary">{{ song.author }}</span>
               </div>
             </div>
             <div class="right text-secondary">06:01</div>
@@ -415,39 +312,65 @@ onUnmounted(() => {
       </template>
       <template #footer> </template>
     </BOffcanvas>
-    <BModal
-      @backdrop="toggleExpand()"
-      size="xl"
-      id="music-player-inner"
-      no-header-close
-      backdrop
-      scrollable
-      centered
-      no-footer
-      lazy
-    >
+    <BModal size="xl" backdrop scrollable lazy no-footer :title="`评论区(${commentList.length})`" centered
+      id="comment-area">
+      <div class="comment-area p-3">
+        <div class="comment-list mb-3">
+          <div v-if="commentList.length === 0"
+            class="comment-empty d-flex flex-column align-items-center justify-content-center p-4 text-secondary">
+            <i-bi-chat-dots style="font-size:2rem" />
+            <div class="mt-2">还没有评论，快来抢沙发 ~</div>
+          </div>
+          <div v-else>
+            <div v-for="c in commentList" :key="c.id" class="comment-item d-flex gap-3 p-2 align-items-start">
+              <BAvatar :src="c.avatar" square class="comment-avatar" />
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <div class="fw-bold">{{ c.author }}</div>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="text-secondary small">{{ c.time }}</div>
+                    <BButton size="sm" variant="outline-danger" class="delete-comment"
+                      @click.stop="deleteComment(c.id)">删除
+                    </BButton>
+                  </div>
+                </div>
+                <div class="comment-content text-wrap">{{ c.content }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="comment-input d-flex gap-2 align-items-start">
+          <BAvatar src="/ysg1.jpg" square class="comment-avatar-sm" />
+          <div class="flex-grow-1">
+            <BFormTextarea v-model="newComment" rows="3" placeholder="写下你的评论..." />
+            <div class="d-flex justify-content-end mt-2">
+              <BButton size="sm" class="ms-2" variant="primary" @click="postComment()">发送</BButton>
+            </div>
+          </div>
+        </div>
+      </div>
+    </BModal>
+    <BModal @backdrop="toggleExpand()" size="xl" id="music-player-inner" no-header-close backdrop scrollable centered
+      no-footer lazy>
       <template #header>
         <BButton size="sm" variant="outline-dark" @click="toggleExpand()">
           <i-bi-chevron-bar-down style="font-size: 1.2rem" />
         </BButton>
       </template>
       <div class="rs-controls-1 d-flex align-items-center flex-row gap-2">
-        <div class="img-list user-select-none">
-          <BImg
-            v-for="img in img_list"
-            @click="console.log('nihaoshijie')"
-            :src="img.url"
-            :alt="img.alt"
-            rounded
-            width="250"
-          />
+        <div class="cover user-select-none">
+          <div class="turntable" :class="{ playing: isPlay }">
+            <div class="disc border">
+              <img :src="dcover || '/imagePlaceholder.webp'" :alt="`cover of ${dtitle}`" />
+            </div>
+          </div>
         </div>
 
-        <div class="rs-song-info d-flex flex-column user-select-none p-3">
-          <div class="rs-title fw-bold h5">明灯愿</div>
+        <div class="rs-song-info user-select-none p-3">
+          <div class="rs-title fw-bold h3">{{ dtitle || '无题' }}</div>
           <div class="rs-info d-flex gap-4 text-secondary mb-5">
-            <span>歌手：叶瞬光</span>
-            <!-- <span>专辑：青冥剑</span> -->
+            <span>作者：{{ dauthor || '无名氏' }}</span>
           </div>
           <div class="lyrics d-flex flex-column align-items-start gap-4">
             <span v-for="ls in lyrics">{{ ls }}</span>
@@ -477,33 +400,7 @@ onUnmounted(() => {
   }
 }
 
-.img-list {
-  display: flex;
-  flex-direction: row;
 
-  img:nth-child(even) {
-    z-index: 2;
-    will-change: transform;
-    filter: brightness(1.2);
-    transform: scale(1.2);
-  }
-
-  img:nth-child(odd) {
-    will-change: transform;
-  }
-
-  img:first-child {
-    transform: translateX(50px) scale(0.9);
-    filter: saturate(0.9);
-    z-index: 1;
-  }
-
-  img:last-child {
-    transform: translateX(-50px) scale(0.9);
-    filter: saturate(0.9);
-    z-index: 1;
-  }
-}
 
 .scroll-list {
   min-height: 10rem;
@@ -595,8 +492,7 @@ onUnmounted(() => {
       background-color: rgb(218, 85, 85);
       border: 1px solid white;
       margin-top: -6px;
-      border-image: linear-gradient(#df5634, #ffb7b7) 0 fill / 8 22 9 0 / 0px
-        0px 0 2000px;
+      border-image: linear-gradient(#df5634, #ffb7b7) 0 fill / 8 22 9 0 / 0px 0px 0 2000px;
       will-change: background;
       transition: all 0.3s ease;
     }
@@ -607,4 +503,138 @@ onUnmounted(() => {
     }
   }
 }
+
+/* Minimal layout tweaks for expanded player modal */
+.rs-controls-1 {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.rs-controls-1 .cover {
+  width: 100%;
+  max-width: 100%;
+}
+
+.rs-controls-1 .cover {
+  padding: 2rem;
+  width: 100%;
+  max-width: 100%;
+  /* 限制封面高度，超出部分隐藏 */
+  height: 400px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.rs-controls-1 .cover img,
+.rs-controls-1 .cover > img,
+.rs-controls-1 .cover .b-img,
+.rs-controls-1 .cover b-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.comment-area {
+  /* 固定整体高度，评论列表可滚动，输入区固定在底部 */
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+
+  .comment-list {
+    flex: 1 1 auto;
+    overflow: auto;
+    padding-right: 0.25rem;
+
+    .comment-item {
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.6);
+    }
+  }
+
+  .comment-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .comment-avatar-sm {
+    width: 36px;
+    height: 36px;
+  }
+
+  .comment-content {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .comment-input {
+    flex: 0 0 auto;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    padding-top: 0.75rem;
+    background: transparent;
+
+    /* 禁止 textarea 拖动/缩放，并固定高度（焊死） */
+    textarea,
+    .form-control {
+      resize: none;
+      height: 72px !important;
+      max-height: 72px !important;
+      min-height: 72px !important;
+    }
+  }
+}
+
+.comment-empty {
+  min-height: 140px;
+}
+
+.delete-comment {
+  padding: 0.15rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+/* 黑胶 / 转盘 样式（嵌套） */
+.rs-controls-1 {
+  .cover {
+      .turntable {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+  
+
+      .disc {
+        position: relative;
+        z-index: 2;
+        width: 92%;
+        max-width: 360px;
+        aspect-ratio: 1/1;
+        border-radius: 50%;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+          width: 86%;
+          height: 86%;
+          border-radius: 50%;
+          object-fit: cover;
+          display: block;
+        }
+      }
+
+    }
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    .cover { height: 260px; .turntable { .disc { max-width: 300px; } } }
+  }
+}
+
 </style>

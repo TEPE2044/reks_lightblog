@@ -1,59 +1,44 @@
 <script setup lang="ts">
 import Editor from "../Components/Editor.vue";
-import { ref, watch, markRaw } from "vue";
-import { useToast } from "bootstrap-vue-next";
-import { createToast } from "../Utils/reks-toast";
+import { ref, watch } from "vue";
 import { set } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { musicStore } from "../Store/music";
-import BiFileEarmarkRichtext from "~icons/bi/file-earmark-richtext";
-import BiFileEarmarkPlay from "~icons/bi/file-earmark-play";
-import BiFileEarmarkMusic from "~icons/bi/file-earmark-music";
-import BiFileEarmarkRichtextPost from "~icons/bi/file-earmark-post";
+import  { type UploadIcon,uploadIconMap } from "../Utils/reks-icon-map";
 
-const iconMap = {
-  blog: markRaw(BiFileEarmarkRichtext),
-  mblog: markRaw(BiFileEarmarkPlay),
-  audio: markRaw(BiFileEarmarkMusic),
-  pro: markRaw(BiFileEarmarkRichtextPost),
-} as const;
-
-type IconKey = keyof typeof iconMap;
-
-const selections = ref<{ name: string; iconKey: IconKey; postType: string }[]>([
+const selections = ref<{ name: string; iconKey: UploadIcon; postType: string }[]>([
   { name: "随心写", iconKey: "blog", postType: "blog" },
-  { name: "音乐博客", iconKey: "mblog", postType: "mblog" },
   { name: "音频", iconKey: "audio", postType: "audio" },
-  { name: "专栏", iconKey: "pro", postType: "pro" },
 ]);
-
-const toast = useToast();
 
 const postType = ref(selections.value[0]?.postType);
 
 const selectType = (ntype: number) => {
-  if (ntype === 3) {
-    createToast(toast, "敬请期待", "暂未开放", "warning");
-    return;
-  }
   postType.value = selections.value[ntype]?.postType;
   //console.log(postType.value)
 };
 
-const { isOriginal, trackTitle, trackDesc, audioFile, wantUpload } =
+const { isOriginal, name, desc, audioFile, wantUpload } =
   storeToRefs(musicStore());
 
 watch(postType, () => {
   set(isOriginal, false);
-  set(trackTitle, "");
-  set(trackDesc, "");
+  set(name, "");
+  set(desc, "");
   set(audioFile, null);
   set(wantUpload, "uex");
   console.log("----upload");
   console.log(wantUpload.value);
 });
+// TODO:会造成严重卡顿
+// onUnmounted(() =>{
+//   window.onbeforeunload = function(event) {
+//     event.preventDefault();
+//   };
+// })
 </script>
 <template>
+  <!-- 优化项 TODO:换成upload/blog upload/music upload/mblog 的路由形式 -->
   <div class="upload">
     <div class="sidebar">
       <div class="selection d-flex flex-column gap-3">
@@ -66,7 +51,7 @@ watch(postType, () => {
           @click="selectType(index)"
         >
           <div class="sname">{{ s.name }}</div>
-          <component :is="iconMap[s.iconKey]" style="font-size: 1.4rem" />
+          <component :is="uploadIconMap[s.iconKey]" style="font-size: 1.4rem" />
         </BButton>
       </div>
     </div>
@@ -84,6 +69,7 @@ watch(postType, () => {
 }
 .upload {
   margin-top: 7.3rem;
+  min-height: 600px;
   @extend %reks-card-box;
   display: grid;
   grid-template-columns: 1fr 8fr;

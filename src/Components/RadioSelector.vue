@@ -4,7 +4,7 @@ import { useToggle as vuseToggle } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { musicStore } from "../Store/music";
 import type { ApiProduct } from "../Utils/reks-interface";
-
+import { iwantsomedata } from "../Utils/reks-test";
 
 const { wantUpload } = storeToRefs(musicStore());
 
@@ -15,18 +15,9 @@ const options = [
 
 const [confirm, toggleConfirm] = vuseToggle();
 
+
 // Simulated API response
-const apiProducts: ApiProduct[] = [
-  { productCode: "PROD-001", productName: "Widget A", category: "Hardware" },
-  { productCode: "Man-Dick", productName: "sdget B", category: "Sex Toy" },
-  { productCode: "PROD-002", productName: "Gadget B", category: "Electronics" },
-  {
-    productCode: "PROD-003",
-    productName: "Tool C",
-    category: "Hardware",
-    discontinued: true,
-  },
-];
+const apiProducts: ApiProduct[] = [];
 // TypeScript knows selectedProductCode is a string (matching productCode field type)
 const selectedProductCode = ref<string>();
 </script>
@@ -42,6 +33,7 @@ const selectedProductCode = ref<string>();
       <div>
         <BInputGroup>
           <BFormInput
+            @focus="iwantsomedata()"
             v-model="selectedProductCode"
             type="text"
             list="product-list"
@@ -65,10 +57,7 @@ const selectedProductCode = ref<string>();
         </div>
       </div>
     </section>
-    <section class="unew mt-3" v-if="wantUpload === 'unew'">
-      <MusicForm/>
-    </section>
-    <section class="unewc mt-3" v-if="wantUpload === 'unewc'"></section>
+    <section class="unew mt-3" v-if="wantUpload === 'unew'" @focus=""></section>
   </div>
 </template>
 

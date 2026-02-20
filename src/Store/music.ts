@@ -1,25 +1,32 @@
-import { useToggle } from "@vueuse/core";
+// 这个他妈的是上传用的
+
 import { defineStore } from "pinia";
 import { ref } from "vue";
 export const musicStore = defineStore('music',() => {
     // 歌曲标题、歌曲简介
-    const trackTitle = ref<string>('')
-    const trackDesc = ref<string>('')
-    const playList = ref<string>('')
+    const name = ref<string>('')
+    const desc = ref<string>('')
     // 是否原创
-    const [isOriginal] = useToggle()
+    const isOriginal = ref<boolean>(false)
     // 是否上传新文件
     const wantUpload = ref<'unew'|'uex'|'unewc'>('uex')
     // 音频文件
     const audioFile = ref<File|null>(null)
     const coverFile = ref<File|null>(null)
+
+    const audioURL = ref<string>()
+    const coverURL = ref<string>()
+
+
+
     return{
-        trackTitle,
-        trackDesc,
-        playList,
+        name,
+        desc,
         isOriginal,
         wantUpload,
         audioFile,
-        coverFile
+        coverFile,
+        audioURL,
+        coverURL
     }
 })
