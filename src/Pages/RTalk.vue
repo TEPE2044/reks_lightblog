@@ -27,7 +27,7 @@ watch(
 </script>
 
 <template>
-  <div class="rt-talk">
+  <div class="rt-talk pb-5 pt-4">
     <div class="rt-header">
       <BFormRadioGroup
         name="swap"
@@ -49,9 +49,10 @@ watch(
 </template>
 
 <style lang="scss" scoped>
+@use "../Asset/CustomStyle/global.scss";
 .rt-talk{
-    // margin-top: 7.3rem;
-    margin-top: 3rem;
+  margin-top: 7.3rem;
+  @extend %reks-card-box;
 }
 
 
