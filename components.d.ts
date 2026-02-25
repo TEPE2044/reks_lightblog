@@ -12,6 +12,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     404: typeof import('./src/Pages/404.vue')['default']
+    AnnouncementPanel: typeof import('./src/Components/AnnouncementPanel.vue')['default']
     App: typeof import('./src/App.vue')['default']
     Auth: typeof import('./src/Components/Auth.vue')['default']
     Avatar: typeof import('./src/Widgets/Avatar.vue')['default']
@@ -60,6 +61,7 @@ declare module 'vue' {
     BTabs: typeof import('bootstrap-vue-next/components/BTabs')['BTabs']
     Caro: typeof import('./src/Widgets/Caro.vue')['default']
     Centre: typeof import('./src/Pages/Centre.vue')['default']
+    Dialog: typeof import('./src/Components/Dialog.vue')['default']
     Editor: typeof import('./src/Components/Editor.vue')['default']
     EditProfile: typeof import('./src/Widgets/EditProfile.vue')['default']
     Empty: typeof import('./src/Components/Empty.vue')['default']
@@ -126,6 +128,7 @@ declare module 'vue' {
     Recommand: typeof import('./src/Layouts/Recommand.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    RTalk: typeof import('./src/Pages/RTalk.vue')['default']
     SafeSetting: typeof import('./src/Components/SafeSetting.vue')['default']
     Search: typeof import('./src/Pages/Search.vue')['default']
     SearchBar: typeof import('./src/Widgets/SearchBar.vue')['default']

@@ -10,6 +10,10 @@ const emd = useToggle("easy-login-box");
 const pageToUpload = () => {
   router.push('/upload')
 }
+const pageToRtalk = () => {
+  router.push('/rtalk')
+  sys.value = !sys.value
+}
 </script>
 <template>
   <div class="message-bar rounded d-flex justify-content-around align-items-center p-2 gap-2">
@@ -38,7 +42,7 @@ const pageToUpload = () => {
       <BDropdownDivider />
       <BDropdownItem class="text-center" @click="user.userLogout">退出登录</BDropdownItem>
     </BDropdown>
-    <BButton @click="sys = !sys" class="position-relative" variant="light" v-if="user.isLoggedIn">
+    <BButton @click="pageToRtalk()" class="position-relative" variant="light" v-if="user.isLoggedIn">
       <i-bi-bell />
 
       <BBadge v-show="sys" dot-indicator variant="danger" class="position-absolute top-0 start-100 translate-middle" />

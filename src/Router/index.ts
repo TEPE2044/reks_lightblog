@@ -71,9 +71,9 @@ const router = createRouter({
           component: () => import("../Widgets/MyFav.vue"),
         },
         {
-          path:'my-music',
-          name:"my-music",
-          component:() => import("../Widgets/MyMusic.vue")
+          path: "my-music",
+          name: "my-music",
+          component: () => import("../Widgets/MyMusic.vue"),
         },
         {
           path: "edit-profile",
@@ -102,22 +102,42 @@ const router = createRouter({
       name: "store",
       component: () => import("../Pages/Store.vue"),
     },
+    {
+      path: "/rtalk",
+      name: "rtalk",
+      component: () => import("../Pages/RTalk.vue"),
+      children: [
+        {
+          path: "",
+          redirect: { name: "anmt" },
+        },
+        {
+          path: "anmt",
+          name: "anmt",
+          component: () => import("../Components/AnnouncementPanel.vue"),
+        },
+        {
+          path: "mes",
+          name: "mes",
+          component: () => import("../Components/Dialog.vue"),
+        },
+      ],
+    },
     { path: "/:pathMatch(.*)*", redirect: "/404" },
   ],
 });
 
-
 router.beforeEach((to, from, next) => {
-  console.log(from.path)
+  console.log(from.path);
   const { rcode, payload, isLoggedIn } = storeToRefs(userStore());
   const isAuthenticated = rcode.value && payload.value && isLoggedIn.value;
-  
+
   // 未登录 & 当前不在首页 → 强制回到首页
   if (!isAuthenticated && to.path !== "/") {
-    next("/");   // ✅ 只有从其他页面跳过来时才重定向
+    next("/"); // ✅ 只有从其他页面跳过来时才重定向
     return;
   }
 
-  next();  // 其他情况正常放行（包括已在首页的情况）
+  next(); // 其他情况正常放行（包括已在首页的情况）
 });
 export default router;
