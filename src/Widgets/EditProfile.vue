@@ -10,7 +10,7 @@ import { createToast } from "../Utils/reks-toast";
 import { useToast } from "bootstrap-vue-next";
 import { getUserProfile } from "../Hooks/Auth";
 const { userInfo, tempAvatar } = storeToRefs(userStore());
-const { storeUserInfo } = userStore()
+const { updateUserInfo } = userStore()
 const toast = useToast();
 const options = [
   { text: '男', value: 1 },
@@ -45,12 +45,13 @@ const profileSave = useDebounceFn(async (data: UserProfile) => {
     console.log("保存用户信息", { ...data, avatar: avatarURL });
     const res1 = await update_profile(data, avatarURL);
     console.log(res1);
-    const new_profile = await getUserProfile();
-    if (new_profile.data) {
-      storeUserInfo(new_profile?.data)
+    try{
+      await updateUserInfo()
       createToast(toast, "更新成功", "用户信息已更新", "success");
     }
-
+    catch(e){
+      console.error(e)
+    }
   }
   catch (err) {
     console.error("保存用户信息失败", err);
