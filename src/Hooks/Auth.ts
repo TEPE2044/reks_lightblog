@@ -33,6 +33,7 @@ export const getUserProfile = async () => {
     method: "GET",
     url: "/user/profile",
   });
+  //console.log(res.data)
   return res.data;
 };
 

@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { loginOut } from "../Hooks/Auth";
-
+import { getUserProfile, loginOut } from "../Hooks/Auth";
 export const userStore = defineStore("user", () => {
   const rcode = ref<string>("");
   const payload = ref<string>("");
@@ -13,6 +12,13 @@ export const userStore = defineStore("user", () => {
   const storeUserInfo = (info: any) => {
     userInfo.value = info;
     localStorage.setItem("userInfo", JSON.stringify(info));
+  }
+
+  const updateUserInfo = async() => {
+    const info = await getUserProfile()
+
+    userInfo.value = info.data
+    localStorage.setItem("userInfo", JSON.stringify(info.data));
   }
 
 
@@ -43,6 +49,7 @@ export const userStore = defineStore("user", () => {
   };
 
   const restoreFromLocal = async() => {
+    await updateUserInfo()
     const storedRcode = localStorage.getItem("rcode");
     const storedPayload = localStorage.getItem("payload");
     const localUser = localStorage.getItem("userInfo");
@@ -62,6 +69,7 @@ export const userStore = defineStore("user", () => {
     isLoggedIn,
     userInfo,
     tempAvatar,
+    updateUserInfo,
     storeUserInfo,
     userLogin,
     userLogout,
