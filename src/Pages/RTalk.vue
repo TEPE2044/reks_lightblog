@@ -39,7 +39,6 @@ watch(
       >
       </BFormRadioGroup>
     </div>
-
     <div class="rt-content px-5 mx-auto mt-3">
       <div class="rt-main">
         <RouterView />
