@@ -8,7 +8,6 @@ import { useDebounceFn } from "@vueuse/core";
 import { update_profile } from "../Hooks/User";
 import { createToast } from "../Utils/reks-toast";
 import { useToast } from "bootstrap-vue-next";
-import { getUserProfile } from "../Hooks/Auth";
 const { userInfo, tempAvatar } = storeToRefs(userStore());
 const { updateUserInfo } = userStore()
 const toast = useToast();

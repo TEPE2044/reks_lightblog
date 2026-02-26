@@ -1,13 +1,17 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { getUserProfile, loginOut } from "../Hooks/Auth";
+import { checkSafe, getUserProfile, loginOut } from "../Hooks/Auth";
 export const userStore = defineStore("user", () => {
   const rcode = ref<string>("");
   const payload = ref<string>("");
   const userInfo = ref<any>(null);
   const tempAvatar = ref<File | null>(null);
-
+  const safeLevel = ref<"weak" | "fine" | "strong">("weak");
   const isLoggedIn = ref(!!localStorage.getItem("token"));
+
+  const checkUserSafety = async() => {
+    safeLevel.value = await checkSafe()
+  }
 
   const storeUserInfo = (info: any) => {
     userInfo.value = info;
@@ -58,6 +62,7 @@ export const userStore = defineStore("user", () => {
       rcode.value = storedRcode;
       payload.value = storedPayload;
       isLoggedIn.value = true;
+      await checkUserSafety()
     }else{
       await userLogout()
     }
@@ -69,6 +74,7 @@ export const userStore = defineStore("user", () => {
     isLoggedIn,
     userInfo,
     tempAvatar,
+    safeLevel,
     updateUserInfo,
     storeUserInfo,
     userLogin,

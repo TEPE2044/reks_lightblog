@@ -57,3 +57,11 @@ export const loginOut = async() => {
   })
   return res
 }
+
+export const checkSafe = async() => {
+  const res = await reapi({
+    method:'GET',
+    url:"/user/safety-level"
+  })
+  return res.data?.level
+}

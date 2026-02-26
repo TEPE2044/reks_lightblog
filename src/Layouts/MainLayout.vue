@@ -1,30 +1,28 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue';
-import { wsClient } from '../Requests/ws-regql';
-import { useToast } from 'bootstrap-vue-next';
-import { createToast } from '../Utils/reks-toast';
+import { onUnmounted,onMounted } from "vue";
+import { wsClient } from "../Requests/ws-regql";
+import { useToast } from "bootstrap-vue-next";
+import { createToast } from "../Utils/reks-toast";
+import type { EventSnapshot } from "../Utils/reks-interface";
+import { noticeStore } from "../Store/notice";
+import { storeToRefs } from "pinia";
+import { userStore } from "../Store/user";
 
-interface Blog {
-  blogId: number;
-  title: string;
-  authorId: number;
-} 
-const toast = useToast()
+const toast = useToast();
+const notice = noticeStore();
 
-function useBlogSubscription() {
-  const latestBlog = ref<Blog | null>(null);
-
+function useEventSubscription() {
   // 开始订阅，拿到“关闭函数”
-  const unsubscribe = wsClient.subscribe<{ testFollowing: Blog }>(
+  const unsubscribe = wsClient.subscribe<{ pushEvent: EventSnapshot }>(
     {
-      query: `subscription { testFollowing { blogId title authorId } }`,
+      query: `subscription { pushEvent { eventType payload } }`,
     },
     {
       next: ({ data }) => {
-        const blog = data?.testFollowing ?? null;
-        latestBlog.value = blog;
-        if (blog) {
-          createToast(toast, "新消息", blog.title, "primary");
+        const res = data?.pushEvent ?? null;
+        notice.setLatest(res);
+        if (res) {
+          createToast(toast, `${res.eventType}消息`, res.payload, "primary");
         }
       },
       error: console.error,
@@ -34,20 +32,32 @@ function useBlogSubscription() {
 
   // 组件销毁时停止监听
   onUnmounted(() => unsubscribe());
-
-  return {
-    latestBlog,
-  };
 }
 
-const { latestBlog } = useBlogSubscription();
+useEventSubscription();
+
+onMounted(() => {
+  const { safeLevel } = storeToRefs(userStore());
+  try {
+    if (safeLevel.value === "weak") {
+      console.log(safeLevel.value);
+      createToast(
+        toast,
+        "账号安全",
+        "账号风险较高，请设置密码和邮箱",
+        "danger",
+      );
+    }
+  } catch (e) {
+    console.error(e);
+  }
+});
 </script>
 
 <template>
   <BContainer class="main-layout mb-5">
-    <router-view/>
+    <router-view />
   </BContainer>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

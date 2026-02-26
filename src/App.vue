@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { BApp } from "bootstrap-vue-next";
-
 </script>
 <!-- App.vue -->
 <template>
   <BApp>
     <header>
-      <Header/>
+      <Header />
     </header>
     <main>
       <MainLayout />
@@ -18,11 +17,8 @@ import { BApp } from "bootstrap-vue-next";
     <Teleport to="body">
       <Auth :show-trigger="false" />
     </Teleport>
-
   </BApp>
 </template>
-
-
 
 <style lang="scss" scoped>
 header {
@@ -36,8 +32,10 @@ header {
 main {
   flex: 1 0 auto;
   background-color: rgb(254, 249, 239);
-  background-image: linear-gradient(62deg,
-      rgba(245, 222, 179, 0.43) 0%,
-      rgba(245, 222, 179, 0.31) 100%);
+  background-image: linear-gradient(
+    62deg,
+    rgba(245, 222, 179, 0.43) 0%,
+    rgba(245, 222, 179, 0.31) 100%
+  );
 }
 </style>
