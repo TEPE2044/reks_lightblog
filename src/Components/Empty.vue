@@ -8,7 +8,7 @@ const props = defineProps({
 
 <template>
   <div class="empty d-flex align-items-center justify-content-center">
-    <div class="empty-card mt-5 w-100">
+    <div class="empty-card mt-3 w-100">
       <i-bi-box/>
       <h5 class="empty-title mt-2">{{ title }}</h5>
     </div>

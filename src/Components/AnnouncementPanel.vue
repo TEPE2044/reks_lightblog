@@ -1,4 +1,5 @@
 <script setup lang="ts">
+// create by GPT-5.3-Codex
 import { computed, ref } from "vue";
 
 const announcements = ref([
