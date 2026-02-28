@@ -1,10 +1,10 @@
 import regql from "../Requests/regql";
 
 export const searchUser = async (who: string) => {
-  const res = await regql.post("", {
+  const res = await regql.post("/seaql", {
     query: `
         query MyQuery {
-            user(p: {page: 1, pageSize: 10}, who: ${who})
+            user(p: {page: 1, pageSize: 10}, who: "${who}")
         }       
     `,
   });
@@ -17,10 +17,10 @@ export const searchBlog = async (
   pageSize: number,
   content: string,
 ) => {
-  const res = await regql.post("", {
+  const res = await regql.post("/seaql", {
     query: `
        query MyQuery {
-            blog(content: ${content}, p: {page: ${page}, pageSize: ${pageSize}})
+            blog(content: "${content}", p: {page: ${page}, pageSize: ${pageSize}})
         }       
     `,
   });
@@ -33,13 +33,18 @@ export const searchBlogTag = async (
   pageSize: number,
   tags: string[],
 ) => {
-  const res = await regql.post("", {
+  const res = await regql.post("/seaql", {
     query: `
-       query MyQuery {
-            blogTag(p: {page: ${page}, pageSize: ${pageSize}}, tags: ${tags})
+       query MyQuery($tags: [String!]!, $page: Int!, $pageSize: Int!) {
+            blogTag(p: {page: $page, pageSize: $pageSize}, tags: $tags)
         }          
     `,
+    variables: {
+      tags,     
+      page,
+      pageSize
+    }
   });
-
   return res.data.data;
 };
+
