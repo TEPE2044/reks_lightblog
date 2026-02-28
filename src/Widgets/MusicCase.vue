@@ -85,6 +85,7 @@ const casePlay = () => {
   aspect-ratio: 4 / 3;
   width: 100%;
   max-width: 450px;
+  min-width: 400px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
 
