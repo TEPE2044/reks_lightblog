@@ -222,7 +222,7 @@ onUnmounted(() => {
 
     <div class="r-progressBar d-flex align-items-center gap-3 user-select-none" @click.stop="">
       <div class="thumbail-album rounded border r-icon" @click.stop="toggleExpand()">
-        <img class="thumbail-img" :src="dcover || '/imagePlaceholder.webp'" />
+        <img class="thumbail-img" :src="dcover || '/imagePlaceholder.webp'" alt="cover" />
       </div>
       <span>{{ currentTime }}</span>
       <BFormInput @input="handleClickPlay(progress)" class="progress" v-model="progress" type="range" max="100"
