@@ -100,3 +100,18 @@ export interface EventSnapshot {
   payload: string;
 }
 
+export interface BlogRes {
+  author:AuthorRes
+  cover:string
+  created_at:Date
+  id:number
+  title:string
+  type:number
+}
+
+export interface AuthorRes {
+  id:number
+  username:string
+  avatar:string
+}
+

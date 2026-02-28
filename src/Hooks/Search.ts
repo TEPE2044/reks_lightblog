@@ -25,7 +25,7 @@ export const searchBlog = async (
     `,
   });
 
-  return res.data.data;
+  return res.data.data.blog;
 };
 
 export const searchBlogTag = async (
