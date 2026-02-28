@@ -1,64 +1,54 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { useToggle as vuseToggle } from "@vueuse/core";
-import { storeToRefs } from "pinia";
-import { musicStore } from "../Store/music";
-import type { ApiProduct } from "../Utils/reks-interface";
-import { iwantsomedata } from "../Utils/reks-test";
-
-const { wantUpload } = storeToRefs(musicStore());
-
+const searchType = ref('keyword');
+const lazyTags = ref([]);
+const lazyText = ref("");
 const options = [
-  { text: "选择已有音频", value: "uex" },
-  { text: "上传新音频", value: "unew" },
+  { text: "内容搜索", value: "keyword" },
+  { text: "标签搜索", value: "tag" },
 ];
-
-const [confirm, toggleConfirm] = vuseToggle();
-
-
-// Simulated API response
-const apiProducts: ApiProduct[] = [];
-// TypeScript knows selectedProductCode is a string (matching productCode field type)
-const selectedProductCode = ref<string>();
 </script>
 <template>
   <div class="radio-selector">
     <BFormRadioGroup
       class="mb-2"
-      v-model="wantUpload"
+      v-model="searchType"
       :options="options"
-      name="wantUpload"
+      name="search-type"
     />
-    <section class="uex mt-3" v-if="wantUpload === 'uex'">
-      <div>
-        <BInputGroup>
-          <BFormInput
-            @focus="iwantsomedata()"
-            v-model="selectedProductCode"
-            type="text"
-            list="product-list"
-            placeholder="搜索歌曲歌曲"
-            :disabled="confirm"
-          />
-          <template #append>
-            <BButton @click="toggleConfirm()">确定</BButton>
-          </template>
-        </BInputGroup>
 
-        <BFormDatalist
-          id="product-list"
-          :options="apiProducts"
-          value-field="productCode"
-          text-field="productName"
-          disabled-field="discontinued"
-        />
-        <div class="mt-3">
-          已选择: <strong>{{ selectedProductCode }}</strong>
-        </div>
-      </div>
+    <section class="keyword mt-3" v-if="searchType === 'keyword'">
+      <BInputGroup>
+        <BFormInput type="text" v-model="lazyText" />
+        <BButton
+          variant="outline-success"
+          class="d-flex align-items-center gap-1"
+        >
+          <i-bi-search /> 搜索</BButton
+        >
+      </BInputGroup>
     </section>
-    <section class="unew mt-3" v-if="wantUpload === 'unew'" @focus=""></section>
+
+    <section class="tag mt-3" v-if="searchType === 'tag'">
+      <BInputGroup>
+        <BFormTags
+          v-model="lazyTags"
+          :limit="5"
+          remove-on-delete
+          add-button-text="Add"
+          limit-tags-text="最多只能设置5个标签噢"
+          input-id="tags-basic"
+          placeholder="添加标签(使用回车确定标签)"
+        />
+      </BInputGroup>
+    </section>
   </div>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+@use "../Asset/CustomStyle/global.scss";
+.radio-selector{
+  padding: 1rem;
+  @extend %reks-card-box;
+}
+</style>

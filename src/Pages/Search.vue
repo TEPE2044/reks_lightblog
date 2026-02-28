@@ -2,8 +2,6 @@
 
 import { onMounted, ref } from "vue";
 import type { PageWrapper } from "../Utils/reks-interface";
-const lazyText = ref("");
-const lazyTags = ref([]);
 
 // 请求参数 内容，标签，
 
@@ -27,28 +25,7 @@ onMounted(() => {
 <template>
   <div class="search d-flex flex-column align-items-center">
     <div class="search-input mt-5 w-75">
-      <BInputGroup>
-        <BFormInput type="text" v-model="lazyText" />
-        <BButton
-          variant="outline-success"
-          class="d-flex align-items-center gap-1"
-        >
-        <i-bi-search/> 搜索</BButton
-        >
-      </BInputGroup>
-    </div>
-    <div class="tags mt-3 w-50">
-      <BInputGroup>
-        <BFormTags
-          v-model="lazyTags"
-          :limit="5"
-          remove-on-delete
-          add-button-text="Add"
-          limit-tags-text="最多只能设置5个标签噢"
-          input-id="tags-basic"
-          placeholder="添加标签(使用回车确定标签)"
-        />
-      </BInputGroup>
+      <RadioSelector/>
     </div>
 
     <div class="result mt-5 w-75">
