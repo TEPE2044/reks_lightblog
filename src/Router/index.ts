@@ -1,6 +1,5 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import { userStore } from "../Store/user";
-import { storeToRefs } from "pinia";
+
 const router = createRouter({
   history: createWebHashHistory(),
   // 路由滚动行为：默认进入页面回到顶部；返回/前进恢复历史位置；带 hash 时定位锚点
@@ -108,7 +107,7 @@ const router = createRouter({
       component: () => import("../Pages/RTalk.vue"),
       children: [
         {
-          path: "",
+          path: " ",
           redirect: { name: "anmt" },
         },
         {
@@ -126,15 +125,15 @@ const router = createRouter({
     { path: "/:pathMatch(.*)*", redirect: "/404" },
   ],
 });
-
+const rcode = localStorage.getItem('rcode')
+const payload = localStorage.getItem('payload')
 router.beforeEach((to, from, next) => {
   console.log(from.path);
-  const { rcode, payload, isLoggedIn } = storeToRefs(userStore());
-  const isAuthenticated = rcode.value && payload.value && isLoggedIn.value;
+  const isAuthenticated = rcode && payload
 
   // 未登录 & 当前不在首页 → 强制回到首页
   if (!isAuthenticated && to.path !== "/") {
-    next("/"); // ✅ 只有从其他页面跳过来时才重定向
+    next("/"); 
     return;
   }
 
