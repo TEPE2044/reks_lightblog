@@ -39,6 +39,7 @@ const queryTags = async () => {
     lazyTags.value as string[],
   );
   if (res && pages.value) {
+    // console.log(res)
     pages.value.rows = res?.total;
     setBlogRes(res?.data);
   }

@@ -45,6 +45,6 @@ export const searchBlogTag = async (
       pageSize
     }
   });
-  return res.data.data;
+  return res.data.data.blogTag;
 };
 
