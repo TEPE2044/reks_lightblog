@@ -7,20 +7,19 @@ const lazyTags = ref([]);
 
 // 请求参数 内容，标签，
 
-// const toLowerCaseFormatter = (value: string) => value.toLowerCase();
+
 const pages = ref<PageWrapper>({
   currentPage: 1,
-  perPage: 1,
-  pageLimit: 5,
+  perPage: 1, 
   rows: 0,
 });
 
+// 会自动计算要有多少页
 onMounted(() => {
   pages.value = {
-    currentPage: 1,
-    perPage: 1,
-    pageLimit: 5,
-    rows: 5,
+    currentPage: 1,//当前页码
+    perPage: 10,// 单页限制多少
+    rows: 5,// 总共有多少数据
   };
 });
 </script>
@@ -54,13 +53,12 @@ onMounted(() => {
 
     <div class="result mt-5 w-75">
       <BCard class="result-nav" title="Card Title" no-body>
-        <BCardHeader class="result-nav-header" header-tag="result-header-nav">
-          <BNav card-header tabs>
-            <BNavItem exact exact-active-class="active">博客</BNavItem>
-            <BNavItem>电台</BNavItem>
-            <BNavItem>图片</BNavItem>
-            <BNavItem>用户</BNavItem>
-          </BNav>
+        <BCardHeader class="result-nav-header" header-tag="result-header-nav" >
+          <BTabs>
+            <BTab active title="博客"></BTab>
+            <BTab lazy title="音乐"></BTab>
+            <BTab lazy title="用户"></BTab>
+          </BTabs>
         </BCardHeader>
 
         <BCardBody class="result-body">
@@ -69,7 +67,7 @@ onMounted(() => {
             <article
               class="row mb-2 shadow-md border card-box atc"
               style="padding-top: 0"
-              v-for="i in pages.pageLimit"
+              v-for="i in pages.perPage"
             >
               <div class="col-6 p-4 img-meta" :key="`rs${i}`">
                 <img

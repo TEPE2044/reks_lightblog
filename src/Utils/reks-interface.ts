@@ -19,7 +19,6 @@ export interface QueueItem {
 export interface PageWrapper {
   currentPage: number;
   perPage: number;
-  pageLimit: 5;
   rows: number;
 }
 
