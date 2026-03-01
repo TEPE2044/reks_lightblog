@@ -107,7 +107,8 @@ const router = createRouter({
       component: () => import("../Pages/RTalk.vue"),
       children: [
         {
-          path: " ",
+          path: "",
+          name:"rstalk",
           redirect: { name: "anmt" },
         },
         {

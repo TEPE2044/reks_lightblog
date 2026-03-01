@@ -21,7 +21,6 @@ export const musicStore = defineStore('music',() => {
         name,
         desc,
         isOriginal,
-        wantUpload,
         audioFile,
         coverFile,
         audioURL,
