@@ -176,18 +176,23 @@ const casePlay = (m: MusicResponse) => {
                   <span class="text-secondary">{{ m.username }}</span>
                 </div>
                 <BButtonGroup class="control-btn mt-3 py-2">
-                  <BButton variant="light" size="sm">
-                    <i-bi-play-circle-fill
-                      class="fs-2"
-                      @click.stop="casePlay(m)"
-                    />
+                  <BButton
+                    variant="light"
+                    size="sm"
+                    class="control-btn-item"
+                    @click.stop="casePlay(m)"
+                  >
+                    <i-bi-play-circle-fill class="fs-4" />
                   </BButton>
-                  <BButton variant="light" size="sm">
-                    <i-bi-plus-circle
-                      class="fs-4"
-                      @click="caseAdd(m)"
-                    /> </BButton
-                ></BButtonGroup>
+                  <BButton
+                    variant="light"
+                    size="sm"
+                    class="control-btn-item"
+                    @click.stop="caseAdd(m)"
+                  >
+                    <i-bi-plus-circle class="fs-5" />
+                  </BButton>
+                </BButtonGroup>
               </div>
             </article>
 
@@ -338,25 +343,43 @@ const casePlay = (m: MusicResponse) => {
     height: 160px;
     object-fit: cover;
     border-radius: 0.5rem;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
   }
 
   .music-title {
     margin-bottom: 0.5rem;
     color: #2f2f2f;
+    font-weight: 700;
+    letter-spacing: 0.01em;
   }
 
   .music-desc {
     margin-bottom: 0.8rem;
     line-height: 1.5;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .music-meta {
     flex-wrap: wrap;
+    padding-top: 0.25rem;
+
+    span {
+      font-size: 0.92rem;
+      font-weight: 500;
+    }
 
     audio {
       max-width: 320px;
       height: 34px;
     }
+  }
+
+  .control-btn {
+    gap: 0.5rem;
   }
 }
 
