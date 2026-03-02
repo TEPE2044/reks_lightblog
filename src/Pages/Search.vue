@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
-import type { PageWrapper } from "../Utils/reks-interface";
+import type { MusicResponse, PageWrapper } from "../Utils/reks-interface";
 import { searchStore } from "../Store/search";
 import { storeToRefs } from "pinia";
 
-const store = searchStore();
-const { blogRes, musicRes, userRes, searchType } = storeToRefs(store);
-const { switchSearchType } = store;
+import { playerStore } from "../Store/player";
+import { BButtonGroup, useToast } from "bootstrap-vue-next";
+import { createToast } from "../Utils/reks-toast";
+import { detailStore } from "../Store/detail";
+
+const { playQueueLength, currentIndex } = storeToRefs(playerStore());
+const { selectOutSide, addIntoPlayQueue } = playerStore();
+
+const { blogRes, musicRes, userRes, searchType } = storeToRefs(searchStore());
+const { switchSearchType } = searchStore();
+
+const { get_detail } = detailStore();
 
 // 会自动计算要有多少页
 const pages = ref<PageWrapper>({
@@ -15,13 +24,17 @@ const pages = ref<PageWrapper>({
   rows: 0, // 总共有多少数据
 });
 
+const toast = useToast();
+
 const activeListLength = computed(() => {
   if (searchType.value === "music") return musicRes.value.length;
   if (searchType.value === "user") return userRes.value.length;
   return blogRes.value.length;
 });
 
-const empty = computed(() => pages.value.rows === 0 || activeListLength.value === 0);
+const empty = computed(
+  () => pages.value.rows === 0 || activeListLength.value === 0,
+);
 
 const currentPage = computed({
   get: () => pages.value.currentPage,
@@ -39,7 +52,41 @@ const tabTitle = computed(() => {
   return "博客结果";
 });
 
+const caseAdd = (m: MusicResponse) => {
+  if (playQueueLength.value === 0) {
+    get_detail({ title: m?.name, author: m?.username, cover: m?.cover });
+  }
+  const res = addIntoPlayQueue(
+    { cover: m?.cover, songURL: m?.audio, title: m?.name, author: m?.username },
+    currentIndex.value,
+  );
+  if (res) {
+    createToast(toast, "添加成功", "歌曲添加成功", "success");
+  } else {
+    createToast(toast, "重复添加", "歌曲重复添加", "success");
+  }
+};
 
+const casePlay = (m: MusicResponse) => {
+  try {
+    selectOutSide({
+      cover: m?.cover,
+      songURL: m?.audio,
+      title: m?.name,
+      author: m?.username,
+    });
+    get_detail({ title: m?.name, author: m?.username, cover: m?.cover });
+    createToast(
+      toast,
+      "播放成功",
+      `正在播放 ${m?.username} - ${m?.name}`,
+      "success",
+    );
+  } catch (e) {
+    createToast(toast, "播放失败", "未知原因", "danger");
+    console.error(e);
+  }
+};
 </script>
 
 <template>
@@ -76,7 +123,9 @@ const tabTitle = computed(() => {
           </div>
 
           <div class="result-item" v-else>
-            <div class="result-summary d-flex align-items-center justify-content-between">
+            <div
+              class="result-summary d-flex align-items-center justify-content-between"
+            >
               <div class="summary-title">{{ tabTitle }}</div>
               <div class="summary-count">共 {{ pages.rows }} 条</div>
             </div>
@@ -93,7 +142,9 @@ const tabTitle = computed(() => {
               <div class="col-md-5 p-3 img-meta">
                 <img :src="i.cover" class="card-img" :alt="`alt${i.cover}`" />
               </div>
-              <div class="col-md-7 p-4 card-content d-flex flex-column justify-content-between">
+              <div
+                class="col-md-7 p-4 card-content d-flex flex-column justify-content-between"
+              >
                 <router-link :to="`/blog/${i.id}`">
                   <h5 class="mt-0 fw-bold title-link">{{ i.title }}</h5>
                 </router-link>
@@ -123,8 +174,20 @@ const tabTitle = computed(() => {
                 <div class="music-meta d-flex align-items-center gap-3">
                   <BAvatar :src="m.avatar" size="36" />
                   <span class="text-secondary">{{ m.username }}</span>
-                  <audio v-if="m.audio" :src="m.audio" controls preload="none" />
                 </div>
+                <BButtonGroup class="control-btn mt-3 py-2">
+                  <BButton variant="light" size="sm">
+                    <i-bi-play-circle-fill
+                      class="fs-2"
+                      @click.stop="casePlay(m)"
+                    />
+                  </BButton>
+                  <BButton variant="light" size="sm">
+                    <i-bi-plus-circle
+                      class="fs-4"
+                      @click="caseAdd(m)"
+                    /> </BButton
+                ></BButtonGroup>
               </div>
             </article>
 
@@ -221,7 +284,9 @@ const tabTitle = computed(() => {
   overflow: hidden;
   background-color: rgba(255, 255, 255, 0.86);
   border-radius: 0.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
