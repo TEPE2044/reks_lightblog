@@ -87,7 +87,7 @@ const queryMusic = async () => {
   );
 
   setPagedResult(res);
-  setMusicRes((res?.data ?? []) as never[]);
+  setMusicRes(res?.data);
   setBlogRes([]);
   setUserRes([]);
 };
@@ -103,7 +103,7 @@ const queryUser = async () => {
   );
 
   setPagedResult(res);
-  setUserRes((res?.data ?? []) as never[]);
+  setUserRes(res?.data);
   setBlogRes([]);
   setMusicRes([]);
 };

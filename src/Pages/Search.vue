@@ -132,7 +132,7 @@ const tabTitle = computed(() => {
               v-if="searchType === 'user'"
               class="user-box mb-3 d-flex align-items-center"
               v-for="u in userRes"
-              :key="`user-${u.id}`"
+              :key="`user-${u.reks_id}`"
             >
               <BAvatar :src="u.avatar" size="56" />
               <div class="user-content ms-3">

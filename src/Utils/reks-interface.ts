@@ -116,7 +116,7 @@ export interface AuthorRes {
 }
 
 export interface SearchUserRes {
-  id: number
+  reks_id: number
   username: string
   avatar: string
   signature?: string
