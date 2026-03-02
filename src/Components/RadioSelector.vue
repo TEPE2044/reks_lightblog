@@ -1,94 +1,164 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { searchBlog, searchBlogTag } from "../Hooks/Search";
+import { computed, ref, watch } from "vue";
+import { searchBlog, searchBlogTag, searchMusic, searchUser } from "../Hooks/Search";
 import type { PageWrapper } from "../Utils/reks-interface";
-import { useDebounceFn } from "@vueuse/core";
 import { searchStore } from "../Store/search";
-const { setBlogRes } = searchStore();
+import { storeToRefs } from "pinia";
 
-const searchType = ref("keyword");
+const props = defineProps<{
+  activeTab: "keyword" | "music" | "user";
+}>();
+
+const store = searchStore();
+const { setBlogRes, setMusicRes, setUserRes, clearSearchResult } = store;
+const { searchType } = storeToRefs(store);
+
+const mode = ref<"keyword" | "tag">("keyword");
 const pages = defineModel<PageWrapper>({
-  default: { currentPage: 1, perPage: 5, rows: 0 }
+  default: { currentPage: 1, perPage: 5, rows: 0 },
 });
 
-const lazyTags = ref<string[] | []>([]);
-const lazyText = ref<string | "">("");
+const lazyTags = ref<string[]>([]);
+const lazyText = ref("");
 const options = [
   { text: "内容搜索", value: "keyword" },
   { text: "标签搜索", value: "tag" },
 ];
 
+const inputPlaceholder = computed(() => {
+  if (props.activeTab === "music") return "请输入音乐关键词🎵";
+  if (props.activeTab === "user") return "请输入用户名或昵称👤";
+  return "请输入文本🤖";
+});
+
+const resetPageToFirst = () => {
+  if (!pages.value) return;
+  pages.value = {
+    ...pages.value,
+    currentPage: 1,
+    rows: 0,
+  };
+};
+
+const setPagedResult = (res?: { total?: number; data?: unknown[] }) => {
+  if (!pages.value) return;
+  pages.value.rows = res?.total ?? 0;
+};
+
 const queryBlog = async () => {
+  const keyword = lazyText.value.trim();
+  if (!keyword) return;
+
   const res = await searchBlog(
     pages.value?.currentPage as number,
     pages.value?.perPage as number,
-    lazyText.value as string,
+    keyword,
   );
-  if(res && pages.value){
-    pages.value.rows = res?.total
-    setBlogRes(res?.data)
-  }
+
+  setPagedResult(res);
+  setBlogRes((res?.data ?? []) as never[]);
+  setMusicRes([]);
+  setUserRes([]);
 };
 
-const query_blog = useDebounceFn(queryBlog, 1000);
-
 const queryTags = async () => {
+  if (lazyTags.value.length === 0) return;
+
   const res = await searchBlogTag(
     pages.value?.currentPage as number,
     pages.value?.perPage as number,
-    lazyTags.value as string[],
+    lazyTags.value,
   );
-  if (res && pages.value) {
-    // console.log(res)
-    pages.value.rows = res?.total;
-    setBlogRes(res?.data);
-  }
+
+  setPagedResult(res);
+  setBlogRes((res?.data ?? []) as never[]);
+  setMusicRes([]);
+  setUserRes([]);
 };
 
-const query_tags = useDebounceFn(queryTags, 1000);
+const queryMusic = async () => {
+  const keyword = lazyText.value.trim();
+  if (!keyword) return;
+
+  const res = await searchMusic(
+    pages.value?.currentPage as number,
+    pages.value?.perPage as number,
+    keyword,
+  );
+
+  setPagedResult(res);
+  setMusicRes((res?.data ?? []) as never[]);
+  setBlogRes([]);
+  setUserRes([]);
+};
+
+const queryUser = async () => {
+  const keyword = lazyText.value.trim();
+  if (!keyword) return;
+
+  const res = await searchUser(
+    pages.value?.currentPage as number,
+    pages.value?.perPage as number,
+    keyword,
+  );
+
+  setPagedResult(res);
+  setUserRes((res?.data ?? []) as never[]);
+  setBlogRes([]);
+  setMusicRes([]);
+};
+
+const runSearchByTab = async () => {
+  if (props.activeTab === "keyword") {
+    if (mode.value === "tag") {
+      await queryTags();
+      return;
+    }
+    await queryBlog();
+    return;
+  }
+
+  if (props.activeTab === "music") {
+    await queryMusic();
+    return;
+  }
+
+  await queryUser();
+};
 
 watch(
- () => pages.value?.currentPage,
-  async(value) => {
-    if (value){
-      await queryBlog();
-    }
-
-    if (searchType.value === "keyword" && lazyText.value.trim().length > 0) {
-      await queryBlog();
-    }
-
-    if (searchType.value === "tag" && lazyTags.value.length > 0) {
-      await queryTags();
-    }
+  () => pages.value?.currentPage,
+  async (value, oldValue) => {
+    if (!value || value === oldValue) return;
+    await runSearchByTab();
   },
 );
 
-watch(searchType, (value) => {
-  if (value === "keyword") {
-    lazyText.value = "";
-  }
-  if (value === "tag") {
+watch(
+  () => props.activeTab,
+  (value) => {
+    searchType.value = value;
+    mode.value = "keyword";
     lazyTags.value = [];
+    lazyText.value = "";
+    clearSearchResult();
+    resetPageToFirst();
+  },
+  { immediate: true },
+);
+
+watch(mode, (value) => {
+  if (value === "keyword") {
+    lazyTags.value = [];
+    return;
   }
+  lazyText.value = "";
 });
 </script>
+
 <template>
   <div class="radio-selector">
-    <section class="keyword mt-2" v-if="searchType === 'keyword'">
-      <BInputGroup>
-        <BFormInput type="text" placeholder="请输入文本🤖" v-model="lazyText" />
-        <BButton
-          @click.stop="query_blog()"
-          variant="outline-success"
-          class="d-flex align-items-center gap-1"
-        >
-          <i-bi-search /> 搜索</BButton
-        >
-      </BInputGroup>
-    </section>
-
-    <section class="tag mt-2" v-if="searchType === 'tag'">
+    <section class="tag mt-2" v-if="activeTab === 'keyword' && mode === 'tag'">
       <BInputGroup>
         <BFormTags
           v-model="lazyTags"
@@ -100,7 +170,20 @@ watch(searchType, (value) => {
           placeholder="添加标签(使用回车确定标签)"
         />
         <BButton
-          @click.stop="query_tags()"
+          @click.stop="runSearchByTab"
+          variant="outline-success"
+          class="d-flex align-items-center gap-1"
+        >
+          <i-bi-search /> 搜索
+        </BButton>
+      </BInputGroup>
+    </section>
+
+    <section class="keyword mt-2" v-else>
+      <BInputGroup>
+        <BFormInput type="text" :placeholder="inputPlaceholder" v-model="lazyText" />
+        <BButton
+          @click.stop="runSearchByTab"
           variant="outline-success"
           class="d-flex align-items-center gap-1"
         >
@@ -110,8 +193,9 @@ watch(searchType, (value) => {
     </section>
 
     <BFormRadioGroup
+      v-show="activeTab === 'keyword'"
       class="mt-3"
-      v-model="searchType"
+      v-model="mode"
       :options="options"
       name="search-type"
     />
@@ -120,6 +204,7 @@ watch(searchType, (value) => {
 
 <style lang="scss" scoped>
 @use "../Asset/CustomStyle/global.scss";
+
 .radio-selector {
   padding: 1rem;
   @extend %reks-card-box;

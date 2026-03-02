@@ -4,7 +4,9 @@ import type { PageWrapper } from "../Utils/reks-interface";
 import { searchStore } from "../Store/search";
 import { storeToRefs } from "pinia";
 
-const { blogRes } = storeToRefs(searchStore());
+const store = searchStore();
+const { blogRes, musicRes, userRes, searchType } = storeToRefs(store);
+const { switchSearchType } = store;
 
 // 会自动计算要有多少页
 const pages = ref<PageWrapper>({
@@ -13,22 +15,58 @@ const pages = ref<PageWrapper>({
   rows: 0, // 总共有多少数据
 });
 
-const empty = computed(() => pages.value.rows === 0 || blogRes.value.length === 0);
+const activeListLength = computed(() => {
+  if (searchType.value === "music") return musicRes.value.length;
+  if (searchType.value === "user") return userRes.value.length;
+  return blogRes.value.length;
+});
+
+const empty = computed(() => pages.value.rows === 0 || activeListLength.value === 0);
+
+const currentPage = computed({
+  get: () => pages.value.currentPage,
+  set: (value: number) => {
+    pages.value = {
+      ...pages.value,
+      currentPage: value,
+    };
+  },
+});
+
+const tabTitle = computed(() => {
+  if (searchType.value === "music") return "音乐结果";
+  if (searchType.value === "user") return "用户结果";
+  return "博客结果";
+});
+
+
 </script>
 
 <template>
   <div class="search d-flex flex-column align-items-center">
     <div class="search-input mt-5 w-75">
-      <RadioSelector v-model="pages" />
+      <RadioSelector v-model="pages" :active-tab="searchType" />
     </div>
 
     <div class="result mt-5 w-75">
       <BCard class="result-nav" title="Card Title" no-body>
         <BCardHeader class="result-nav-header" header-tag="result-header-nav">
           <BTabs>
-            <BTab active title="博客"></BTab>
-            <BTab lazy title="音乐"></BTab>
-            <BTab lazy title="用户"></BTab>
+            <BTab
+              title="博客"
+              :active="searchType === 'keyword'"
+              @click.stop="switchSearchType('keyword')"
+            />
+            <BTab
+              title="音乐"
+              :active="searchType === 'music'"
+              @click.stop="switchSearchType('music')"
+            />
+            <BTab
+              title="用户"
+              :active="searchType === 'user'"
+              @click.stop="switchSearchType('user')"
+            />
           </BTabs>
         </BCardHeader>
 
@@ -39,13 +77,15 @@ const empty = computed(() => pages.value.rows === 0 || blogRes.value.length === 
 
           <div class="result-item" v-else>
             <div class="result-summary d-flex align-items-center justify-content-between">
-              <div class="summary-title">搜索结果</div>
+              <div class="summary-title">{{ tabTitle }}</div>
               <div class="summary-count">共 {{ pages.rows }} 条</div>
             </div>
             <div class="text-secondary font-monospace mb-3 small">
               当前页：第 {{ pages.currentPage }} 页
             </div>
+
             <article
+              v-if="searchType === 'keyword'"
               class="row mb-3 border card-box atc g-0"
               v-for="i in blogRes"
               :key="`rs${i.id}${i.author.id}`"
@@ -65,12 +105,49 @@ const empty = computed(() => pages.value.rows === 0 || blogRes.value.length === 
                 </div>
               </div>
             </article>
+
+            <article
+              v-if="searchType === 'music'"
+              class="music-box mb-3"
+              v-for="m in musicRes"
+              :key="`music-${m.id}`"
+            >
+              <div class="music-cover">
+                <img :src="m.cover" :alt="`music-${m.id}`" />
+              </div>
+
+              <div class="music-content">
+                <h5 class="music-title">{{ m.name }}</h5>
+                <div class="music-desc text-secondary">{{ m.desc }}</div>
+
+                <div class="music-meta d-flex align-items-center gap-3">
+                  <BAvatar :src="m.avatar" size="36" />
+                  <span class="text-secondary">{{ m.username }}</span>
+                  <audio v-if="m.audio" :src="m.audio" controls preload="none" />
+                </div>
+              </div>
+            </article>
+
+            <article
+              v-if="searchType === 'user'"
+              class="user-box mb-3 d-flex align-items-center"
+              v-for="u in userRes"
+              :key="`user-${u.id}`"
+            >
+              <BAvatar :src="u.avatar" size="56" />
+              <div class="user-content ms-3">
+                <div class="user-name fw-bold">{{ u.username }}</div>
+                <div class="user-signature text-secondary">
+                  {{ u.signature || "这个用户很神秘，还没有留下签名。" }}
+                </div>
+              </div>
+            </article>
           </div>
         </BCardBody>
         <BCardFooter>
           <BPagination
             class="d-flex align-items-center justify-content-center mt-3 page-style"
-            v-model="pages.currentPage"
+            v-model="currentPage"
             :total-rows="pages?.rows"
             :per-page="pages?.perPage"
             last-number
@@ -182,6 +259,59 @@ const empty = computed(() => pages.value.rows === 0 || blogRes.value.length === 
   margin-bottom: 0;
 }
 
+.music-box {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(220, 220, 220, 0.9);
+  background-color: rgba(255, 255, 255, 0.84);
+
+  .music-cover img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+  }
+
+  .music-title {
+    margin-bottom: 0.5rem;
+    color: #2f2f2f;
+  }
+
+  .music-desc {
+    margin-bottom: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .music-meta {
+    flex-wrap: wrap;
+
+    audio {
+      max-width: 320px;
+      height: 34px;
+    }
+  }
+}
+
+.user-box {
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(220, 220, 220, 0.9);
+  background-color: rgba(255, 255, 255, 0.84);
+
+  .user-name {
+    color: #2f2f2f;
+    margin-bottom: 0.2rem;
+  }
+
+  .user-signature {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
 @media (max-width: 768px) {
   .card-box {
     min-height: auto;
@@ -193,6 +323,14 @@ const empty = computed(() => pages.value.rows === 0 || blogRes.value.length === 
         border-top-right-radius: 0.5rem;
         border-bottom-left-radius: 0;
       }
+    }
+  }
+
+  .music-box {
+    grid-template-columns: 1fr;
+
+    .music-cover img {
+      height: 180px;
     }
   }
 }

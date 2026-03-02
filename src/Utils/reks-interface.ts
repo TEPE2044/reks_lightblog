@@ -115,3 +115,10 @@ export interface AuthorRes {
   avatar:string
 }
 
+export interface SearchUserRes {
+  id: number
+  username: string
+  avatar: string
+  signature?: string
+}
+

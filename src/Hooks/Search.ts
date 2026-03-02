@@ -1,15 +1,41 @@
 import regql from "../Requests/regql";
 
-export const searchUser = async (who: string) => {
+export const searchUser = async (page: number, pageSize: number, who: string) => {
   const res = await regql.post("/seaql", {
     query: `
-        query MyQuery {
-            user(p: {page: 1, pageSize: 10}, who: "${who}")
-        }       
+        query MyQuery($page: Int!, $pageSize: Int!, $who: String!) {
+            user(p: {page: $page, pageSize: $pageSize}, who: $who)
+        }
     `,
+    variables: {
+      page,
+      pageSize,
+      who,
+    },
   });
 
-  return res.data.data;
+  return res.data.data.user;
+};
+
+export const searchMusic = async (
+  page: number,
+  pageSize: number,
+  content: string,
+) => {
+  const res = await regql.post("/seaql", {
+    query: `
+        query MyQuery($page: Int!, $pageSize: Int!, $content: String!) {
+            music(content: $content, p: {page: $page, pageSize: $pageSize})
+        }
+    `,
+    variables: {
+      page,
+      pageSize,
+      content,
+    },
+  });
+
+  return res.data.data.music;
 };
 
 export const searchBlog = async (

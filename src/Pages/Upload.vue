@@ -18,7 +18,7 @@ const selectType = (ntype: number) => {
   //console.log(postType.value)
 };
 
-const { isOriginal, name, desc, audioFile, wantUpload } =
+const { isOriginal, name, desc, audioFile } =
   storeToRefs(musicStore());
 
 watch(postType, () => {
@@ -26,9 +26,9 @@ watch(postType, () => {
   set(name, "");
   set(desc, "");
   set(audioFile, null);
-  set(wantUpload, "uex");
+  //set(wantUpload, "uex");
   console.log("----upload");
-  console.log(wantUpload.value);
+  // console.log(wantUpload.value);
 });
 // TODO:会造成严重卡顿
 // onUnmounted(() =>{
