@@ -116,7 +116,10 @@ const toggleMusicList = () => {
 };
 // 评论界面
 const comments = useToggle("comment-area")
+// 暂未开放
 const toggleComment = () => {
+  createToast(toast,"暂未开放","前面的世界，以后再来探索吧",'warning')
+  return
   comments.toggle()
 }
 // 详细界面
