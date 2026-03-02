@@ -1,41 +1,38 @@
 <script setup lang="ts">
 import Editor from "../Components/Editor.vue";
 import { ref, watch } from "vue";
-import { set } from "@vueuse/core";
-import { storeToRefs } from "pinia";
-import { musicStore } from "../Store/music";
-import  { type UploadIcon,uploadIconMap } from "../Utils/reks-icon-map";
+import { type UploadIcon, uploadIconMap } from "../Utils/reks-icon-map";
+import router from "../Router";
+import { useRoute } from "vue-router";
+const route = useRoute()
+const curPath = ref(route.name === "blog" ? "blog" : "music");
 
-const selections = ref<{ name: string; iconKey: UploadIcon; postType: string }[]>([
-  { name: "随心写", iconKey: "blog", postType: "blog" },
-  { name: "音频", iconKey: "audio", postType: "audio" },
+interface Selection {
+  name: string;
+  iconKey: UploadIcon;
+  path: string;
+}
+
+const selections = ref<Selection[]>([
+  { name: "随心写", iconKey: "blog", path: "/upload/blog" },
+  { name: "音频", iconKey: "audio", path: "/upload/music" },
 ]);
 
-const postType = ref(selections.value[0]?.postType);
-
-const selectType = (ntype: number) => {
-  postType.value = selections.value[ntype]?.postType;
-  //console.log(postType.value)
+const switchPost = (rpath: string) => {
+  router.push(rpath)
 };
 
-const { isOriginal, name, desc, audioFile } =
-  storeToRefs(musicStore());
+// const { isOriginal, name, desc, audioFile } = storeToRefs(musicStore());
 
-watch(postType, () => {
-  set(isOriginal, false);
-  set(name, "");
-  set(desc, "");
-  set(audioFile, null);
-  //set(wantUpload, "uex");
-  console.log("----upload");
-  // console.log(wantUpload.value);
-});
-// TODO:会造成严重卡顿
-// onUnmounted(() =>{
-//   window.onbeforeunload = function(event) {
-//     event.preventDefault();
-//   };
-// })
+// watch(postType, () => {
+//   set(isOriginal, false);
+//   set(name, "");
+//   set(desc, "");
+//   set(audioFile, null);
+//   //set(wantUpload, "uex");
+//   console.log("----upload");
+//   // console.log(wantUpload.value);
+// });
 </script>
 <template>
   <!-- 优化项 TODO:换成upload/blog upload/music upload/mblog 的路由形式 -->
@@ -44,11 +41,10 @@ watch(postType, () => {
       <div class="selection d-flex flex-column gap-3">
         <!-- <p class="title">上传格式</p> -->
         <BButton
-          :class="{ slt: postType === s.postType }"
           class="select-item d-flex flex-row gap-3 align-items-center justify-content-center rounded-3 border-0"
-          v-for="(s, index) in selections"
+          v-for="(s) in selections"
           :key="`selecetion${s}`"
-          @click="selectType(index)"
+          @click="switchPost(s.path)"
         >
           <div class="sname">{{ s.name }}</div>
           <component :is="uploadIconMap[s.iconKey]" style="font-size: 1.4rem" />
@@ -56,8 +52,9 @@ watch(postType, () => {
       </div>
     </div>
 
-    <div class="textarea mt-3 mb-3">
-      <Editor v-model="postType" />
+    <div class="textarea mt-3 mb-3 px-2">
+      <RouterView/>
+      <!-- <Editor v-model="postType" /> -->
     </div>
   </div>
 </template>

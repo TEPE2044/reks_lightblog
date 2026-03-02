@@ -48,6 +48,23 @@ const router = createRouter({
       path: "/upload",
       name: "upload",
       component: () => import("../Pages/Upload.vue"),
+      children: [
+        {
+          path: "",
+          name: "upload-space",
+          redirect: { name: "upload-blog" },
+        },
+        {
+          path: "blog",
+          name: "upload-blog",
+          component: () => import("../Components/BlogUpload.vue"),
+        },
+        {
+          path: "music",
+          name: "upload-music",
+          component: () => import("../Widgets/MusicForm.vue"),
+        },
+      ],
     },
     {
       path: "/centre",
@@ -108,7 +125,7 @@ const router = createRouter({
       children: [
         {
           path: "",
-          name:"rstalk",
+          name: "rstalk",
           redirect: { name: "anmt" },
         },
         {
@@ -126,15 +143,15 @@ const router = createRouter({
     { path: "/:pathMatch(.*)*", redirect: "/404" },
   ],
 });
-const rcode = localStorage.getItem('rcode')
-const payload = localStorage.getItem('payload')
+const rcode = localStorage.getItem("rcode");
+const payload = localStorage.getItem("payload");
 router.beforeEach((to, from, next) => {
   console.log(from.path);
-  const isAuthenticated = rcode && payload
+  const isAuthenticated = rcode && payload;
 
   // 未登录 & 当前不在首页 → 强制回到首页
   if (!isAuthenticated && to.path !== "/") {
-    next("/"); 
+    next("/");
     return;
   }
 
