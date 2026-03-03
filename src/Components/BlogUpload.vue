@@ -79,7 +79,6 @@ const editorConfig: Partial<IEditorConfig> = {
             insertFn(res.data.url, res.data.alt || "", res.data.url);
             createToast(toast, "上传成功", "图片上传成功", "success");
           } else {
-
             alert(res.message || "上传失败");
           }
         } catch (error) {

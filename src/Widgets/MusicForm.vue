@@ -78,7 +78,7 @@ const upload_new_music = async (data: MusicData) => {
     console.log("----1")
     console.log(coverURL.value) // ok
 
-    createToast(toast, "上传成功", "图片上传成功", "success");
+    //createToast(toast, "上传成功", "图片上传成功", "success");
 
     // 2. 上传音频
     const audioForm = new FormData();
@@ -93,8 +93,6 @@ const upload_new_music = async (data: MusicData) => {
     console.log("----2")
     console.log(audioURL.value)  // ok
 
-    createToast(toast, "上传成功", "音频上传成功", "success");
-
     // 3. 组装完整数据并上传表单
     const completeData = {
       ...data,
@@ -102,12 +100,17 @@ const upload_new_music = async (data: MusicData) => {
       audioURL: audioURL.value,      
     };
     
+    
     console.log(completeData)
 
     const formRes = await upload_music_form(completeData);
     console.log(formRes)
+    // TODO:加一个确认上传界面
+    // TODO:重置表单
+    createToast(toast, "正在上传", "上传已开始，上传成功后将会通知您", "success");
 
-    createToast(toast, "上传成功", "音乐上传成功", "success");
+    // TODO:用订阅队列返回消息
+    //createToast(toast, "上传成功", "音乐上传成功", "success");
 
     // 可选：上传成功后重置表单或跳转
     // resetForm();
