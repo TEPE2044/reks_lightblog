@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import Editor from "../Components/Editor.vue";
 import { ref, watch } from "vue";
 import { type UploadIcon, uploadIconMap } from "../Utils/reks-icon-map";
 import router from "../Router";
 import { useRoute } from "vue-router";
 const route = useRoute()
-const curPath = ref(route.name === "blog" ? "blog" : "music");
+const curPath = ref<string>('/upload/blog')
+// 针对非响应式对象的watch写法
+watch(() => route.fullPath, (newPath) => {
+  curPath.value = newPath
+  console.log(curPath.value)
+}, { immediate: true })
 
 interface Selection {
   name: string;
@@ -22,17 +26,6 @@ const switchPost = (rpath: string) => {
   router.push(rpath)
 };
 
-// const { isOriginal, name, desc, audioFile } = storeToRefs(musicStore());
-
-// watch(postType, () => {
-//   set(isOriginal, false);
-//   set(name, "");
-//   set(desc, "");
-//   set(audioFile, null);
-//   //set(wantUpload, "uex");
-//   console.log("----upload");
-//   // console.log(wantUpload.value);
-// });
 </script>
 <template>
   <!-- 优化项 TODO:换成upload/blog upload/music upload/mblog 的路由形式 -->
@@ -43,6 +36,7 @@ const switchPost = (rpath: string) => {
         <BButton
           class="select-item d-flex flex-row gap-3 align-items-center justify-content-center rounded-3 border-0"
           v-for="(s) in selections"
+          :class="{slt:curPath === s.path }"
           :key="`selecetion${s}`"
           @click="switchPost(s.path)"
         >
