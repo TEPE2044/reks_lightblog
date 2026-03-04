@@ -15,13 +15,11 @@ $caro-height: 280px;
 %reks-avatar {
   user-select: none;
   cursor: pointer;
-  
 }
 
 %reks-section-title{
   border-left: 2px solid firebrick;
   padding-left: 8px;
-  
 }
 
 %reks-title{
@@ -45,4 +43,11 @@ $caro-height: 280px;
       opacity: 1;
     }
   }
+}
+
+:deep(.b-avatar-img img) {
+  image-rendering: -webkit-optimize-quality;
+  image-rendering: crisp-edges;
+  filter: blur(0.5px) !important;
+  transform: scale(1.005) !important;
 }

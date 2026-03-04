@@ -1,5 +1,7 @@
 import axios from "axios";
 import { userStore } from "../Store/user";
+import router from "../Router";
+
 
 const reapi = axios.create({
   baseURL: "http://localhost:12404/api/v1/",
@@ -24,11 +26,15 @@ reapi.interceptors.request.use(config => {
 // 响应拦截器
 reapi.interceptors.response.use(
   res => res,
-  err => {
-    if(err.response.status === 401) {
+  async err => {
+    if(err.response?.status === 401) {
       const user = userStore();
       user.userLogout();
       alert("身份验证失败，请重新登录");
+      router.replace('/')
+    }
+    if(err.response?.status === 429){
+      alert("请求次数已达上限！请勿重复请求")
     }
     return Promise.reject(err);
   }

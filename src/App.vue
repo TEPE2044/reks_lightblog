@@ -1,3 +1,6 @@
+<script setup lang="ts">
+import { BApp } from "bootstrap-vue-next";
+</script>
 <!-- App.vue -->
 <template>
   <BApp>
@@ -9,20 +12,13 @@
     </main>
     <footer>
       <Footer />
+      <MusicPlayer />
     </footer>
     <Teleport to="body">
       <Auth :show-trigger="false" />
     </Teleport>
   </BApp>
 </template>
-
-<script setup lang="ts">
-import { BApp } from "bootstrap-vue-next";
-import Header from "./Components/Header.vue";
-import MainLayout from "./Layouts/MainLayout.vue";
-import Footer from "./Components/Footer.vue";
-import Auth from "./UI/Auth.vue";
-</script>
 
 <style lang="scss" scoped>
 header {

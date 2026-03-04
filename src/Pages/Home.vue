@@ -1,11 +1,4 @@
 <script setup lang="ts">
-import Recommand from '../Layouts/Recommand.vue';
-import Caro from '../UI/Caro.vue';
-import ProfileCard from '../UI/ProfileCard.vue';
-import ShowCase from '../UI/ShowCase.vue';
-
-
-
 </script>
 
 <template>
@@ -15,15 +8,18 @@ import ShowCase from '../UI/ShowCase.vue';
         <Caro /> 
       </div>
 
-      <div class="profilecard">
-          <ProfileCard />
-      </div>  
+      <div class="fastlogin">
+        <FastLogin />
+      </div>
     </BContainer>
     <BContainer class="home-content mt-4">
-      <ShowCase/>
-      <!-- TODO:横向滚动盒子 -->
-      <Recommand />
+      <ShowCase />
     </BContainer>
+    <BContainer class="home-hotlist mt-4">
+      <HotList />
+    </BContainer>
+
+
   </div>
 </template>
 
@@ -35,19 +31,21 @@ import ShowCase from '../UI/ShowCase.vue';
     margin-top: 7.3rem;
     display: grid;
     grid-template-areas:
-      "profilecard caro";
+      "fastlogin caro";
     grid-template-columns: 1fr 4fr;
     gap: 20px;
-    @media (max-width: 768px) {
+
+    @media (max-width: 1000px) {
       display: flex;
       flex-direction: column;
     }
+
     .activities-caro {
       grid-area: caro;
     }
 
-    .profilecard {
-      grid-area: profilecard;
+    .fastlogin {
+      grid-area: fastlogin;
     }
   }
 }

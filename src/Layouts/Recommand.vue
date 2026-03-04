@@ -1,23 +1,23 @@
 <script setup lang="ts">
-//TODO:重构
 </script>
 
 <template>
-  <div class="recommand mb-4 mt-4">
-    <BCard class="recommand-tab mb-4" no-body>
-      <BCardHeader header-tag="nav">
-        <BNav align="center" pills>
-          <BNavItem to="/news/" exact exact-active-class="active">推荐
+  <div class="recommand py-3">
+    <div class="recommand-tab mb-4">
+      <div class="recommand-nav-wrap">
+        <BNav align="center" pills class="recommand-nav">
+          <BNavItem to="/hub/main" exact exact-active-class="active">推荐
           </BNavItem>
-          <BNavItem to="/subscribe/" exact exact-active-class="active">订阅
+          <BNavItem to="/hub/subscribe" exact exact-active-class="active">订阅
           </BNavItem>
         </BNav>
-      </BCardHeader>
+      </div>
 
-      <BCardBody class="content">
+
+      <div class="content">
         <RouterView />
-      </BCardBody>
-    </BCard>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -32,35 +32,54 @@
   background-color: rgba(178, 34, 34, 0.126) !important;
 }
 
-
 .recommand {
+  --recommand-sticky-top: 6.6rem;
+
   border-radius: 12px;
+  @extend %reks-card-box;
+  // background-color: rgba(255, 255, 255, 0.591);
 
   .label-word {
     color: #660909;
   }
 
-  min-height: 400px;
+  min-height: 300px;
 
   .recommand-tab {
+    position: relative;
+    isolation: isolate;
+
+    .recommand-nav-wrap {
+      position: sticky;
+      top: var(--recommand-sticky-top);
+      z-index: 30;
+      background-color: #fafafa;
+      padding: 0.25rem 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    }
 
     /* 保证内容区高度一致，避免切换时父容器高度跳动 */
     .content {
-      min-height: 300px;
+      min-height: 520px;
+      max-height: calc(100vh - var(--recommand-sticky-top) - 5.5rem);
+      overflow-y: auto;
       position: relative;
+      z-index: 1;
+      background-color: #fafafa;
       /* 为绝对定位的进入元素提供上下文 */
-    }
-
-    /* 如果你使用 <transition> 包裹 RouterView，可以让进入的组件绝对定位 */
-    .recommand-content {
-      position: absolute;
-      inset: 0;
-      /* top:0; right:0; bottom:0; left:0 */
     }
   }
 }
 
-.b-card-body {
-  min-height: 300px; // 保证内容区高度一致
+@media (max-width: 768px) {
+  .recommand {
+    --recommand-sticky-top: 6.2rem;
+
+    .recommand-tab {
+      .content {
+        max-height: calc(100vh - var(--recommand-sticky-top) - 5rem);
+      }
+    }
+  }
 }
 </style>

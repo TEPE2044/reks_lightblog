@@ -5,7 +5,6 @@ import type { PhoneData, AccountData } from "../Utils/reks-interface";
 import { createToast } from "../Utils/reks-toast";
 import { reactive, ref, shallowRef, watchEffect } from "vue";
 import Vcode from "vue3-puzzle-vcode";
-import reapi from "../Requests/reapi";
 import { useCountdown } from "@vueuse/core";
 import { userStore } from "../Store/user";
 import type { RNext } from "../Utils/reks-next-job";
@@ -22,8 +21,7 @@ const toast = useToast();
 // 验证码锁
 const codeActive = ref(false);
 
-//TODO:超过一定登录次数，提示：你似乎不是人类，请稍后再试
-
+//TODO:后续人机交互设计：同时按下按键处理/Canvas WebGL处理
 /*
 puzzle
 # var
@@ -55,7 +53,7 @@ const onSuccess = () => {
     rnext = null;
   }
 };
-// TODO:加一个loading动画
+// 加一个loading动画
 /*
 login-methods
 - phoneLogin 手机号登录（验证码登录）
@@ -83,25 +81,7 @@ const { remaining, start, stop } = useCountdown(countdownSeconds, {
   },
 });
 
-// request 获取短信验证码
-const getCode = async () => {
-  loading.value = true;
-  try {
-    const code_res = await reapi({
-      method: "POST",
-      // url: "/auth/send-sms-code",
-      url: "/auth/fake-sms-code",
-      data: {
-        phone: phoneData.phone,
-        codeActive: codeActive.value,
-      },
-    });
-    return code_res;
-  } catch (e) {
-    console.error("获取验证码失败:", e);
-    createToast(toast, "发送失败", "网络或服务错误，请稍后重试", "danger");
-  }
-};
+const loading = ref(false);
 
 // trigger 触发发送短信
 const sendCode = async () => {
@@ -124,25 +104,31 @@ const sendCode = async () => {
     openPuzzle(async () => {
       try {
         start();
-
-        const getcode_res = await getCode();
+        loading.value = true;
+        const getcode_res = await getCode(phoneData.phone, codeActive.value);
         loading.value = false;
         if (getcode_res) {
           createToast(
             toast,
             "验证码已发送",
             `验证码已发送至${phoneData.phone}`,
-            "success"
+            "success",
           );
         } else {
           stop();
           codeActive.value = false;
+          createToast(
+            toast,
+            "发送失败",
+            "网络或服务错误，请稍后重试",
+            "danger",
+          );
         }
       } catch (e) {
         console.log("验证码发送失败，重置计时器");
         codeActive.value = false;
         stop();
-        
+        createToast(toast, "发送失败", "网络或服务错误，请稍后重试", "danger");
         console.error("发送验证码失败:", e);
       }
     });
@@ -153,32 +139,14 @@ const sendCode = async () => {
   }
 };
 
-// request 账号登录
-const loginbyPhone = async () => {
-  loading.value = true;
-  const res = await reapi({
-    method: "POST",
-    // url: "/auth/login-by-phone",
-    url: "/auth/fake-login-by-phone",
-    data: {
-      phone: phoneData.phone,
-      code: phoneData.code,
-      iaccept: phoneData.iaccept,
-    },
-  });
-  return res.data;
-};
-
-// request 获取用户信息
-const getUserProfile = async () => {
-  const res = await reapi({
-    method: "GET",
-    url: "/user/profile",
-  });
-  return res.data;
-};
-
+// trigger 手机号登录
 import { useDebounceFn } from "@vueuse/core";
+import {
+  getCode,
+  getUserProfile,
+  loginbyAccount,
+  loginbyPhone,
+} from "../Hooks/Auth";
 const submitPhoneData = useDebounceFn(async () => {
   if (phoneData.iaccept === false) {
     createToast(toast, "登录失败", "请同意用户协议和隐私政策", "warning");
@@ -191,21 +159,32 @@ const submitPhoneData = useDebounceFn(async () => {
     return;
   }
   try {
-    const login_res = await loginbyPhone();
+    loading.value = true;
+    const login_res = await loginbyPhone(phoneData);
     console.log("登录成功:", login_res);
     if (login_res.tokens) {
       // 存储token
+      loading.value = false;
       user.userLogin(login_res.tokens);
       createToast(toast, "登录成功", "欢迎回来", "success");
-      // const user_info = await getUserProfile(); 
+      const user_info = await getUserProfile();
+      user.storeUserInfo(user_info.data);
+      console.log("用户信息:", user_info);
       emd.hide();
       reset();
+
+      if(login_res?.sign === 'new'){
+        createToast(toast,"安全提醒","当前账号安全等级低，请前往个人中心设置邮箱、密码","warning")
+      }
     } else {
-      createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
+      createToast(toast, "登录失败", login_res.msg, "danger");
     }
   } catch (e) {
+    loading.value = false;
     console.error("登录失败:", e);
-    createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
+    createToast(toast, "登录失败",(e as any)?.response.data.detail, "danger");
+  }finally{
+    loading.value = false;
   }
 }, 1300);
 
@@ -218,22 +197,6 @@ const accountData = reactive<AccountData>({
   password: "",
 });
 
-import { hashPsw } from "../Utils/reks-crypto";
-const loading = ref(false);
-
-const loginbyAccount = async (hashpsw: string) => {
-  const res = await reapi({
-    method: "POST",
-    // url: "/auth/login-by-account",
-    url: "/auth/fake-login-by-account",
-    data: {
-      account: accountData.account,
-      password: hashpsw,
-    },
-  });
-  return res.data;
-};
-
 // 更优雅的写法2026/12/13（🐧跳舞）
 const sumbitAccountData = useDebounceFn(() => {
   // 账号登录功能
@@ -244,7 +207,10 @@ const sumbitAccountData = useDebounceFn(() => {
     },
     { valid: phoneRegex(accountData.account), msg: "账号格式不正确" },
     {
-      valid: accountData.password && accountData.password.length >= 6,
+      valid:
+        accountData.password &&
+        accountData.password.length >= 6 &&
+        accountData.password.length <= 20,
       msg: "请输入正确的密码",
     },
   ];
@@ -256,27 +222,34 @@ const sumbitAccountData = useDebounceFn(() => {
   }
 
   try {
-    // 密码加密
-    const hashed_password = hashPsw(accountData.password);
+    // 密码加密 -> 密码不加密了
+    // const hashed_password = hashPsw(accountData.password);
     openPuzzle(async () => {
       try {
-        const res = await loginbyAccount(hashed_password);
-        console.log("账号登录成功:", res);
-        if (res.token) {
+        loading.value = true;
+        const login_res = await loginbyAccount(accountData);
+        // console.log("账号登录成功:", login_res);
+        if (login_res.tokens) {
           // 存储token
-          user.userLogin(res.token);
+          loading.value = false;
+          user.userLogin(login_res.tokens);
           createToast(toast, "登录成功", "欢迎回来", "success");
+          const user_info = await getUserProfile();
+          user.storeUserInfo(user_info.data);
+          console.log("用户信息:", user_info);
           emd.hide();
           reset();
         }
       } catch (e) {
+        loading.value = false;
         console.error("账号登录失败:", e);
-        createToast(toast, "登录失败", "账号不存在或账号信息错误", "danger");
+        createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
       }
     });
   } catch (e) {
+    loading.value = false;
     console.error("账号登录失败:", e);
-    createToast(toast, "登录失败", "网络或服务错误，请稍后重试", "danger");
+    createToast(toast, "登录失败", "账号不存在或账号信息错误", "danger");
   }
 }, 1000);
 
@@ -314,6 +287,7 @@ watchEffect(() => {
       </div>
 
       <div class="box box-show w-75 mx-auto" v-if="isShow">
+        <!-- TODO:后续要单独封装，使用pinia管理 -->
         <Vcode :show="isShow" type="inside" @success="onSuccess" />
         <BButton
           class="d-flex justify-content-center align-items-center mt-4"
@@ -330,7 +304,8 @@ watchEffect(() => {
                 label="账号"
                 label-for="user-account"
               >
-                <BFormInput :disabled="loading"
+                <BFormInput
+                  :disabled="loading"
                   autocomplete="current-account"
                   type="tel"
                   id="user-account"
@@ -347,7 +322,8 @@ watchEffect(() => {
                 label="密码"
                 label-for="user-password"
               >
-                <BFormInput :disabled="loading"
+                <BFormInput
+                  :disabled="loading"
                   autocomplete="current-password"
                   type="password"
                   id="user-password"
@@ -363,7 +339,7 @@ watchEffect(() => {
                 class="w-100 mt-2"
                 variant="primary"
                 @click="sumbitAccountData"
-                :disabled="loading"
+                :disabled="loading === true"
                 >登录</BButton
               >
 
@@ -441,7 +417,7 @@ watchEffect(() => {
             </BFormCheckbox>
 
             <BButton
-              :disabled="phoneData.code.length === 0"
+              :disabled="loading === true"
               class="w-100 mt-4 mb-3"
               variant="primary"
               @click="submitPhoneData"
