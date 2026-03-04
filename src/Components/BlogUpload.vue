@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import "@wangeditor-next/editor/dist/css/style.css";
 import { storeToRefs } from "pinia";
-import { onMounted, onBeforeUnmount} from "vue";
+import { onMounted, onBeforeUnmount } from "vue";
 import { Editor, Toolbar } from "@wangeditor-next/editor-for-vue";
 import type { IEditorConfig, IToolbarConfig } from "@wangeditor-next/editor";
 import { useToast, useToggle } from "bootstrap-vue-next";
@@ -12,11 +12,16 @@ import { createToast } from "../Utils/reks-toast";
 import router from "../Router";
 import { userStore } from "../Store/user";
 
+const options = withDefaults(defineProps<{ mblog?: boolean }>(), {
+  mblog: false,
+});
+
 const toast = useToast();
 const { userInfo } = storeToRefs(userStore());
 
 // 状态管理
-const { editor, valueHTML, pub_tags, pub_title, coverImages } = storeToRefs(editorStore());
+const { editor, valueHTML, pub_tags, pub_title, coverImages } =
+  storeToRefs(editorStore());
 const { handleCreated, handleChange } = editorStore();
 
 // modal
@@ -118,7 +123,7 @@ const handleSubmit = async () => {
       pub_title.value,
       valueHTML.value,
       coverImages.value,
-      pub_tags.value
+      pub_tags.value,
     );
     console.log("发布成功:", res);
     createToast(toast, "发布成功", "发布成功！期待上热门哦", "success");
@@ -141,31 +146,148 @@ onBeforeUnmount(() => {
     editor.value = undefined as any;
   }
 });
+
+const sltMusic = useToggle("sltMusic");
+
+const toggleMsBox = () => {
+  sltMusic.toggle()
+}
+
+import { ref } from 'vue'
+
+interface Person {
+  name: string
+  age: number
+  city: string
+}
+
+const filter = ref('')
+const selectedPerson = ref<Person | null>(null)  // 存储选中的行
+
+const fields = [
+  { key: 'name', sortable: true },
+  { key: 'age', sortable: true },
+  { key: 'city', sortable: true },
+  { key: 'select', label: '选择', sortable: false },  // 新增 radio 列
+]
+
+const items: Person[] = [
+  { name: 'Alice Johnson', age: 28, city: 'New York' },
+  { name: 'Bob Smith', age: 34, city: 'Los Angeles' },
+  { name: 'Charlie Brown', age: 22, city: 'Chicago' },
+  { name: 'Diana Prince', age: 29, city: 'San Francisco' },
+  { name: 'Eve Davis', age: 31, city: 'Boston' },
+  { name: 'Frank Miller', age: 45, city: 'Seattle' },
+  { name: 'Grace Lee', age: 27, city: 'Austin' },
+  { name: 'Henry Wilson', age: 38, city: 'Denver' },
+  { name: 'Ivy Chen', age: 25, city: 'Portland' },
+  { name: 'Jack Taylor', age: 42, city: 'Miami' },
+]
+
+// 处理 radio 选择
+const handleSelect = (item: Person) => {
+  selectedPerson.value = item
+  console.log('Selected:', item)
+}
 </script>
 
 <template>
+   <BModal
+    id="sltMusic"
+    title="选择歌曲"
+    size="xl"
+    backdrop
+    scrollable
+    lazy
+    no-footer
+  >
+    <div>
+      <BFormGroup label="Filter" label-for="filter-input" class="mb-3">
+        <BFormInput
+          id="filter-input"
+          v-model="filter"
+          type="search"
+          placeholder="Type to search..."
+        />
+      </BFormGroup>
+
+      <p class="text-muted mb-2">
+        已选择: {{ selectedPerson ? selectedPerson.name : '无' }}
+      </p>
+
+      <BTable
+        :items="items"
+        :fields="fields"
+        :filter="filter"
+        :debounce="500"
+        striped
+        hover
+        selectable  
+      >
+        <!-- 自定义 select 列：渲染 radio -->
+        <template #cell(select)="{ item }">
+          <BFormRadio
+            :value="item"
+            v-model="selectedPerson"
+            :name="'person-radio'"
+          />
+        </template>
+      </BTable>
+    </div>
+  </BModal>
+
   <div class="editor-container mx-auto">
-    <section class="editor-section">
+    <section class="audio-secetion mt-2 mb-4" v-if="mblog">
+      <p class="section-title">选择歌曲</p>
+      <div class="bgrp d-flex gap-3">
+        <BButton variant="outline-secondary" @click.stop="toggleMsBox()">选择已有的歌曲</BButton>
+        <BButton to="/upload/music">上传新歌曲</BButton>
+      </div>
+    </section>
+    <section class="editor-section" :class="{ 'mt-3': mblog }">
       <!-- 标题输入 -->
       <div class="form-floating mb-2">
-        <input id="uploadTitle" v-model="pub_title" type="text" class="form-control" minlength="1" maxlength="20"
-          required placeholder="有何感想？" />
+        <input
+          id="uploadTitle"
+          v-model="pub_title"
+          type="text"
+          class="form-control"
+          minlength="1"
+          maxlength="20"
+          required
+          placeholder="有何感想？"
+        />
         <label for="uploadTitle">从标题开始</label>
       </div>
-      <Toolbar class="editor-toolbar" :editor="editor" :default-config="toolbarConfig" mode="default" />
-      <Editor v-model="valueHTML" class="editor-content" :default-config="editorConfig" mode="default"
-        @on-created="handleCreated" @on-change="handleChange" />
+      <Toolbar
+        class="editor-toolbar"
+        :editor="editor"
+        :default-config="toolbarConfig"
+        mode="default"
+      />
+      <Editor
+        v-model="valueHTML"
+        class="editor-content"
+        :default-config="editorConfig"
+        mode="default"
+        @on-created="handleCreated"
+        @on-change="handleChange"
+      />
     </section>
 
     <section class="tags-section">
       <p class="section-title">上传标签</p>
-      <BFormTags v-model="pub_tags" input-id="tags-basic" :limit="5" duplicate-tag-text="重复标签" remove-on-delete
-        add-button-text="Add" limit-tags-text="最多只能设置5个标签噢" placeholder="设置标签(使用回车确定标签)" />
+      <BFormTags
+        v-model="pub_tags"
+        input-id="tags-basic"
+        :limit="5"
+        duplicate-tag-text="重复标签"
+        remove-on-delete
+        add-button-text="Add"
+        limit-tags-text="最多只能设置5个标签噢"
+        placeholder="设置标签(使用回车确定标签)"
+      />
     </section>
-
-    <!-- <section class="audio-secetion mt-2" v-if="postType == 'mblog'">
-      <RadioSelector />
-    </section> -->
 
     <!-- 规定确认 -->
     <!-- <section class="agreement-section">
@@ -204,7 +326,14 @@ onBeforeUnmount(() => {
   </div>
 
   <!-- 预览模态框 -->
-  <BModal id="preview" size="lg" scrollable no-close-on-backdrop no-backdrop no-footer>
+  <BModal
+    id="preview"
+    size="lg"
+    scrollable
+    no-close-on-backdrop
+    no-backdrop
+    no-footer
+  >
     <article class="preview-content">
       <h2 class="preview-title">{{ pub_title }}</h2>
 
@@ -223,7 +352,7 @@ onBeforeUnmount(() => {
           <BAvatar size="50" :src="userInfo?.avatar || null" />
           <div class="author-details">
             <div class="author-name">{{ userInfo?.username }}</div>
-            <div class="author-sign">{{ userInfo?.sign || '' }}</div>
+            <div class="author-sign">{{ userInfo?.sign || "" }}</div>
           </div>
         </div>
         <BButton variant="outline-secondary" size="sm">+ 关注</BButton>

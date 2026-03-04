@@ -64,6 +64,11 @@ const router = createRouter({
           name: "upload-music",
           component: () => import("../Widgets/MusicForm.vue"),
         },
+        {
+          path:"mblog",
+          name:'upload-mblog',
+          component:() => import("../Components/MBlog.vue")
+        }
       ],
     },
     {

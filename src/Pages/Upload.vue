@@ -20,6 +20,7 @@ interface Selection {
 const selections = ref<Selection[]>([
   { name: "随心写", iconKey: "blog", path: "/upload/blog" },
   { name: "音频", iconKey: "audio", path: "/upload/music" },
+  { name: "音乐博客", iconKey: "mblog", path: "/upload/mblog" },
 ]);
 
 const switchPost = (rpath: string) => {
