@@ -22,7 +22,6 @@ export const query_my_draft = async () => {
   return res.data;
 };
 
-
 export const query_blog_by_id = async (id: number) => {
   const res = await reapi({
     url: `/blog/${id}`,
@@ -30,12 +29,33 @@ export const query_blog_by_id = async (id: number) => {
   });
   return res.data;
 };
+export const upload_mblog = async (
+  title: string,
+  content: string,
+  cover: string[],
+  tags: string[],
+  mid: number,
+) => {
+  const res = await reapi({
+    url: "/my-blog/new-mblog",
+    method: "POST",
+    data: {
+      title: title,
+      content: content,
+      cover: cover,
+      tags: tags,
+      music_id: mid,
+    },
+  });
+  return res
+};
+
 // blog_id是0表示新建博客，非0表示编辑博客
 export const upload_blog = async (
   title: string,
   content: string,
   cover: string[],
-  tags: string[]
+  tags: string[],
 ) => {
   const res = await reapi({
     url: "/blog/my-blog/new",
@@ -55,7 +75,7 @@ export const update_blog = async (
   title: string,
   content: string,
   cover: string[],
-  tags: string[]
+  tags: string[],
 ) => {
   const res = await reapi({
     url: `/blog/my-blog/${id}`,

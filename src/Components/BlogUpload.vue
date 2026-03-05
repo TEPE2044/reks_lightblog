@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import "@wangeditor-next/editor/dist/css/style.css";
 import { storeToRefs } from "pinia";
-import { onMounted, onBeforeUnmount } from "vue";
+import { onMounted, onBeforeUnmount,ref } from "vue";
 import { Editor, Toolbar } from "@wangeditor-next/editor-for-vue";
 import type { IEditorConfig, IToolbarConfig } from "@wangeditor-next/editor";
 import { useToast, useToggle } from "bootstrap-vue-next";
@@ -12,8 +12,9 @@ import { createToast } from "../Utils/reks-toast";
 import router from "../Router";
 import { userStore } from "../Store/user";
 
-const options = withDefaults(defineProps<{ mblog?: boolean }>(), {
+const options = withDefaults(defineProps<{ mblog?: boolean,upload:'mblog'|'' }>(), {
   mblog: false,
+  upload:''
 });
 
 const toast = useToast();
@@ -153,7 +154,6 @@ const toggleMsBox = () => {
   sltMusic.toggle()
 }
 
-import { ref } from 'vue'
 
 interface Person {
   name: string
@@ -196,18 +196,19 @@ const handleSelect = (item: Person) => {
     id="sltMusic"
     title="选择歌曲"
     size="xl"
+    cancel-title="取消"
+    ok-title="选定"
     backdrop
     scrollable
     lazy
     no-footer
   >
     <div>
-      <BFormGroup label="Filter" label-for="filter-input" class="mb-3">
+      <BFormGroup label="查找歌曲" label-for="filter-input" class="mb-3">
         <BFormInput
           id="filter-input"
           v-model="filter"
           type="search"
-          placeholder="Type to search..."
         />
       </BFormGroup>
 
@@ -222,14 +223,14 @@ const handleSelect = (item: Person) => {
         :debounce="500"
         striped
         hover
-        selectable  
       >
         <!-- 自定义 select 列：渲染 radio -->
         <template #cell(select)="{ item }">
           <BFormRadio
-            :value="item"
+            :value="item as any"
             v-model="selectedPerson"
             :name="'person-radio'"
+            @click="handleSelect(item)"
           />
         </template>
       </BTable>
@@ -314,7 +315,10 @@ const handleSelect = (item: Person) => {
         <template #title>
           <strong>确认发布?</strong>
         </template>
-        <BButton size="sm" variant="success" class="me-2" @click="handleSubmit">
+         <BButton v-if="upload === 'mblog'" title="音乐博客" size="sm" variant="success" class="me-2" @click="">
+          <i-bi-send /> 发布
+        </BButton>
+        <BButton v-else title="普通博客" size="sm" variant="success" class="me-2" @click="handleSubmit">
           <i-bi-send /> 发布
         </BButton>
         <BButton size="sm" variant="primary"> <i-bi-box /> 暂存 </BButton>

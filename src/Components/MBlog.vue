@@ -1,6 +1,6 @@
 <template>
     <div>
-        <BlogUpload :mblog="true"/>
+        <BlogUpload :mblog="true" :upload="'mblog'"/>
     </div>
 </template>
 
