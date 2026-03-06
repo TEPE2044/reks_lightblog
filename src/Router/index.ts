@@ -109,6 +109,11 @@ const router = createRouter({
       ],
     },
     {
+      path: "/centre/user/:id",
+      name: "guest-centre",
+      component: () => import("../Pages/Guest.vue"),
+    },
+    {
       path: "/404",
       name: "not-found",
       component: () => import("../Pages/404.vue"),
