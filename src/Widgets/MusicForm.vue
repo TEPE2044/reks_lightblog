@@ -5,17 +5,16 @@ import { musicStore } from "../Store/music";
 import type { MusicData } from "../Utils/reks-interface";
 import { createToast } from "../Utils/reks-toast";
 import { BButton, useToast } from "bootstrap-vue-next";
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import { upload_img } from "../Hooks/Editor";
 import { upload_music, upload_music_form } from "../Hooks/Music";
 const { isOriginal, name, desc, audioFile, coverFile, coverURL, audioURL } =
   storeToRefs(musicStore());
 
 const toast = useToast();
-const pre_audio = ref<string | null>(null)
-const coverPreview = ref<string | null>(null)
+const pre_audio = ref<string | null>(null);
+const coverPreview = ref<string | null>(null);
 
-const defaultTitle = computed(() => audioFile?.value?.name ?? "")
 // 封面上传
 const handleCoverUpload = (e: Event) => {
   const input = e.target as HTMLInputElement;
@@ -38,7 +37,7 @@ const handleCoverUpload = (e: Event) => {
   }
 };
 
-// 音频上传
+// 本地预览
 const handleAudioUpload = (e: Event) => {
   const input = e.target as HTMLInputElement;
   let temp = (e.target as HTMLInputElement).files?.[0];
@@ -51,18 +50,17 @@ const handleAudioUpload = (e: Event) => {
     set(audioFile, null);
     return;
   } else {
-    pre_audio.value = URL.createObjectURL(temp)
+    pre_audio.value = URL.createObjectURL(temp);
     set(audioFile, temp);
+    set(name, audioFile?.value?.name);
   }
 };
-
+// 音频上传
 const upload_new_music = async (data: MusicData) => {
   if (!data.name) {
     createToast(toast, "上传失败", "未上传任何数据", "warning");
     return;
   }
-
-
 
   try {
     // 1. 上传图片
@@ -75,8 +73,8 @@ const upload_new_music = async (data: MusicData) => {
     }
     coverURL.value = imgRes.data.url; // 同步更新ref
 
-    console.log("----1")
-    console.log(coverURL.value) // ok
+    console.log("----1");
+    console.log(coverURL.value); // ok
 
     //createToast(toast, "上传成功", "图片上传成功", "success");
 
@@ -90,38 +88,41 @@ const upload_new_music = async (data: MusicData) => {
     }
     audioURL.value = audioRes.link; // 同步更新ref
 
-    console.log("----2")
-    console.log(audioURL.value)  // ok
+    console.log("----2");
+    console.log(audioURL.value); // ok
 
     // 3. 组装完整数据并上传表单
     const completeData = {
       ...data,
-      coverURL: coverURL.value,    
-      audioURL: audioURL.value,      
+      coverURL: coverURL.value,
+      audioURL: audioURL.value,
     };
-    
-    
-    console.log(completeData)
+
+    console.log(completeData);
 
     const formRes = await upload_music_form(completeData);
-    console.log(formRes)
+    console.log(formRes);
     // TODO:加一个确认上传界面
     // TODO:重置表单
-    createToast(toast, "正在上传", "上传已开始，上传成功后将会通知您", "success");
+    createToast(
+      toast,
+      "正在上传",
+      "上传已开始，上传成功后将会通知您",
+      "success",
+    );
 
     // TODO:用订阅队列返回消息
     //createToast(toast, "上传成功", "音乐上传成功", "success");
 
     // 可选：上传成功后重置表单或跳转
     // resetForm();
-
   } catch (error) {
     console.error("上传流程失败:", error);
     createToast(
       toast,
       "上传失败",
       error instanceof Error ? error.message : "未知错误",
-      "danger"
+      "danger",
     );
     return; // 阻止后续执行
   }
@@ -130,50 +131,104 @@ const upload_new_music = async (data: MusicData) => {
 <template>
   <div class="music-form">
     <!-- 原创/转载选择 -->
-    <div class="mt-3 d-flex flex-column align-items-center justify-content-center">
+    <div
+      class="mt-3 d-flex flex-column align-items-center justify-content-center"
+    >
       <div class="h5 mb-3">上传音频 <i-bi-file-music /></div>
       <div class="input-group">
-        <input type="file" id="uploadAudio" class="form-control" :multiple="false" @change="handleAudioUpload"
-          accept="audio/mp3,audio/wav" />
+        <input
+          type="file"
+          id="uploadAudio"
+          class="form-control"
+          :multiple="false"
+          @change="handleAudioUpload"
+          accept="audio/mp3,audio/wav"
+        />
       </div>
     </div>
 
     <div v-if="pre_audio" class="mt-3">
       <!-- 是否原创？ -->
-      <div class="btn-group mt-3 mb-3" id="isor" role="group">
-        <input type="radio" class="btn-check" id="original" v-model="isOriginal" value="true" />
-        <label class="btn btn-outline-primary" for="original">原创</label>
 
-        <input type="radio" class="btn-check" id="repost" v-model="isOriginal" value="false" />
-        <label class="btn btn-outline-primary" for="repost">转载</label>
-      </div>
       <div class="d-flex align-items-start gap-3 mb-3">
-        <div class="flex-shrink-0" style="min-width:240px; max-width:320px;">
-          <audio :src="pre_audio || ''" controls controlsList="nodownload" class="w-100"></audio>
-          <div class="mt-2 text-muted small">预览音频</div>
+        <div class="flex-shrink-0" style="min-width: 280px; max-width: 320px">
+          <div class="text-muted small">预览音频</div>
+          <audio
+            :src="pre_audio || ''"
+            controls
+            controlsList="nodownload"
+            class="w-100"
+          ></audio>
         </div>
         <div class="flex-fill">
+          <div class="btn-group mt-3 mb-3" id="isor" role="group">
+            <input
+              type="radio"
+              class="btn-check"
+              id="original"
+              v-model="isOriginal"
+              value="true"
+            />
+            <label class="btn btn-outline-primary" for="original">原创</label>
+
+            <input
+              type="radio"
+              class="btn-check"
+              id="repost"
+              v-model="isOriginal"
+              value="false"
+            />
+            <label class="btn btn-outline-primary" for="repost">转载</label>
+          </div>
           <div class="mb-3">
             <label for="uploadTitle" class="form-label">歌曲名称</label>
-            <input v-model="name" type="text" class="form-control" id="uploadTitle" minlength="1"
-              :placeholder="defaultTitle" />
+            <input
+              v-model="name"
+              type="text"
+              class="form-control"
+              id="uploadTitle"
+              minlength="1"
+            />
           </div>
 
           <div class="mb-3">
             <label for="uploadContent" class="form-label">简介</label>
-            <textarea v-model="desc" class="form-control" id="uploadContent" rows="4" style="resize: none"></textarea>
+            <textarea
+              v-model="desc"
+              class="form-control"
+              id="uploadContent"
+              rows="4"
+              style="resize: none"
+            ></textarea>
           </div>
 
           <div class="mb-3">
             <label class="form-label">添加歌曲封面</label>
-            <input type="file" id="uploadIcon" class="form-control" @change="handleCoverUpload" accept="image/*" />
+            <input
+              type="file"
+              id="uploadIcon"
+              class="form-control"
+              @change="handleCoverUpload"
+              accept="image/*"
+            />
           </div>
 
           <div class="d-flex align-items-center gap-3">
-            <BButton variant="primary" @click.stop="upload_new_music({ isOriginal, name, desc,})">确认上传
+            <BButton
+              variant="primary"
+              @click.stop="upload_new_music({ isOriginal, name, desc })"
+              >确认上传
             </BButton>
-            <div v-if="coverPreview" class="border rounded" style="width:64px; height:64px; overflow:hidden;">
-              <img :src="coverPreview" alt="cover" style="width:100%; height:100%; object-fit:cover" />
+            <div
+              v-if="coverPreview"
+              class="border rounded"
+              style="width: 64px; height: 64px; overflow: hidden"
+            >
+              <img
+                :src="coverPreview"
+                alt="cover"
+                style="width: 100%; height: 100%; object-fit: cover"
+              />
             </div>
             <div v-else class="text-muted small">未上传封面</div>
           </div>
@@ -181,9 +236,6 @@ const upload_new_music = async (data: MusicData) => {
       </div>
     </div>
   </div>
-
-
-
 </template>
 
 <style lang="scss" scoped>

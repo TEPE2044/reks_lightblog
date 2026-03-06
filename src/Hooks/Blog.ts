@@ -37,7 +37,7 @@ export const upload_mblog = async (
   mid: number,
 ) => {
   const res = await reapi({
-    url: "/my-blog/new-mblog",
+    url: "blog/my-blog/new-mblog",
     method: "POST",
     data: {
       title: title,
@@ -47,7 +47,7 @@ export const upload_mblog = async (
       music_id: mid,
     },
   });
-  return res
+  return res.data
 };
 
 // blog_id是0表示新建博客，非0表示编辑博客
@@ -67,7 +67,7 @@ export const upload_blog = async (
       tags: tags,
     },
   });
-  return res;
+  return res.data
 };
 
 export const update_blog = async (
