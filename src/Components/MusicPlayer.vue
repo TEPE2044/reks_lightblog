@@ -116,7 +116,10 @@ const toggleMusicList = () => {
 };
 // 评论界面
 const comments = useToggle("comment-area")
+// 暂未开放
 const toggleComment = () => {
+  createToast(toast,"暂未开放","前面的世界，以后再来探索吧",'warning')
+  return
   comments.toggle()
 }
 // 详细界面
@@ -222,7 +225,7 @@ onUnmounted(() => {
 
     <div class="r-progressBar d-flex align-items-center gap-3 user-select-none" @click.stop="">
       <div class="thumbail-album rounded border r-icon" @click.stop="toggleExpand()">
-        <img class="thumbail-img" :src="dcover || '/imagePlaceholder.webp'" />
+        <img class="thumbail-img" :src="dcover || '/imagePlaceholder.webp'" alt="cover" />
       </div>
       <span>{{ currentTime }}</span>
       <BFormInput @input="handleClickPlay(progress)" class="progress" v-model="progress" type="range" max="100"

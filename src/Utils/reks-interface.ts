@@ -12,15 +12,14 @@ export interface AccountData {
 export interface QueueItem {
   cover: string;
   songURL: string;
-  title:string;
-  author:string
+  title: string;
+  author: string;
 }
 
-export interface PageWrapper{
-  currentPage:number,
-  perPage:number,
-  pageLimit:5,
-  rows:number
+export interface PageWrapper {
+  currentPage: number;
+  perPage: number;
+  rows: number;
 }
 
 export interface ToastVariant {
@@ -42,9 +41,9 @@ export interface ApiProduct {
   discontinued?: boolean;
 }
 
-export interface PasswordGroup{
-  psw:string,
-  auth_psw:string
+export interface PasswordGroup {
+  psw: string;
+  auth_psw: string;
 }
 
 export interface UserProfile {
@@ -53,7 +52,7 @@ export interface UserProfile {
   signature: string;
 }
 
-export interface BlogData{
+export interface BlogData {
   id: number;
   cover: string[];
   title: string;
@@ -61,39 +60,65 @@ export interface BlogData{
   type: number;
 }
 
-export interface MusicTwice{
-  isOriginal:boolean
-  name:string
-  desc:string
-  coverURL:string|undefined  
-  audioURL:string|undefined  
+export interface MusicTwice {
+  isOriginal: boolean;
+  name: string;
+  desc: string;
+  coverURL: string | undefined;
+  audioURL: string | undefined;
 }
 
-
-export interface MusicData{
-  isOriginal:boolean
-  name:string
-  desc:string
+export interface MusicData {
+  isOriginal: boolean;
+  name: string;
+  desc: string;
 }
 
-export interface MusicResponse{
-  audio:string
+export interface MusicResponse {
+  audio: string;
+  cover: string;
+  created_at: Date;
+  desc: string;
+  id: number;
+  name: string;
+  original: boolean;
+  rid: number;
+  state: number;
+  username: string;
+  avatar: string;
+}
+
+export interface Detail {
+  title: string;
+  author: string;
+  cover: string;
+  // desc
+}
+
+export interface EventSnapshot {
+  eventType: string;
+  payload: string;
+}
+
+export interface BlogRes {
+  author:AuthorRes
   cover:string
   created_at:Date
-  desc:string,
-  id:number,
-  name:string,
-  original:boolean,
-  rid:number,
-  state:number
+  id:number
+  title:string
+  type:number
+}
+
+export interface AuthorRes {
+  id:number
   username:string
   avatar:string
 }
 
-
-export interface Detail{
-  title:string
-  author:string
-  cover:string
-  // desc
+export interface SearchUserRes {
+  reks_id: number
+  username: string
+  avatar: string
+  signature?: string
 }
+

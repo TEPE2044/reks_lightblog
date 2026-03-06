@@ -172,6 +172,10 @@ const submitPhoneData = useDebounceFn(async () => {
       console.log("用户信息:", user_info);
       emd.hide();
       reset();
+
+      if(login_res?.sign === 'new'){
+        createToast(toast,"安全提醒","当前账号安全等级低，请前往个人中心设置邮箱、密码","warning")
+      }
     } else {
       createToast(toast, "登录失败", login_res.msg, "danger");
     }

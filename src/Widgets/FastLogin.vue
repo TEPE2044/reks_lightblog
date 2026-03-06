@@ -12,11 +12,11 @@ import { useToast, useToggle } from "bootstrap-vue-next";
 const user = userStore();
 const toast = useToast();
 const emd = useToggle("easy-login-box");
-
 const easyLogout = () => {
   user.userLogout();
   createToast(toast, "登出成功", "下次再见！", "info");
 };
+
 </script>
 
 <template>
@@ -48,7 +48,7 @@ const easyLogout = () => {
         key="logged-in"
         class="user-login d-flex flex-column gap-4 justify-content-center align-items-center mt-3 pb-3 position-relative"
       >
-        <div class="d-flex flex-column gap-2 align-items-center mt-2">
+        <div class="d-flex flex-column gap-2 align-items-center mt-2" >
           <!-- 如果头像加载失败或没有头像，使用默认头像 -->
           <BAvatar
             size="5rem"

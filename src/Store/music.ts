@@ -8,8 +8,6 @@ export const musicStore = defineStore('music',() => {
     const desc = ref<string>('')
     // 是否原创
     const isOriginal = ref<boolean>(false)
-    // 是否上传新文件
-    const wantUpload = ref<'unew'|'uex'|'unewc'>('uex')
     // 音频文件
     const audioFile = ref<File|null>(null)
     const coverFile = ref<File|null>(null)
@@ -23,7 +21,6 @@ export const musicStore = defineStore('music',() => {
         name,
         desc,
         isOriginal,
-        wantUpload,
         audioFile,
         coverFile,
         audioURL,

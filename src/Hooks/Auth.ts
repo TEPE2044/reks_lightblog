@@ -33,6 +33,7 @@ export const getUserProfile = async () => {
     method: "GET",
     url: "/user/profile",
   });
+  //console.log(res.data)
   return res.data;
 };
 
@@ -55,4 +56,12 @@ export const loginOut = async() => {
     url:"/auth/logout"
   })
   return res
+}
+
+export const checkSafe = async() => {
+  const res = await reapi({
+    method:'GET',
+    url:"/user/safety-level"
+  })
+  return res.data?.level
 }
