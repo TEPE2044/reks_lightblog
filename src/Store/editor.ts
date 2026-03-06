@@ -10,6 +10,8 @@ export const editorStore = defineStore("editor", () => {
   const valueHTML = ref<string>("");
   // 标签
   const pub_tags = ref<string[]>([]);
+  // 音乐id
+  const music_id = ref<number>(0);
 
   // ========== 新增：封面图计算属性 ==========
   const coverImages = computed(() => {
@@ -35,6 +37,7 @@ export const editorStore = defineStore("editor", () => {
     pub_title,
     pub_tags,
     coverImages, 
+    music_id,
     handleCreated,
     handleChange,
   };

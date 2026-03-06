@@ -64,6 +64,11 @@ const router = createRouter({
           name: "upload-music",
           component: () => import("../Widgets/MusicForm.vue"),
         },
+        {
+          path:"mblog",
+          name:'upload-mblog',
+          component:() => import("../Components/MBlog.vue")
+        }
       ],
     },
     {
@@ -102,6 +107,11 @@ const router = createRouter({
           component: () => import("../Components/SafeSetting.vue"),
         },
       ],
+    },
+    {
+      path: "/centre/user/:id",
+      name: "guest-centre",
+      component: () => import("../Pages/Guest.vue"),
     },
     {
       path: "/404",

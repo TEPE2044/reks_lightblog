@@ -33,7 +33,7 @@
 }
 
 .recommand {
-  --recommand-sticky-top: 6.6rem;
+  --recommand-sticky-top: 6.2rem;
 
   border-radius: 12px;
   @extend %reks-card-box;

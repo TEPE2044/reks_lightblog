@@ -196,20 +196,23 @@ const casePlay = (m: MusicResponse) => {
               </div>
             </article>
 
-            <article
+            <RouterLink
               v-if="searchType === 'user'"
-              class="user-box mb-3 d-flex align-items-center"
+              class="user-link"
               v-for="u in userRes"
               :key="`user-${u.reks_id}`"
+              :to="{ name: 'guest-centre', params: { id: u.reks_id } }"
             >
-              <BAvatar :src="u.avatar" size="56" />
-              <div class="user-content ms-3">
-                <div class="user-name fw-bold">{{ u.username }}</div>
-                <div class="user-signature text-secondary">
-                  {{ u.signature || "这个用户很神秘，还没有留下签名。" }}
+              <article class="user-box mb-3 d-flex align-items-center">
+                <BAvatar :src="u.avatar" size="56" />
+                <div class="user-content ms-3">
+                  <div class="user-name fw-bold">{{ u.username }}</div>
+                  <div class="user-signature text-secondary">
+                    {{ u.signature || "这个用户很神秘，还没有留下签名。" }}
+                  </div>
                 </div>
-              </div>
-            </article>
+              </article>
+            </RouterLink>
           </div>
         </BCardBody>
         <BCardFooter>
@@ -388,6 +391,14 @@ const casePlay = (m: MusicResponse) => {
   border-radius: 0.75rem;
   border: 1px solid rgba(220, 220, 220, 0.9);
   background-color: rgba(255, 255, 255, 0.84);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.08);
+  }
 
   .user-name {
     color: #2f2f2f;
@@ -398,6 +409,12 @@ const casePlay = (m: MusicResponse) => {
     font-size: 0.9rem;
     line-height: 1.5;
   }
+}
+
+.user-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
 }
 
 @media (max-width: 768px) {
