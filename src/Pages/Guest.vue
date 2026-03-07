@@ -7,6 +7,7 @@ import { query_music_by_user_id } from "../Hooks/Music";
 import {
 	handleFollow,
 	handleUnFollow,
+	queryFollowStatsByRid,
 	queryFollowingList,
 } from "../Hooks/SubScribe";
 import { query_profile_by_user_id } from "../Hooks/User";
@@ -22,6 +23,7 @@ const activeTab = ref<GuestTab>("blog");
 const subscribed = ref(false);
 const subscribePending = ref(false);
 const guestLoading = ref(false);
+const guestFollowStats = ref<{ followingCount: number; followerCount: number } | null>(null);
 
 const targetUserId = computed(() => Number(route.params.id));
 
@@ -44,6 +46,7 @@ const resetGuestData = () => {
 	guestBlogList.value = [];
 	guestMusicList.value = [];
 	guestFavList.value = [];
+	guestFollowStats.value = null;
 };
 
 const activeCount = computed(() => {
@@ -96,6 +99,12 @@ const loadGuestData = async () => {
 		guestBlogList.value = blogRes?.blogs || [];
 		guestMusicList.value = musicRes || [];
 		guestFavList.value = [];
+
+		try {
+			guestFollowStats.value = await queryFollowStatsByRid(rid);
+		} catch {
+			guestFollowStats.value = null;
+		}
 	} catch {
 		resetGuestData();
 		createToast(toast, "加载失败", "无法获取该用户主页数据", "danger");
@@ -159,6 +168,11 @@ watch(
 				</div>
 			</div>
 
+			<div class="guest-follow-data d-flex align-items-center gap-3 me-3">
+				<span class="follow-meta">关注：{{ guestFollowStats?.followingCount ?? "--" }}</span>
+				<span class="follow-meta">粉丝：{{ guestFollowStats?.followerCount ?? "--" }}</span>
+			</div>
+
 			<div class="guest-actions ms-auto d-flex align-items-center">
 				<BButton
 					variant="outline-secondary"
@@ -203,7 +217,6 @@ watch(
 					收藏
 				</BButton>
 
-				<span class="ms-auto text-secondary small">仅浏览模式，不支持编辑</span>
 			</div>
 
 			<div class="guest-content px-3 pb-3">
@@ -289,6 +302,17 @@ watch(
 		.more-text {
 			font-weight: 700;
 			letter-spacing: 0.08em;
+		}
+
+		.guest-follow-data {
+			padding: 0.45rem 0.7rem;
+			border-radius: 999px;
+			background: rgba(178, 34, 34, 0.08);
+
+			.follow-meta {
+				font-size: 0.84rem;
+				color: #444;
+			}
 		}
 	}
 
