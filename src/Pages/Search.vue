@@ -29,7 +29,7 @@ const toast = useToast();
 const activeListLength = computed(() => {
   if (searchType.value === "music") return musicRes.value.length;
   if (searchType.value === "user") return userRes.value.length;
-  return blogRes.value.filter((item) => !!item.cover && String(item.cover).trim().length > 0).length;
+  return blogRes.value.length;
 });
 
 const empty = computed(
@@ -136,10 +136,11 @@ const casePlay = (m: MusicResponse) => {
             <article
               v-if="searchType === 'keyword'"
               class="blog-grid-card"
-              v-for="i in blogRes.filter((item) => !!item.cover && String(item.cover).trim().length > 0)"
+              :class="{ 'no-cover': !i.cover || String(i.cover).trim().length === 0 }"
+              v-for="i in blogRes"
               :key="`rs${i.id}${i.author.id}`"
             >
-              <div class="cover-wrap">
+              <div class="cover-wrap" v-if="i.cover && String(i.cover).trim().length > 0">
                 <img :src="i.cover" class="cover-img" :alt="`alt${i.cover}`" />
               </div>
               <div class="card-content d-flex flex-column justify-content-between">
@@ -361,6 +362,19 @@ const casePlay = (m: MusicResponse) => {
       margin-top: auto;
       border-top: 1px dashed rgba(180, 180, 180, 0.6);
       padding-top: 0.7rem;
+    }
+  }
+}
+
+.blog-grid-card.no-cover {
+  grid-template-columns: 1fr;
+
+  .card-content {
+    padding: 0.2rem 0.15rem;
+
+    .title-link {
+      font-size: 1.02rem;
+      margin-bottom: 0.9rem;
     }
   }
 }

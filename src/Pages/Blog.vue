@@ -70,7 +70,7 @@ watch(
             </div>
         </aside>
     </div>
-    <div class="blog" v-else>
+    <div class="blog mt-5" v-else>
         <Empty title="不存在该博客"></Empty>
     </div>
 </template>
