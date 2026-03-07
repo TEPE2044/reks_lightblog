@@ -60,6 +60,21 @@ export const query_blog_by_user_id_cursor = async (
   });
   return res.data as BlogCursorResponse;
 };
+
+export const query_my_blog_cursor = async (
+  cursor: number | null,
+  limit = 9,
+) => {
+  const res = await reapi({
+    url: "/blog/my-blog/cursor",
+    method: "POST",
+    data: {
+      cursor,
+      limit,
+    },
+  });
+  return res.data as BlogCursorResponse;
+};
 export const upload_mblog = async (
   title: string,
   content: string,

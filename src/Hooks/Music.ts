@@ -41,6 +41,21 @@ export const query_music_by_user_id_cursor = async (
   return res as MusicCursorResponse;
 };
 
+export const query_my_music_cursor = async (
+  cursor: number | null,
+  limit = 9,
+) => {
+  const { data: res } = await reapi({
+    url: "/music/my-music/cursor",
+    method: "POST",
+    data: {
+      cursor,
+      limit,
+    },
+  });
+  return res as MusicCursorResponse;
+};
+
 export const upload_music = async (form: FormData) => {
   const { data: res } = await reapi({
     url: "/music/upload/audio",

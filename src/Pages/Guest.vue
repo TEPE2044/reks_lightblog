@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useInfiniteScroll } from "@vueuse/core";
+import { useDebounceFn, useInfiniteScroll } from "@vueuse/core";
 import { useToast } from "bootstrap-vue-next";
 import { storeToRefs } from "pinia";
 import { computed, ref, watch } from "vue";
@@ -151,7 +151,7 @@ const loadGuestData = async () => {
 	}
 };
 
-const toggleSubscribe = async () => {
+const doToggleSubscribe = async () => {
 	if (subscribePending.value) return;
 
 	const fid = targetUserId.value;
@@ -180,6 +180,10 @@ const toggleSubscribe = async () => {
 		subscribePending.value = false;
 	}
 };
+
+const toggleSubscribe = useDebounceFn(() => {
+	void doToggleSubscribe();
+}, 300);
 
 watch(
 	() => route.params.id,
