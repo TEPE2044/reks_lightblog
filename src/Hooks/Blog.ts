@@ -1,4 +1,11 @@
 import reapi from "../Requests/reapi";
+import type { BlogData } from "../Utils/reks-interface";
+
+export interface BlogCursorResponse {
+  items: BlogData[];
+  next_cursor: number | null;
+  has_more: boolean;
+}
 
 export const query_my_blog = async () => {
   const res = await reapi({
@@ -36,6 +43,22 @@ export const query_blog_by_user_id = async (rid: number) => {
     method: "GET",
   });
   return res.data;
+};
+
+export const query_blog_by_user_id_cursor = async (
+  rid: number,
+  cursor: number | null,
+  limit = 9,
+) => {
+  const res = await reapi({
+    url: `/blog/user/${rid}/cursor`,
+    method: "POST",
+    data: {
+      cursor,
+      limit,
+    },
+  });
+  return res.data as BlogCursorResponse;
 };
 export const upload_mblog = async (
   title: string,

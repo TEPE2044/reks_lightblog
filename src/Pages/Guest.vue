@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { useInfiniteScroll } from "@vueuse/core";
 import { useToast } from "bootstrap-vue-next";
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { query_blog_by_user_id } from "../Hooks/Blog";
-import { query_music_by_user_id } from "../Hooks/Music";
+import { query_blog_by_user_id_cursor } from "../Hooks/Blog";
+import { query_music_by_user_id_cursor } from "../Hooks/Music";
 import {
 	handleFollow,
 	handleUnFollow,
@@ -15,6 +16,7 @@ import { createToast } from "../Utils/reks-toast";
 import type { BlogData, MusicResponse } from "../Utils/reks-interface";
 
 type GuestTab = "blog" | "music" | "fav";
+const PAGE_LIMIT = 9;
 
 const route = useRoute();
 const toast = useToast();
@@ -24,6 +26,8 @@ const subscribed = ref(false);
 const subscribePending = ref(false);
 const guestLoading = ref(false);
 const guestFollowStats = ref<{ followingCount: number; followerCount: number } | null>(null);
+const blogLoadingMore = ref(false);
+const musicLoadingMore = ref(false);
 
 const targetUserId = computed(() => Number(route.params.id));
 
@@ -36,6 +40,10 @@ const guestProfile = ref({
 const guestBlogList = ref<BlogData[]>([]);
 const guestMusicList = ref<MusicResponse[]>([]);
 const guestFavList = ref<BlogData[]>([]);
+const blogCursor = ref<number | null>(null);
+const musicCursor = ref<number | null>(null);
+const blogHasMore = ref(true);
+const musicHasMore = ref(true);
 
 const resetGuestData = () => {
 	guestProfile.value = {
@@ -47,6 +55,12 @@ const resetGuestData = () => {
 	guestMusicList.value = [];
 	guestFavList.value = [];
 	guestFollowStats.value = null;
+	blogCursor.value = null;
+	musicCursor.value = null;
+	blogHasMore.value = true;
+	musicHasMore.value = true;
+	blogLoadingMore.value = false;
+	musicLoadingMore.value = false;
 };
 
 const activeCount = computed(() => {
@@ -60,6 +74,19 @@ const tabTitle = computed(() => {
 	if (activeTab.value === "fav") return "TA 的收藏";
 	return "TA 的博客";
 });
+
+const isLoadingMore = computed(() => {
+	if (activeTab.value === "music") return musicLoadingMore.value;
+	if (activeTab.value === "blog") return blogLoadingMore.value;
+	return false;
+});
+
+const switchTab = (tab: GuestTab) => {
+	activeTab.value = tab;
+	if (!guestLoading.value) {
+		void loadActiveTabFirstPage();
+	}
+};
 
 const syncSubscribeState = async () => {
 	const fid = targetUserId.value;
@@ -76,6 +103,53 @@ const syncSubscribeState = async () => {
 	}
 };
 
+const loadMoreBlog = async () => {
+	if (blogLoadingMore.value || !blogHasMore.value) return;
+	const rid = targetUserId.value;
+	if (!Number.isInteger(rid) || rid <= 0) return;
+
+	blogLoadingMore.value = true;
+	try {
+		const page = await query_blog_by_user_id_cursor(rid, blogCursor.value, PAGE_LIMIT);
+		guestBlogList.value = [...guestBlogList.value, ...(page.items || [])];
+		blogCursor.value = page.next_cursor;
+		blogHasMore.value = !!page.has_more;
+	} finally {
+		blogLoadingMore.value = false;
+	}
+};
+
+const loadMoreMusic = async () => {
+	if (musicLoadingMore.value || !musicHasMore.value) return;
+	const rid = targetUserId.value;
+	if (!Number.isInteger(rid) || rid <= 0) return;
+
+	musicLoadingMore.value = true;
+	try {
+		const page = await query_music_by_user_id_cursor(rid, musicCursor.value, PAGE_LIMIT);
+		guestMusicList.value = [...guestMusicList.value, ...(page.items || [])];
+		musicCursor.value = page.next_cursor;
+		musicHasMore.value = !!page.has_more;
+	} finally {
+		musicLoadingMore.value = false;
+	}
+};
+
+const loadActiveTabFirstPage = async () => {
+	if (activeTab.value === "blog") {
+		if (guestBlogList.value.length === 0 && blogHasMore.value) {
+			await loadMoreBlog();
+		}
+		return;
+	}
+
+	if (activeTab.value === "music") {
+		if (guestMusicList.value.length === 0 && musicHasMore.value) {
+			await loadMoreMusic();
+		}
+	}
+};
+
 const loadGuestData = async () => {
 	const rid = targetUserId.value;
 	if (!Number.isInteger(rid) || rid <= 0) {
@@ -83,12 +157,12 @@ const loadGuestData = async () => {
 		return;
 	}
 
+	resetGuestData();
 	guestLoading.value = true;
 	try {
-		const [profileRes, blogRes, musicRes] = await Promise.all([
+		const [profileRes] = await Promise.all([
 			query_profile_by_user_id(rid),
-			query_blog_by_user_id(rid),
-			query_music_by_user_id(rid),
+			loadActiveTabFirstPage(),
 		]);
 
 		guestProfile.value = {
@@ -96,20 +170,18 @@ const loadGuestData = async () => {
 			sign: profileRes?.sign || "这个用户很神秘，还没有留下签名。",
 			avatar: profileRes?.avatar || "",
 		};
-		guestBlogList.value = blogRes?.blogs || [];
-		guestMusicList.value = musicRes || [];
-		guestFavList.value = [];
-
+	} catch {
+		createToast(toast, "加载失败", "无法获取该用户主页数据", "danger");
+	} finally {
 		try {
 			guestFollowStats.value = await queryFollowStatsByRid(rid);
 		} catch {
 			guestFollowStats.value = null;
 		}
-	} catch {
-		resetGuestData();
-		createToast(toast, "加载失败", "无法获取该用户主页数据", "danger");
-	} finally {
+
 		guestLoading.value = false;
+		// 兜底：首屏初始化阶段若因时序没有拿到数据，结束后再尝试拉取一页。
+		void loadActiveTabFirstPage();
 	}
 };
 
@@ -150,6 +222,40 @@ watch(
 		void syncSubscribeState();
 	},
 	{ immediate: true },
+);
+
+watch(
+	activeTab,
+	() => {
+		if (guestLoading.value) return;
+		void loadActiveTabFirstPage();
+	},
+);
+
+useInfiniteScroll(
+	window,
+	() => {
+		if (activeTab.value === "blog") {
+			void loadMoreBlog();
+			return;
+		}
+		if (activeTab.value === "music") {
+			void loadMoreMusic();
+		}
+	},
+	{
+		distance: 10,
+		canLoadMore: () => {
+			if (guestLoading.value) return false;
+			if (activeTab.value === "blog") {
+				return blogHasMore.value && !blogLoadingMore.value;
+			}
+			if (activeTab.value === "music") {
+				return musicHasMore.value && !musicLoadingMore.value;
+			}
+			return false;
+		},
+	},
 );
 </script>
 
@@ -198,21 +304,21 @@ watch(
 				<BButton
 					:variant="activeTab === 'blog' ? 'danger' : 'outline-secondary'"
 					size="sm"
-					@click="activeTab = 'blog'"
+					@click="switchTab('blog')"
 				>
 					博客
 				</BButton>
 				<BButton
 					:variant="activeTab === 'music' ? 'danger' : 'outline-secondary'"
 					size="sm"
-					@click="activeTab = 'music'"
+					@click="switchTab('music')"
 				>
 					音乐
 				</BButton>
 				<BButton
 					:variant="activeTab === 'fav' ? 'danger' : 'outline-secondary'"
 					size="sm"
-					@click="activeTab = 'fav'"
+					@click="switchTab('fav')"
 				>
 					收藏
 				</BButton>
@@ -257,6 +363,10 @@ watch(
 
 				<div v-else class="py-4">
 					<Empty title="收藏模块暂未开放" />
+				</div>
+
+				<div v-if="isLoadingMore" class="load-more-tip py-3 text-center text-secondary">
+					加载中...
 				</div>
 			</div>
 		</BContainer>
@@ -371,6 +481,10 @@ watch(
 			max-width: none !important;
 			min-width: 0 !important;
 			width: 100% !important;
+		}
+
+		.load-more-tip {
+			font-size: 0.9rem;
 		}
 	}
 }
