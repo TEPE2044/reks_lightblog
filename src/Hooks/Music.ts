@@ -10,6 +10,14 @@ export const query_my_music = async () => {
   return res;
 };
 
+export const query_music_by_user_id = async (rid: number) => {
+  const { data: res } = await reapi({
+    url: `/music/user/${rid}`,
+    method: "GET",
+  });
+  return res;
+};
+
 export const upload_music = async (form: FormData) => {
   const { data: res } = await reapi({
     url: "/music/upload/audio",

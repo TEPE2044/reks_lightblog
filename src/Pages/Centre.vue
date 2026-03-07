@@ -10,13 +10,10 @@ const navs = [
   { name: "账号安全", path: { name: "safe-setting" } },
 ];
 
-const handleSubscribe = () => {
-
-}
 //TODO:
 // 1.缺少关注列表（/centre/followList）
 // 2.缺少路由查看别人的中心（另开子路由 /centre/user/1）
-// 3.缺少关注样式
+// 3.缺少关注样式  
 </script>
 
 <template>
@@ -41,14 +38,14 @@ const handleSubscribe = () => {
           </div>
         </div>
       </div>
-      <div class="btns" title="个人主页不出现这些，没用">
+      <!-- <div class="btns" title="个人主页不出现这些，没用">
         <BButton @click="handleSubscribe" variant="outline-secondary" class="mx-2">关注</BButton>
         <BDropdown offset="10" no-wrapper no-caret>
           <template #button-content>...</template>
           <BButton variant="outline-secondary" class="mx-2">私信</BButton>
           <BButton variant="outline-secondary" class="mx-2">举报</BButton>
         </BDropdown>
-      </div>
+      </div> -->
     </BContainer>
 
     <BContainer class="centre-body mt-5 h-100">

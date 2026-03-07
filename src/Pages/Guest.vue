@@ -1,179 +1,55 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { userStore } from "../Store/user";
+import { useToast } from "bootstrap-vue-next";
+import { computed, ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import { query_blog_by_user_id } from "../Hooks/Blog";
+import { query_music_by_user_id } from "../Hooks/Music";
+import {
+	handleFollow,
+	handleUnFollow,
+	queryFollowingList,
+} from "../Hooks/SubScribe";
+import { query_profile_by_user_id } from "../Hooks/User";
+import { createToast } from "../Utils/reks-toast";
 import type { BlogData, MusicResponse } from "../Utils/reks-interface";
 
 type GuestTab = "blog" | "music" | "fav";
 
-const user = userStore();
+const route = useRoute();
+const toast = useToast();
 
 const activeTab = ref<GuestTab>("blog");
 const subscribed = ref(false);
+const subscribePending = ref(false);
+const guestLoading = ref(false);
 
-const guestProfile = computed(() => ({
-	username: user.userInfo?.username || "访客用户",
-	sign: user.userInfo?.sign || "这个用户很神秘，还没有留下签名。",
-	avatar: user.userInfo?.avatar || "",
-}));
+const targetUserId = computed(() => Number(route.params.id));
 
-const mockBlogList: BlogData[] = [
-	{
-		id: 1,
-		title: "初春杂谈",
-		cover: [
-			"https://picsum.photos/seed/guest-blog-1-a/640/420",
-			"https://picsum.photos/seed/guest-blog-1-b/640/420",
-			"https://picsum.photos/seed/guest-blog-1-c/640/420",
-		],
-		created_at: new Date("2026-03-01T08:00:00"),
-		type: 1,
-	},
-	{
-		id: 2,
-		title: "学习路线整理",
-		cover: [
-			"https://picsum.photos/seed/guest-blog-2-a/640/420",
-			"https://picsum.photos/seed/guest-blog-2-b/640/420",
-		],
-		created_at: new Date("2026-02-28T10:30:00"),
-		type: 1,
-	},
-	{
-		id: 3,
-		title: "工作流小优化",
-		cover: ["https://picsum.photos/seed/guest-blog-3-a/640/420"],
-		created_at: new Date("2026-02-26T14:10:00"),
-		type: 1,
-	},
-	{
-		id: 4,
-		title: "周末片段",
-		cover: [
-			"https://picsum.photos/seed/guest-blog-4-a/640/420",
-			"https://picsum.photos/seed/guest-blog-4-b/640/420",
-		],
-		created_at: new Date("2026-02-21T19:20:00"),
-		type: 1,
-	},
-	{
-		id: 5,
-		title: "对比实验记录",
-		cover: [
-			"https://picsum.photos/seed/guest-blog-5-a/640/420",
-			"https://picsum.photos/seed/guest-blog-5-b/640/420",
-			"https://picsum.photos/seed/guest-blog-5-c/640/420",
-		],
-		created_at: new Date("2026-02-18T09:00:00"),
-		type: 0,
-	},
-	{
-		id: 6,
-		title: "本月收藏分享",
-		cover: ["https://picsum.photos/seed/guest-blog-6-a/640/420"],
-		created_at: new Date("2026-02-15T16:45:00"),
-		type: 1,
-	},
-];
+const guestProfile = ref({
+	username: "访客用户",
+	sign: "这个用户很神秘，还没有留下签名。",
+	avatar: "",
+});
 
-const mockMusicList: MusicResponse[] = [
-	{
-		id: 101,
-		name: "夜航",
-		desc: "轻电子风格，适合深夜写代码时循环。",
-		cover: "https://picsum.photos/seed/guest-music-1/640/420",
-		audio: "",
-		created_at: new Date("2026-02-20T23:10:00"),
-		original: true,
-		rid: 201,
-		state: 1,
-		username: "Harbor",
-		avatar: "https://picsum.photos/seed/guest-avatar-1/120/120",
-	},
-	{
-		id: 102,
-		name: "晨雾",
-		desc: "钢琴与弦乐的短篇即兴。",
-		cover: "https://picsum.photos/seed/guest-music-2/640/420",
-		audio: "",
-		created_at: new Date("2026-02-17T07:30:00"),
-		original: true,
-		rid: 202,
-		state: 1,
-		username: "Frost",
-		avatar: "https://picsum.photos/seed/guest-avatar-2/120/120",
-	},
-	{
-		id: 103,
-		name: "火花",
-		desc: "偏实验向的鼓点和合成器编排。",
-		cover: "https://picsum.photos/seed/guest-music-3/640/420",
-		audio: "",
-		created_at: new Date("2026-02-11T12:15:00"),
-		original: false,
-		rid: 203,
-		state: 1,
-		username: "Lumen",
-		avatar: "https://picsum.photos/seed/guest-avatar-3/120/120",
-	},
-	{
-		id: 104,
-		name: "无题",
-		desc: "四分钟的人声采样混剪。",
-		cover: "https://picsum.photos/seed/guest-music-4/640/420",
-		audio: "",
-		created_at: new Date("2026-02-09T18:50:00"),
-		original: false,
-		rid: 204,
-		state: 1,
-		username: "Miro",
-		avatar: "https://picsum.photos/seed/guest-avatar-4/120/120",
-	},
-    
-    
-];
+const guestBlogList = ref<BlogData[]>([]);
+const guestMusicList = ref<MusicResponse[]>([]);
+const guestFavList = ref<BlogData[]>([]);
 
-const mockFavList: BlogData[] = [
-	{
-		id: 201,
-		title: "设计系统入门",
-		cover: ["https://picsum.photos/seed/guest-fav-1/640/420"],
-		created_at: new Date("2026-02-05T11:00:00"),
-		type: 1,
-	},
-	{
-		id: 202,
-		title: "编曲流程笔记",
-		cover: [
-			"https://picsum.photos/seed/guest-fav-2-a/640/420",
-			"https://picsum.photos/seed/guest-fav-2-b/640/420",
-		],
-		created_at: new Date("2026-02-03T14:32:00"),
-		type: 0,
-	},
-	{
-		id: 203,
-		title: "性能排查清单",
-		cover: ["https://picsum.photos/seed/guest-fav-3/640/420"],
-		created_at: new Date("2026-01-30T21:20:00"),
-		type: 1,
-	},
-	{
-		id: 204,
-		title: "交互微动效示例",
-		cover: [
-			"https://picsum.photos/seed/guest-fav-4-a/640/420",
-			"https://picsum.photos/seed/guest-fav-4-b/640/420",
-			"https://picsum.photos/seed/guest-fav-4-c/640/420",
-		],
-		created_at: new Date("2026-01-26T09:10:00"),
-		type: 1,
-	},
-];
+const resetGuestData = () => {
+	guestProfile.value = {
+		username: "访客用户",
+		sign: "这个用户很神秘，还没有留下签名。",
+		avatar: "",
+	};
+	guestBlogList.value = [];
+	guestMusicList.value = [];
+	guestFavList.value = [];
+};
 
 const activeCount = computed(() => {
-	if (activeTab.value === "music") return mockMusicList.length;
-	if (activeTab.value === "fav") return mockFavList.length;
-	return mockBlogList.length;
+	if (activeTab.value === "music") return guestMusicList.value.length;
+	if (activeTab.value === "fav") return guestFavList.value.length;
+	return guestBlogList.value.length;
 });
 
 const tabTitle = computed(() => {
@@ -182,9 +58,90 @@ const tabTitle = computed(() => {
 	return "TA 的博客";
 });
 
-const toggleSubscribe = () => {
-	subscribed.value = !subscribed.value;
+const syncSubscribeState = async () => {
+	const fid = targetUserId.value;
+	if (!Number.isInteger(fid) || fid <= 0) {
+		subscribed.value = false;
+		return;
+	}
+
+	try {
+		const list = await queryFollowingList();
+		subscribed.value = list.some((item) => item.rid === fid);
+	} catch {
+		subscribed.value = false;
+	}
 };
+
+const loadGuestData = async () => {
+	const rid = targetUserId.value;
+	if (!Number.isInteger(rid) || rid <= 0) {
+		resetGuestData();
+		return;
+	}
+
+	guestLoading.value = true;
+	try {
+		const [profileRes, blogRes, musicRes] = await Promise.all([
+			query_profile_by_user_id(rid),
+			query_blog_by_user_id(rid),
+			query_music_by_user_id(rid),
+		]);
+
+		guestProfile.value = {
+			username: profileRes?.username || "访客用户",
+			sign: profileRes?.sign || "这个用户很神秘，还没有留下签名。",
+			avatar: profileRes?.avatar || "",
+		};
+		guestBlogList.value = blogRes?.blogs || [];
+		guestMusicList.value = musicRes || [];
+		guestFavList.value = [];
+	} catch {
+		resetGuestData();
+		createToast(toast, "加载失败", "无法获取该用户主页数据", "danger");
+	} finally {
+		guestLoading.value = false;
+	}
+};
+
+const toggleSubscribe = async () => {
+	if (subscribePending.value) return;
+
+	const fid = targetUserId.value;
+	if (!Number.isInteger(fid) || fid <= 0) {
+		createToast(toast, "关注失败", "无效的用户 ID", "danger");
+		return;
+	}
+
+	subscribePending.value = true;
+	try {
+		const actionRes = subscribed.value
+			? await handleUnFollow(fid)
+			: await handleFollow(fid);
+
+		if (actionRes.status === 200) {
+			subscribed.value = !subscribed.value;
+			createToast(toast, "操作成功", actionRes.msg, "success");
+			return;
+		}
+
+		createToast(toast, "操作失败", actionRes.msg || "请稍后重试", "danger");
+		await syncSubscribeState();
+	} catch {
+		createToast(toast, "操作失败", "网络错误，请稍后重试", "danger");
+	} finally {
+		subscribePending.value = false;
+	}
+};
+
+watch(
+	() => route.params.id,
+	() => {
+		void loadGuestData();
+		void syncSubscribeState();
+	},
+	{ immediate: true },
+);
 </script>
 
 <template>
@@ -193,7 +150,7 @@ const toggleSubscribe = () => {
 			<div class="d-flex align-items-center gap-3 guest-base-info">
 				<BAvatar
 					size="82px"
-					:src="guestProfile.avatar"
+					:src="guestProfile.avatar || ''"
 					style="box-shadow: rgba(0, 0, 0, 0.15) 2px 4px 10px"
 				/>
 				<div class="guest-text">
@@ -206,6 +163,7 @@ const toggleSubscribe = () => {
 				<BButton
 					variant="outline-secondary"
 					class="me-2"
+					:disabled="subscribePending"
 					@click="toggleSubscribe"
 				>
 					{{ subscribed ? "已关注" : "关注" }}
@@ -254,34 +212,38 @@ const toggleSubscribe = () => {
 					<span class="badge-count">{{ activeCount }} 条</span>
 				</div>
 
-				<div class="waterfall-box" v-if="activeTab === 'blog'">
+				<div v-if="guestLoading" class="py-4">
+					<Empty title="主页加载中..." />
+				</div>
+
+				<div class="waterfall-box" v-else-if="activeTab === 'blog' && guestBlogList.length > 0">
 					<div
 						class="waterfall-item"
-						v-for="item in mockBlogList"
+						v-for="item in guestBlogList"
 						:key="`guest-blog-${item.id}`"
 					>
 						<BlogCard :blog="item" />
 					</div>
 				</div>
+				<div v-else-if="activeTab === 'blog'" class="py-4">
+					<Empty title="TA 还没有发布博客" />
+				</div>
 
-				<div class="music-grid-box" v-else-if="activeTab === 'music'">
+				<div class="music-grid-box" v-else-if="activeTab === 'music' && guestMusicList.length > 0">
 					<div
 						class="music-grid-item music-item"
-						v-for="item in mockMusicList"
+						v-for="item in guestMusicList"
 						:key="`guest-music-${item.id}`"
 					>
 						<MusicCase :music="item" />
 					</div>
 				</div>
+				<div v-else-if="activeTab === 'music'" class="py-4">
+					<Empty title="TA 还没有发布音乐" />
+				</div>
 
-				<div class="waterfall-box" v-else>
-					<div
-						class="waterfall-item"
-						v-for="item in mockFavList"
-						:key="`guest-fav-${item.id}`"
-					>
-						<BlogCard :blog="item" />
-					</div>
+				<div v-else class="py-4">
+					<Empty title="收藏模块暂未开放" />
 				</div>
 			</div>
 		</BContainer>
