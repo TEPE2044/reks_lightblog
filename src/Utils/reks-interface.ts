@@ -58,6 +58,16 @@ export interface BlogData {
   title: string;
   created_at: Date;
   type: number;
+  music?: BlogMusicMeta | null;
+}
+
+export interface BlogMusicMeta {
+  id: number;
+  name: string;
+  cover: string;
+  audio: string;
+  username: string;
+  avatar: string;
 }
 
 export interface MusicTwice {

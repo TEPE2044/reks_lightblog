@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useToast } from "bootstrap-vue-next";
+import { storeToRefs } from "pinia";
 import type { BlogData } from "../Utils/reks-interface";
 import router from "../Router";
+import { playerStore } from "../Store/player";
+import { detailStore } from "../Store/detail";
+import { createToast } from "../Utils/reks-toast";
 
 
 // type 0是音乐博客，1普通博客
@@ -9,6 +14,10 @@ const blogProps = defineProps<{ blog: BlogData}>();
 const b = blogProps.blog;
 // Record<number, boolean> 用于跟踪每张图片的加载状态，键是图片索引，值是布尔值表示是否加载完成
 const imgLoaded = ref<Record<number, boolean>>({});
+const toast = useToast();
+const { addIntoPlayQueue, selectOutSide } = playerStore();
+const { playQueueLength, currentIndex } = storeToRefs(playerStore());
+const { get_detail } = detailStore();
 
 const readBlog = async (id: number) => {
   try {
@@ -18,6 +27,64 @@ const readBlog = async (id: number) => {
   } catch (e) {
     // 忽略导航失败（例如重复导航）
     console.warn("导航到博客页失败:", e);
+  }
+};
+
+const caseAdd = () => {
+  if (!b.music?.audio) {
+    createToast(toast, "添加失败", "当前音乐缺少音频链接", "danger");
+    return;
+  }
+
+  if (playQueueLength.value === 0) {
+    get_detail({
+      title: b.music.name,
+      author: b.music.username,
+      cover: b.music.cover,
+    });
+  }
+
+  const res = addIntoPlayQueue(
+    {
+      cover: b.music.cover,
+      songURL: b.music.audio,
+      title: b.music.name,
+      author: b.music.username,
+    },
+    currentIndex.value,
+  );
+
+  if (res) {
+    createToast(toast, "添加成功", "歌曲添加成功", "success");
+  } else {
+    createToast(toast, "重复添加", "歌曲重复添加", "success");
+  }
+};
+
+const casePlay = () => {
+  if (!b.music?.audio) {
+    createToast(toast, "播放失败", "当前音乐缺少音频链接", "danger");
+    return;
+  }
+
+  try {
+    selectOutSide({
+      cover: b.music.cover,
+      songURL: b.music.audio,
+      title: b.music.name,
+      author: b.music.username,
+    });
+
+    get_detail({
+      title: b.music.name,
+      author: b.music.username,
+      cover: b.music.cover,
+    });
+
+    createToast(toast, "播放成功", `正在播放 ${b.music.username} - ${b.music.name}`, "success");
+  } catch (e) {
+    createToast(toast, "播放失败", "未知原因", "danger");
+    console.error(e);
   }
 };
 
@@ -45,7 +112,7 @@ const readBlog = async (id: number) => {
             overflow: hidden;
             cursor: pointer;
           ">
-          <img src="/ai.webp" style="width: 100%; height: 100%; object-fit: cover" alt="album" />
+          <img :src="b.music?.cover || '/ai.webp'" style="width: 100%; height: 100%; object-fit: cover" alt="album" />
           <!-- 播放按钮 -->
           <div class="play-btn" style="
               position: absolute;
@@ -56,7 +123,7 @@ const readBlog = async (id: number) => {
               justify-content: center;
               opacity: 0;
               transition: opacity 0.2s;
-            ">
+            " @click.stop="casePlay">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff">
               <path d="M8 5v14l11-7z" />
             </svg>
@@ -66,10 +133,18 @@ const readBlog = async (id: number) => {
         <!-- 右侧歌曲信息 -->
         <div style="margin-left: 12px; flex: 1">
           <div style="font-size: 15px; font-weight: 600; color: #111">
-            ReKindlers
+            {{ b.music?.name || "未绑定音乐" }}
           </div>
-          <div style="font-size: 13px; color: #666; margin-top: 4px">
-            Since 2024 · 3:42
+          <div style="font-size: 13px; color: #666; margin-top: 4px; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+            <span>{{ b.music?.username || "未知作者" }}</span>
+            <div style="display: inline-flex; gap: 6px">
+              <BButton size="sm" variant="light" @click.stop="casePlay">
+                <i-bi-play-circle-fill class="fs-5" />
+              </BButton>
+              <BButton size="sm" variant="light" @click.stop="caseAdd">
+                <i-bi-plus-circle class="fs-6" />
+              </BButton>
+            </div>
           </div>
         </div>
       </div>
