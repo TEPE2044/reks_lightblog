@@ -608,6 +608,51 @@ onUnmounted(() => {
       align-items: center;
       justify-content: center;
 
+      // 把波纹挂在 turntable，避免被 disc 的 overflow:hidden 裁切
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        // 跟随唱片尺寸，而不是父容器尺寸，避免外圈过大
+        width: min(97%, 372px);
+        aspect-ratio: 1 / 1;
+        border-radius: 50%;
+        transform: translate(-50%, -50%) scale(0.98);
+        pointer-events: none;
+        z-index: 1;
+        opacity: 0;
+        transition: opacity 1.1s ease, transform 1.1s ease, box-shadow 1.1s ease;
+      }
+
+      &::before {
+        border: 2px solid rgba(23, 71, 145, 0.38);
+        box-shadow:
+          0 0 0 0 rgba(23, 71, 145, 0.3),
+          0 0 16px rgba(23, 71, 145, 0.18);
+      }
+
+      &::after {
+        width: min(97%, 382px);
+        border: 1px solid rgba(23, 71, 145, 0.3);
+        box-shadow:
+          0 0 0 0 rgba(23, 71, 145, 0.2),
+          0 0 16px rgba(23, 71, 145, 0.12);
+      }
+
+      &.playing::before {
+        opacity: 0.7;
+        transform: translate(-50%, -50%) scale(1);
+        animation: tide-wave-inner 2.6s ease-in-out infinite;
+      }
+
+      &.playing::after {
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(1.015);
+        animation: tide-wave-outer 3.4s ease-in-out infinite;
+      }
+
   
 
       .disc {
@@ -636,7 +681,49 @@ onUnmounted(() => {
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    .cover { height: 260px; .turntable { .disc { max-width: 300px; } } }
+    .cover { height: 200px; .turntable { .disc { max-width: 200px; } } }
+  }
+}
+
+@keyframes tide-wave-inner {
+  0% {
+    transform: translate(-50%, -50%) scale(0.98);
+    box-shadow:
+      0 0 0 0 rgba(23, 71, 145, 0.28),
+      0 0 12px rgba(23, 71, 145, 0.16);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.02);
+    box-shadow:
+      0 0 0 3px rgba(23, 71, 145, 0.1),
+      0 0 16px rgba(23, 71, 145, 0.2);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.98);
+    box-shadow:
+      0 0 0 0 rgba(23, 71, 145, 0.28),
+      0 0 12px rgba(23, 71, 145, 0.1);
+  }
+}
+
+@keyframes tide-wave-outer {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow:
+      0 0 0 0 rgba(23, 71, 145, 0.2),
+      0 0 12px rgba(23, 71, 145, 0.1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.03);
+    box-shadow:
+      0 0 0 4px rgba(23, 71, 145, 0.06),
+      0 0 18px rgba(23, 71, 145, 0.16);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow:
+      0 0 0 0 rgba(23, 71, 145, 0.2),
+      0 0 12px rgba(23, 71, 145, 0.1);
   }
 }
 
