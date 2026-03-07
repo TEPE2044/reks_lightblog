@@ -1,33 +1,40 @@
 <script setup lang="ts">
 import { useInfiniteScroll } from "@vueuse/core";
 import { useToast } from "bootstrap-vue-next";
+import { storeToRefs } from "pinia";
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { query_blog_by_user_id_cursor } from "../Hooks/Blog";
-import { query_music_by_user_id_cursor } from "../Hooks/Music";
 import {
 	handleFollow,
 	handleUnFollow,
 	queryFollowStatsByRid,
 	queryFollowingList,
 } from "../Hooks/SubScribe";
+import { guestFeedStore } from "../Store/guestFeed";
 import { query_profile_by_user_id } from "../Hooks/User";
 import { createToast } from "../Utils/reks-toast";
-import type { BlogData, MusicResponse } from "../Utils/reks-interface";
+import type { BlogData } from "../Utils/reks-interface";
 
 type GuestTab = "blog" | "music" | "fav";
 const PAGE_LIMIT = 9;
 
 const route = useRoute();
 const toast = useToast();
+const feed = guestFeedStore();
+const {
+	blogList: guestBlogList,
+	musicList: guestMusicList,
+	blogHasMore,
+	musicHasMore,
+	blogLoadingMore,
+	musicLoadingMore,
+} = storeToRefs(feed);
 
 const activeTab = ref<GuestTab>("blog");
 const subscribed = ref(false);
 const subscribePending = ref(false);
 const guestLoading = ref(false);
 const guestFollowStats = ref<{ followingCount: number; followerCount: number } | null>(null);
-const blogLoadingMore = ref(false);
-const musicLoadingMore = ref(false);
 
 const targetUserId = computed(() => Number(route.params.id));
 
@@ -37,13 +44,7 @@ const guestProfile = ref({
 	avatar: "",
 });
 
-const guestBlogList = ref<BlogData[]>([]);
-const guestMusicList = ref<MusicResponse[]>([]);
 const guestFavList = ref<BlogData[]>([]);
-const blogCursor = ref<number | null>(null);
-const musicCursor = ref<number | null>(null);
-const blogHasMore = ref(true);
-const musicHasMore = ref(true);
 
 const resetGuestData = () => {
 	guestProfile.value = {
@@ -51,16 +52,9 @@ const resetGuestData = () => {
 		sign: "这个用户很神秘，还没有留下签名。",
 		avatar: "",
 	};
-	guestBlogList.value = [];
-	guestMusicList.value = [];
+	feed.resetFeed();
 	guestFavList.value = [];
 	guestFollowStats.value = null;
-	blogCursor.value = null;
-	musicCursor.value = null;
-	blogHasMore.value = true;
-	musicHasMore.value = true;
-	blogLoadingMore.value = false;
-	musicLoadingMore.value = false;
 };
 
 const activeCount = computed(() => {
@@ -104,50 +98,21 @@ const syncSubscribeState = async () => {
 };
 
 const loadMoreBlog = async () => {
-	if (blogLoadingMore.value || !blogHasMore.value) return;
 	const rid = targetUserId.value;
 	if (!Number.isInteger(rid) || rid <= 0) return;
-
-	blogLoadingMore.value = true;
-	try {
-		const page = await query_blog_by_user_id_cursor(rid, blogCursor.value, PAGE_LIMIT);
-		guestBlogList.value = [...guestBlogList.value, ...(page.items || [])];
-		blogCursor.value = page.next_cursor;
-		blogHasMore.value = !!page.has_more;
-	} finally {
-		blogLoadingMore.value = false;
-	}
+	await feed.loadMoreBlog(rid, PAGE_LIMIT);
 };
 
 const loadMoreMusic = async () => {
-	if (musicLoadingMore.value || !musicHasMore.value) return;
 	const rid = targetUserId.value;
 	if (!Number.isInteger(rid) || rid <= 0) return;
-
-	musicLoadingMore.value = true;
-	try {
-		const page = await query_music_by_user_id_cursor(rid, musicCursor.value, PAGE_LIMIT);
-		guestMusicList.value = [...guestMusicList.value, ...(page.items || [])];
-		musicCursor.value = page.next_cursor;
-		musicHasMore.value = !!page.has_more;
-	} finally {
-		musicLoadingMore.value = false;
-	}
+	await feed.loadMoreMusic(rid, PAGE_LIMIT);
 };
 
 const loadActiveTabFirstPage = async () => {
-	if (activeTab.value === "blog") {
-		if (guestBlogList.value.length === 0 && blogHasMore.value) {
-			await loadMoreBlog();
-		}
-		return;
-	}
-
-	if (activeTab.value === "music") {
-		if (guestMusicList.value.length === 0 && musicHasMore.value) {
-			await loadMoreMusic();
-		}
-	}
+	const rid = targetUserId.value;
+	if (!Number.isInteger(rid) || rid <= 0) return;
+	await feed.ensureFirstPage(activeTab.value, rid, PAGE_LIMIT);
 };
 
 const loadGuestData = async () => {
@@ -160,6 +125,7 @@ const loadGuestData = async () => {
 	resetGuestData();
 	guestLoading.value = true;
 	try {
+		feed.initUserFeed(rid);
 		const [profileRes] = await Promise.all([
 			query_profile_by_user_id(rid),
 			loadActiveTabFirstPage(),
