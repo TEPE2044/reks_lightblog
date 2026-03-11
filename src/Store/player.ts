@@ -44,7 +44,7 @@ export const playerStore = defineStore("player", () => {
     let isExisted = playQueue.value.some(
       (song) => song.songURL === data.songURL
     );
-    console.log(isExisted);
+    console.log(`列表是否存在这首歌？ ${isExisted}`);
     if (isExisted === false) {
       if (playQueueLength.value === 0) {
         playQueue.value.push(data);
@@ -66,7 +66,13 @@ export const playerStore = defineStore("player", () => {
   const removeFromPlayQueue = (idx: number) => {
     // 如果删除的是当前播放的歌曲，播放下一首
     // 如果删除的是最后一首，并且是当前播放的歌曲，播放前一首
+    console.warn(idx);
+    console.error(currentIndex.value);
+
     if (idx === currentIndex.value) {
+      console.log(`1长度为${playQueueLength.value}`);
+      console.log(playQueue.value);
+
       currentIndex.value = currentIndex.value + 1;
       if (currentIndex.value === playQueueLength.value - 1) {
         currentIndex.value = currentIndex.value - 1;
@@ -75,11 +81,22 @@ export const playerStore = defineStore("player", () => {
     playQueue.value = playQueue.value.filter(
       (song) => song !== playQueue.value[idx]
     );
-    console.log(playQueue.value);
+    if (playQueueLength.value === 0) {
+      player?.pause();
+      duration.value = "00:00";
+      currentTime.value = "00:00";
+      progress.value = 0;
+      currentIndex.value = 0
+      player?.unload();
+    }
+    console.log(`2长度为${playQueueLength.value}`);
   };
   // 删除全部
   const removeAll = () => {
     playQueue.value = [];
+    player?.pause();
+    player?.unload();
+    currentIndex.value = 0
     console.log(playQueue.value);
   };
 
@@ -180,9 +197,9 @@ export const playerStore = defineStore("player", () => {
 
   // 上一首
   const frontSong = () => {
-    if(currentIndex.value === 0){
-      currentIndex.value = playQueueLength.value - 1 
-    }else{
+    if (currentIndex.value === 0) {
+      currentIndex.value = playQueueLength.value - 1;
+    } else {
       currentIndex.value = (currentIndex.value - 1) % playQueueLength.value;
     }
     switchSong();
@@ -198,8 +215,8 @@ export const playerStore = defineStore("player", () => {
     currentTime.value = "00:00";
     progress.value = 0;
 
-    console.log("----3")
-    console.log(currentIndex.value)
+    console.log("----3");
+    console.log(currentIndex.value);
   };
 
   //TODO:点击播放分成两种
@@ -212,8 +229,13 @@ export const playerStore = defineStore("player", () => {
 
   // 第二种需要先判断当前播放列表里有没有这首歌，没有就添加，有就获取索引，然后播放
   const selectOutSide = (data: QueueItem) => {
+    console.log(`当前位置${currentIndex.value}`)
     const is_add = addIntoPlayQueue(data, currentIndex.value);
+    console.log(`存在${is_add}`);
     if (is_add === true) {
+      if (playQueueLength.value > 1) {
+        currentIndex.value = playQueue.value.indexOf(data);
+      }
       switchSong();
     }
   };
