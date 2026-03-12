@@ -1,10 +1,15 @@
 import reapi from "../Requests/reapi";
-import type { BlogData } from "../Utils/reks-interface";
+import type { BlogData, HotBlogItem } from "../Utils/reks-interface";
 
 export interface BlogCursorResponse {
   items: BlogData[];
   next_cursor: number | null;
   has_more: boolean;
+}
+
+export interface HotBlogResponse {
+  msg: string;
+  blogs: HotBlogItem[];
 }
 
 export const query_my_blog = async () => {
@@ -16,6 +21,17 @@ export const query_my_blog = async () => {
     },
   });
   return res.data;
+};
+
+export const query_hot_blog = async (limit = 10) => {
+  const res = await reapi({
+    url: "/blog/hot",
+    method: "GET",
+    params: {
+      limit,
+    },
+  });
+  return res.data as HotBlogResponse;
 };
 
 export const query_my_draft = async () => {

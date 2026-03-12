@@ -62,6 +62,10 @@ export interface BlogData {
   music?: BlogMusicMeta | null;
 }
 
+export interface HotBlogItem extends BlogData {
+  like_count: number;
+}
+
 export interface BlogMusicMeta {
   id: number;
   name: string;
