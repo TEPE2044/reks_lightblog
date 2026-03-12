@@ -10,6 +10,7 @@ export interface AccountData {
 }
 
 export interface QueueItem {
+  // id
   cover: string;
   songURL: string;
   title: string;
@@ -96,6 +97,25 @@ export interface MusicResponse {
   state: number;
   username: string;
   avatar: string;
+}
+
+export interface FavoriteBlogItem extends BlogData {
+  target_type: "blog";
+  favorited_at: Date;
+  author_rid: number;
+  username: string;
+  avatar: string;
+}
+
+export interface FavoriteMusicItem extends MusicResponse {
+  target_type: "music";
+  favorited_at: Date;
+  author_rid: number;
+}
+
+export interface FavoriteListResponse<T> {
+  msg: string;
+  favorites: T[];
 }
 
 export interface Detail {

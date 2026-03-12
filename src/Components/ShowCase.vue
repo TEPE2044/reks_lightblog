@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { useTemplateRef, ref, onMounted } from "vue";
+import { useToast } from "bootstrap-vue-next";
+import { storeToRefs } from "pinia";
 import type { MusicResponse } from "../Utils/reks-interface";
 import { useEventListener, useToggle } from "@vueuse/core";
 import Empty from "../Components/Empty.vue";
 import { query_my_music } from "../Hooks/Music";
+import { favoriteBatchStore } from "../Store/favoriteBatch";
+import { createToast } from "../Utils/reks-toast";
 
 const showcase = useTemplateRef("showcase");
 useEventListener(
@@ -19,8 +23,27 @@ useEventListener(
 const musicList = ref<MusicResponse[]>([]);
 const loading = ref(true);
 const [empty, setEmpty] = useToggle();
+const toast = useToast();
+const fav = favoriteBatchStore();
+const {
+  musicFavoriteStatusMap,
+  musicFavoriteReadyMap,
+  musicFavoritePendingMap,
+} = storeToRefs(fav);
+
+const handleMusicFavoriteToggle = async (payload: { id: number; next: boolean }) => {
+  const res = await fav.handleMusicFavoriteToggle(payload);
+  if (res.status === "not_logged_in") {
+    createToast(toast, "请先登录", "登录后才能收藏音乐", "warning");
+    return;
+  }
+  if (res.status === "failed") {
+    createToast(toast, "操作失败", "音乐收藏状态更新失败，请稍后重试", "danger");
+  }
+};
 
 onMounted(async () => {
+  fav.resetMusicFavoriteState();
   try {
     const res = await query_my_music();
 
@@ -31,6 +54,10 @@ onMounted(async () => {
     }
 
     musicList.value = res;
+    const syncRes = await fav.syncFavoriteStatusForMusic(res);
+    if (syncRes === "degraded-first") {
+      createToast(toast, "状态降级", "音乐收藏状态加载失败，已使用默认状态", "warning");
+    }
 
     if (res.length === 0) {
       setEmpty(true);
@@ -58,7 +85,15 @@ onMounted(async () => {
     <div class="scroll-bar w-100 mb-4 p-4">
       <div class="case-title h5">电台上新</div>
       <div ref="showcase" class="case py-4 mt-4" v-if="!empty">
-        <MusicCase v-for="music in musicList" :key="music.id" :music="music" />
+        <MusicCase
+          v-for="music in musicList"
+          :key="music.id"
+          :music="music"
+          :show-favorite="true"
+          :favorited="musicFavoriteStatusMap[music.id]"
+          :favorite-disabled="!musicFavoriteReadyMap[music.id] || musicFavoritePendingMap[music.id]"
+          @favorite-toggle="handleMusicFavoriteToggle"
+        />
       </div>
       <div class="case d-flex align-items-center justify-content-center" v-else>
         <Empty title="空空如也" />

@@ -10,12 +10,14 @@ import {
 	queryFollowStatsByRid,
 	queryFollowingList,
 } from "../Hooks/SubScribe";
+import { queryUserFavorites } from "../Hooks/Fav";
 import { guestFeedStore } from "../Store/guestFeed";
 import { query_profile_by_user_id } from "../Hooks/User";
 import { createToast } from "../Utils/reks-toast";
-import type { BlogData } from "../Utils/reks-interface";
+import type { FavoriteBlogItem, FavoriteMusicItem } from "../Utils/reks-interface";
 
 type GuestTab = "blog" | "music" | "fav";
+type FavoriteTab = "blog" | "music";
 const PAGE_LIMIT = 9;
 
 const route = useRoute();
@@ -31,10 +33,12 @@ const {
 } = storeToRefs(feed);
 
 const activeTab = ref<GuestTab>("blog");
+const favoriteTab = ref<FavoriteTab>("blog");
 const subscribed = ref(false);
 const subscribePending = ref(false);
 const guestLoading = ref(false);
 const guestFollowStats = ref<{ followingCount: number; followerCount: number } | null>(null);
+const guestFavoriteLoading = ref(false);
 
 const targetUserId = computed(() => Number(route.params.id));
 
@@ -44,7 +48,8 @@ const guestProfile = ref({
 	avatar: "",
 });
 
-const guestFavList = ref<BlogData[]>([]);
+const guestFavBlogList = ref<FavoriteBlogItem[]>([]);
+const guestFavMusicList = ref<FavoriteMusicItem[]>([]);
 
 const resetGuestData = () => {
 	guestProfile.value = {
@@ -53,19 +58,46 @@ const resetGuestData = () => {
 		avatar: "",
 	};
 	feed.resetFeed();
-	guestFavList.value = [];
+	guestFavBlogList.value = [];
+	guestFavMusicList.value = [];
 	guestFollowStats.value = null;
+};
+
+const loadGuestFavorites = async () => {
+	const rid = targetUserId.value;
+	if (!Number.isInteger(rid) || rid <= 0) return;
+
+	guestFavoriteLoading.value = true;
+	try {
+		const [blogRes, musicRes] = await Promise.all([
+			queryUserFavorites<FavoriteBlogItem>(rid, "blog"),
+			queryUserFavorites<FavoriteMusicItem>(rid, "music"),
+		]);
+		guestFavBlogList.value = blogRes.favorites || [];
+		guestFavMusicList.value = musicRes.favorites || [];
+	} catch (e) {
+		console.error(e);
+		createToast(toast, "加载失败", "无法获取 TA 的收藏列表", "danger");
+	} finally {
+		guestFavoriteLoading.value = false;
+	}
 };
 
 const activeCount = computed(() => {
 	if (activeTab.value === "music") return guestMusicList.value.length;
-	if (activeTab.value === "fav") return guestFavList.value.length;
+	if (activeTab.value === "fav") {
+		return favoriteTab.value === "music"
+			? guestFavMusicList.value.length
+			: guestFavBlogList.value.length;
+	}
 	return guestBlogList.value.length;
 });
 
 const tabTitle = computed(() => {
 	if (activeTab.value === "music") return "TA 的音乐";
-	if (activeTab.value === "fav") return "TA 的收藏";
+	if (activeTab.value === "fav") {
+		return favoriteTab.value === "music" ? "TA 收藏的音乐" : "TA 收藏的博客";
+	}
 	return "TA 的博客";
 });
 
@@ -78,8 +110,16 @@ const isLoadingMore = computed(() => {
 const switchTab = (tab: GuestTab) => {
 	activeTab.value = tab;
 	if (!guestLoading.value) {
+		if (tab === "fav") {
+			void loadGuestFavorites();
+			return;
+		}
 		void loadActiveTabFirstPage();
 	}
+};
+
+const switchFavoriteTab = (tab: FavoriteTab) => {
+	favoriteTab.value = tab;
 };
 
 const syncSubscribeState = async () => {
@@ -189,6 +229,7 @@ watch(
 	() => route.params.id,
 	() => {
 		void loadGuestData();
+		void loadGuestFavorites();
 		void syncSubscribeState();
 	},
 	{ immediate: true },
@@ -301,6 +342,23 @@ useInfiniteScroll(
 					<span class="badge-count">{{ activeCount }} 条</span>
 				</div>
 
+				<div v-if="activeTab === 'fav'" class="fav-subtab d-flex align-items-center gap-2 pb-3">
+					<BButton
+						:variant="favoriteTab === 'blog' ? 'danger' : 'outline-secondary'"
+						size="sm"
+						@click="switchFavoriteTab('blog')"
+					>
+						博客收藏
+					</BButton>
+					<BButton
+						:variant="favoriteTab === 'music' ? 'danger' : 'outline-secondary'"
+						size="sm"
+						@click="switchFavoriteTab('music')"
+					>
+						音乐收藏
+					</BButton>
+				</div>
+
 				<div v-if="guestLoading" class="py-4">
 					<Empty title="主页加载中..." />
 				</div>
@@ -311,7 +369,7 @@ useInfiniteScroll(
 						v-for="item in guestBlogList"
 						:key="`guest-blog-${item.id}`"
 					>
-						<BlogCard :blog="item" />
+						<BlogCard :blog="item" :show-actions="false" :show-favorite="false" />
 					</div>
 				</div>
 				<div v-else-if="activeTab === 'blog'" class="py-4">
@@ -331,8 +389,32 @@ useInfiniteScroll(
 					<Empty title="TA 还没有发布音乐" />
 				</div>
 
+				<div v-else-if="activeTab === 'fav' && guestFavoriteLoading" class="py-4">
+					<Empty title="收藏加载中..." />
+				</div>
+
+				<div class="waterfall-box" v-else-if="activeTab === 'fav' && favoriteTab === 'blog' && guestFavBlogList.length > 0">
+					<div
+						class="waterfall-item"
+						v-for="item in guestFavBlogList"
+						:key="`guest-fav-blog-${item.id}`"
+					>
+						<BlogCard :blog="item" :show-actions="false" :show-favorite="false" />
+					</div>
+				</div>
+
+				<div class="music-grid-box" v-else-if="activeTab === 'fav' && favoriteTab === 'music' && guestFavMusicList.length > 0">
+					<div
+						class="music-grid-item music-item"
+						v-for="item in guestFavMusicList"
+						:key="`guest-fav-music-${item.id}`"
+					>
+						<MusicCase :music="item" :show-favorite="false" />
+					</div>
+				</div>
+
 				<div v-else class="py-4">
-					<Empty title="收藏模块暂未开放" />
+					<Empty :title="favoriteTab === 'blog' ? 'TA 还没有收藏博客' : 'TA 还没有收藏音乐'" />
 				</div>
 
 				<div v-if="isLoadingMore" class="load-more-tip py-3 text-center text-secondary">

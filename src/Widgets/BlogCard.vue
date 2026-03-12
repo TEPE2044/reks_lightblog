@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { useToast } from "bootstrap-vue-next";
 import { storeToRefs } from "pinia";
 import type { BlogData } from "../Utils/reks-interface";
@@ -9,8 +9,38 @@ import { detailStore } from "../Store/detail";
 import { createToast } from "../Utils/reks-toast";
 
 
+type FavoriteTogglePayload = {
+  id: number;
+  next: boolean;
+};
+
 // type 0是音乐博客，1普通博客
-const blogProps = defineProps<{ blog: BlogData}>();
+const blogProps = withDefaults(defineProps<{
+  blog: BlogData;
+  liked?: boolean;
+  likeReady?: boolean;
+  likeDisabled?: boolean;
+  favorited?: boolean;
+  favoriteReady?: boolean;
+  favoriteDisabled?: boolean;
+  showLike?: boolean;
+  showFavorite?: boolean;
+  showActions?: boolean;
+}>(), {
+  liked: false,
+  likeReady: true,
+  likeDisabled: false,
+  favorited: false,
+  favoriteReady: true,
+  favoriteDisabled: false,
+  showLike: true,
+  showFavorite: true,
+  showActions: true,
+});
+const emit = defineEmits<{
+  (e: "like-toggle", payload: FavoriteTogglePayload): void;
+  (e: "favorite-toggle", payload: FavoriteTogglePayload): void;
+}>();
 const b = blogProps.blog;
 // Record<number, boolean> 用于跟踪每张图片的加载状态，键是图片索引，值是布尔值表示是否加载完成
 const imgLoaded = ref<Record<number, boolean>>({});
@@ -18,6 +48,22 @@ const toast = useToast();
 const { addIntoPlayQueue, selectOutSide } = playerStore();
 const { playQueueLength, currentIndex } = storeToRefs(playerStore());
 const { get_detail } = detailStore();
+const isLiked = computed(() => Boolean(blogProps.liked));
+const likeReady = computed(() => Boolean(blogProps.likeReady));
+const likePending = computed(() => Boolean(blogProps.likeDisabled));
+const isFavorited = computed(() => Boolean(blogProps.favorited));
+const favoriteReady = computed(() => Boolean(blogProps.favoriteReady));
+const favoritePending = computed(() => Boolean(blogProps.favoriteDisabled));
+
+const handleLike = async () => {
+  if (likePending.value || !likeReady.value) return;
+  emit("like-toggle", { id: b.id, next: !isLiked.value });
+};
+
+const handleFavorite = async () => {
+  if (favoritePending.value || !favoriteReady.value) return;
+  emit("favorite-toggle", { id: b.id, next: !isFavorited.value });
+};
 
 const readBlog = async (id: number) => {
   try {
@@ -164,12 +210,22 @@ const casePlay = () => {
       </div>
       <div class="rs-time mt-2">发布于{{ b.created_at }}</div>
     </div>
-    <template #footer>
+    <template #footer v-if="blogProps.showActions">
       <div class="controls d-inline-flex align-items-center gap-3">
-        <div class="cion">
+        <div
+          v-if="blogProps.showLike"
+          class="cion"
+          :class="{ active: isLiked, disabled: !likeReady || likePending }"
+          @click.stop="handleLike"
+        >
           <i-bi-hand-thumbs-up />
         </div>
-        <div class="cion mt-1">
+        <div
+          v-if="blogProps.showFavorite"
+          class="cion mt-1"
+          :class="{ active: isFavorited, disabled: !favoriteReady || favoritePending }"
+          @click.stop="handleFavorite"
+        >
           <i-bi-heart />
         </div>
       </div>
@@ -187,6 +243,24 @@ const casePlay = () => {
 .rs-time {
   font-size: 12px;
   color: #999;
+}
+
+.cion {
+  cursor: pointer;
+  transition: color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &.active {
+    color: #dc3545;
+  }
+
+  &.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 .blog-card {
