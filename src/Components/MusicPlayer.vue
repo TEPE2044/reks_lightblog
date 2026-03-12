@@ -72,11 +72,14 @@ onMounted(() => {
 
 
 // 唯一适合用shallowRef
+// const lyrics = shallowRef([
+//   "「…我想成为万千萤火中的一盏。」",
+//   "「天总会亮的。无论黑夜多么漫长，白昼终将到来。」",
+//   "「在遥远的过去，和遥远的未来，一定也有无数人做出了和我一样的选择。我们…从不孤单。」",
+// ]);
 const lyrics = shallowRef([
-  "「…我想成为万千萤火中的一盏。」",
-  "「天总会亮的。无论黑夜多么漫长，白昼终将到来。」",
-  "「在遥远的过去，和遥远的未来，一定也有无数人做出了和我一样的选择。我们…从不孤单。」",
-]);
+  "暂无歌词"
+])
 
 // 评论数据与操作
 const commentList = ref([
@@ -361,7 +364,7 @@ onUnmounted(() => {
           <i-bi-chevron-bar-down style="font-size: 1.2rem" />
         </BButton>
       </template>
-      <div class="rs-controls-1 d-flex align-items-center flex-row gap-2">
+      <div class="rs-controls-1">
         <div class="cover user-select-none">
           <div class="turntable" :class="{ playing: isPlay }">
             <div class="disc border">
@@ -510,8 +513,8 @@ onUnmounted(() => {
 /* Minimal layout tweaks for expanded player modal */
 .rs-controls-1 {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1rem;
+  grid-template-columns: 1.3fr 1fr;
+  gap: .1rem;
   align-items: center;
 }
 
@@ -634,7 +637,7 @@ onUnmounted(() => {
       }
 
       &::after {
-        width: min(97%, 382px);
+        width: min(97%, 400px);
         border: 1px solid rgba(23, 71, 145, 0.3);
         box-shadow:
           0 0 0 0 rgba(23, 71, 145, 0.2),

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { createToast } from "../Utils/reks-toast";
-const metricsData = ref([
-  { label: "订阅", value: 0 },
-  { label: "博客", value: 0 },
-  { label: "积分", value: 0 },
-]);
+// const metricsData = ref([
+//   { label: "订阅", value: 0 },
+//   { label: "博客", value: 0 },
+//   { label: "积分", value: 0 },
+// ]);
 
 import { userStore } from "../Store/user";
 import { useToast, useToggle } from "bootstrap-vue-next";
+import router from "../Router";
 const user = userStore();
 const toast = useToast();
 const emd = useToggle("easy-login-box");
@@ -16,6 +16,11 @@ const easyLogout = () => {
   user.userLogout();
   createToast(toast, "登出成功", "下次再见！", "info");
 };
+const rt = router
+const toMain = () => {
+  rt.push("/centre/my-blog")
+}
+
 
 </script>
 
@@ -48,7 +53,7 @@ const easyLogout = () => {
         key="logged-in"
         class="user-login d-flex flex-column gap-4 justify-content-center align-items-center mt-3 pb-3 position-relative"
       >
-        <div class="d-flex flex-column gap-2 align-items-center mt-2" >
+        <div class="d-flex flex-column gap-2 align-items-center mt-2" @click="toMain()">
           <!-- 如果头像加载失败或没有头像，使用默认头像 -->
           <BAvatar
             size="5rem"
@@ -59,12 +64,12 @@ const easyLogout = () => {
           <div class="user-name">{{ user.userInfo?.username }}</div>
         </div>
         <BButtonGroup>
-          <BButton size="sm" variant="outline-success">一键签到</BButton>
+          <BButton size="sm" disabled variant="outline-success">一键签到</BButton>
           <BButton size="sm" variant="outline-danger" @click="easyLogout"
             >退出登录</BButton
           >
         </BButtonGroup>
-        <div class="metrics-bar d-flex flex-row gap-4 px-2">
+        <!-- <div class="metrics-bar d-flex flex-row gap-4 px-2">
           <div
             class="metrics-content d-flex flex-column align-items-center"
             v-for="metrics in metricsData"
@@ -73,7 +78,7 @@ const easyLogout = () => {
             <div class="value">{{ metrics.value }}</div>
             <div class="label text-secondary">{{ metrics.label }}</div>
           </div>
-        </div>
+        </div> -->
       </div>
     </transition>
   </div>

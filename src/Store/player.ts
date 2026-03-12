@@ -44,7 +44,7 @@ export const playerStore = defineStore("player", () => {
   const addIntoPlayQueue = (data: QueueItem, currentIndex: number) => {
     // 没法用included，includes比较的是对象引用，而data每次都是新创建的对象（即使内容一样），引用地址不同
     let isExisted = playQueue.value.some(
-      (song) => song.songURL === data.songURL,
+      (song) => song.songURL === data.songURL
     );
 
     console.log(`列表是否存在这首歌？ ${isExisted}`);
@@ -84,7 +84,7 @@ export const playerStore = defineStore("player", () => {
       }
     }
     playQueue.value = playQueue.value.filter(
-      (song) => song !== playQueue.value[idx],
+      (song) => song !== playQueue.value[idx]
     );
     if (playQueueLength.value === 0) {
       player?.pause();
@@ -247,11 +247,13 @@ export const playerStore = defineStore("player", () => {
         return;
       }
       let songIdx = playQueue.value.findIndex(
-        (item) => item.songURL === data.songURL,
+        (item) => item.songURL === data.songURL
       );
       console.error(songIdx);
-      currentIndex.value = songIdx;
-      switchSong();
+      if (currentIndex.value !== songIdx || playQueueLength.value <= 1) {
+        currentIndex.value = songIdx;
+        switchSong();
+      }
     } catch (e) {
       console.log("播放失败");
     }
