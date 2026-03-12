@@ -39,12 +39,16 @@ export const playerStore = defineStore("player", () => {
   // 下一首播放？ 需要考虑不同情况
   // 如果现在是最后一首咋办:那就用push
   // 非最后一首的情况都用splice(currentIndex,0,data)，splice第二个是删除的个数
+  //isExisted = true  → 队列中已存在这首歌
+  //isExisted = false  → 队列中不存在这首歌
   const addIntoPlayQueue = (data: QueueItem, currentIndex: number) => {
     // 没法用included，includes比较的是对象引用，而data每次都是新创建的对象（即使内容一样），引用地址不同
     let isExisted = playQueue.value.some(
-      (song) => song.songURL === data.songURL
+      (song) => song.songURL === data.songURL,
     );
+
     console.log(`列表是否存在这首歌？ ${isExisted}`);
+    // 这里isExisted仅判断原来的状态，无需更新
     if (isExisted === false) {
       if (playQueueLength.value === 0) {
         playQueue.value.push(data);
@@ -57,10 +61,11 @@ export const playerStore = defineStore("player", () => {
       } else {
         playQueue.value.splice(currentIndex + 1, 0, data);
       }
-      console.log(playQueue.value);
-      return true;
+      // console.log(playQueue.value);
+      console.warn("经过操作已插入列表");
+      return isExisted;
     }
-    return false;
+    return isExisted;
   };
   // 删除
   const removeFromPlayQueue = (idx: number) => {
@@ -79,14 +84,14 @@ export const playerStore = defineStore("player", () => {
       }
     }
     playQueue.value = playQueue.value.filter(
-      (song) => song !== playQueue.value[idx]
+      (song) => song !== playQueue.value[idx],
     );
     if (playQueueLength.value === 0) {
       player?.pause();
       duration.value = "00:00";
       currentTime.value = "00:00";
       progress.value = 0;
-      currentIndex.value = 0
+      currentIndex.value = 0;
       player?.unload();
     }
     console.log(`2长度为${playQueueLength.value}`);
@@ -96,7 +101,7 @@ export const playerStore = defineStore("player", () => {
     playQueue.value = [];
     player?.pause();
     player?.unload();
-    currentIndex.value = 0
+    currentIndex.value = 0;
     console.log(playQueue.value);
   };
 
@@ -214,8 +219,7 @@ export const playerStore = defineStore("player", () => {
     duration.value = "00:00";
     currentTime.value = "00:00";
     progress.value = 0;
-
-    console.log("----3");
+    console.warn("已切换歌曲");
     console.log(currentIndex.value);
   };
 
@@ -227,16 +231,29 @@ export const playerStore = defineStore("player", () => {
     switchSong();
   };
 
-  // 第二种需要先判断当前播放列表里有没有这首歌，没有就添加，有就获取索引，然后播放
+  // 逻辑整理：
+  // 1.点击按钮后，判断当前歌曲是否在播放列表中
+  // 2.存在True 不存在False
+  // 3.
   const selectOutSide = (data: QueueItem) => {
-    console.log(`当前位置${currentIndex.value}`)
-    const is_add = addIntoPlayQueue(data, currentIndex.value);
-    console.log(`存在${is_add}`);
-    if (is_add === true) {
-      if (playQueueLength.value > 1) {
-        currentIndex.value = playQueue.value.indexOf(data);
+    console.log(`当前歌曲位置${currentIndex.value}`);
+    // 该行为无论如何都会将这首曲子加入到播放队列中
+    const isExisted = addIntoPlayQueue(data, currentIndex.value);
+    console.warn(`该歌曲存在播放列表中? ${isExisted}`);
+    try {
+      // 无需判断播放器为0的情况,addIntoPlayQueue已经处理，但是currentIndex要变化
+      if (playQueueLength.value === 0) {
+        currentIndex.value = 0;
+        return;
       }
+      let songIdx = playQueue.value.findIndex(
+        (item) => item.songURL === data.songURL,
+      );
+      console.error(songIdx);
+      currentIndex.value = songIdx;
       switchSong();
+    } catch (e) {
+      console.log("播放失败");
     }
   };
 
