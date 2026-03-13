@@ -17,6 +17,7 @@ import { useRoute } from "vue-router";
 const route = useRoute()
 const toast = useToast()
 const response = ref()
+
 const isLiked = ref(false)
 const likeCount = ref(0)
 const likeReady = ref(false)
@@ -28,7 +29,7 @@ let favoriteSyncSeq = 0
 let favoriteMutationSeq = 0
 let likeSyncSeq = 0
 let likeMutationSeq = 0
-
+// 同步点赞状态
 const syncLikeStatus = async (id: number) => {
     if (!hasFavoriteAuthSession()) {
         likeReady.value = true
@@ -124,12 +125,15 @@ const handleLike = async () => {
         return
     }
 
-    const previous = isLiked.value
-    const previousLikeCount = likeCount.value
+    const previous = isLiked.value //点赞前的状态 true/false
+    const previousLikeCount = likeCount.value //点赞前数量
+    // 乐观更新，当前状态取反，坐等更新
     const next = !previous
+    // 请求期间锁住，不给瞎几把乱点
     likePending.value = true
     likeMutationSeq += 1
     isLiked.value = next
+    // AI写的，如果是点赞+1，取消点赞-1
     likeCount.value = Math.max(0, previousLikeCount + (next ? 1 : -1))
 
     try {
@@ -180,7 +184,6 @@ watch(
         <!-- 左侧主内容区 -->
         <div class="blog-main">
             <h2 class="blog-title">{{ response?.title }}</h2>
-
             <div class="tags">
                 <span v-for="tag in response?.tags" :key="tag" class="tag">
                     {{ tag }}
@@ -194,6 +197,8 @@ watch(
 
         <!-- 右侧用户卡片侧边栏 -->
         <aside class="author-sidebar">
+            <!-- TODO 关联歌曲组 -->
+
             <div class="author-card">
                 <BAvatar size="80" src="" />
                 <div class="author-name">{{ response?.author }}</div>
