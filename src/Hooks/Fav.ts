@@ -32,7 +32,7 @@ export interface LikeCountResponse {
   msg: string;
   like_count: number;
 }
-
+// 如果没有rcode和payload，不能使用收藏功能，有后端兜底
 export const hasFavoriteAuthSession = () => {
   const rcode = localStorage.getItem("rcode");
   const payload = localStorage.getItem("payload");

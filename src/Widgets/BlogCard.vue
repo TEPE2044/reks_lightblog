@@ -48,9 +48,11 @@ const toast = useToast();
 const { addIntoPlayQueue, selectOutSide } = playerStore();
 const { playQueueLength, currentIndex } = storeToRefs(playerStore());
 const { get_detail } = detailStore();
+//点赞状态
 const isLiked = computed(() => Boolean(blogProps.liked));
 const likeReady = computed(() => Boolean(blogProps.likeReady));
 const likePending = computed(() => Boolean(blogProps.likeDisabled));
+//收藏状态
 const isFavorited = computed(() => Boolean(blogProps.favorited));
 const favoriteReady = computed(() => Boolean(blogProps.favoriteReady));
 const favoritePending = computed(() => Boolean(blogProps.favoriteDisabled));

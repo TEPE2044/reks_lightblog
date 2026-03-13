@@ -18,7 +18,7 @@ export interface FavoriteTogglePayload {
 export interface FavoriteItemLike {
   id: number;
 }
-
+//返回类型
 type SyncStatus = "ok" | "guest" | "degraded" | "degraded-first";
 
 type ToggleResult =
@@ -34,6 +34,9 @@ type LikeToggleResult =
   | { status: "ok"; isLiked: boolean; msg: string };
 
 export const favoriteBatchStore = defineStore("favoriteBatch", () => {
+  // statusMap: 当前是否已点赞/已收藏，是最终要展示的结果本身
+  // readyMap: 这一项的初始状态是否已经从后端同步回来
+  // pendingMap: 这一项是否正在提交切换请求，用来防止重复点击
   const favoriteStatusMap = ref<Record<number, boolean>>({});
   const favoriteReadyMap = ref<Record<number, boolean>>({});
   const favoritePendingMap = ref<Record<number, boolean>>({});
@@ -48,7 +51,8 @@ export const favoriteBatchStore = defineStore("favoriteBatch", () => {
   const likeReadyMap = ref<Record<number, boolean>>({});
   const likePendingMap = ref<Record<number, boolean>>({});
   const likeBatchFailed = ref(false);
-
+  
+  //reset用于重置状态
   const resetBlogFavoriteState = () => {
     favoriteStatusMap.value = {};
     favoriteReadyMap.value = {};
@@ -74,7 +78,8 @@ export const favoriteBatchStore = defineStore("favoriteBatch", () => {
     likePendingMap.value = {};
     likeBatchFailed.value = false;
   };
-
+  
+  // 通用方法 根据id批量获取状态
   const syncTargetStatusByIds = async (
     rawIds: number[],
     targetType: FavoriteTargetType,
@@ -82,15 +87,22 @@ export const favoriteBatchStore = defineStore("favoriteBatch", () => {
     readyMap: Ref<Record<number, boolean>>,
     batchFailed: Ref<boolean>,
   ): Promise<SyncStatus> => {
+    // 去重后再批量请求，避免同一个 id 在同一轮里重复查询
+    // .filter过滤掉null undefined，.filter后面的条件是保存 
+    // Set去重之后，重新恢复为数组
     const ids = [...new Set(rawIds.filter((id) => Number.isInteger(id)))];
+    // as const 的作用是告诉 TypeScript：这里返回的不是普通字符串 string，而是字面量类型 "ok"。 
+    // "ok"：值是 ok  /"ok" as const：值是 ok，而且类型也锁定为 "ok"
     if (ids.length === 0) return "ok" as const;
 
     ids.forEach((id) => {
+      // 开始同步前先标记为“未就绪”，这样 UI 可以决定先禁用按钮或显示占位态
       readyMap.value[id] = false;
     });
 
     if (!hasFavoriteAuthSession()) {
       ids.forEach((id) => {
+        // 游客没有登录态时，默认按 false 处理，但也要标记 ready，避免界面一直等待
         statusMap.value[id] = false;
         readyMap.value[id] = true;
       });
@@ -199,6 +211,7 @@ export const favoriteBatchStore = defineStore("favoriteBatch", () => {
   ): Promise<ToggleResult> => {
     const id = payload.id;
     if (pendingMap.value[id]) {
+      // 同一项上一次请求还没结束时，直接忽略这次点击，避免连点造成状态乱跳
       return { status: "ignored" as const };
     }
 
@@ -207,6 +220,7 @@ export const favoriteBatchStore = defineStore("favoriteBatch", () => {
     }
 
     const previous = Boolean(statusMap.value[id]);
+  // 请求发出前先锁住按钮，并做一次乐观更新，让界面立即响应用户点击
     pendingMap.value[id] = true;
     statusMap.value[id] = payload.next;
 
@@ -216,9 +230,11 @@ export const favoriteBatchStore = defineStore("favoriteBatch", () => {
       return { status: "ok" as const, isFavorited: res.is_favorited, msg: res.msg };
     } catch (e) {
       console.error(e);
+      // 如果接口失败，就把界面状态回滚到点击前
       statusMap.value[id] = previous;
       return { status: "failed" as const };
     } finally {
+      // 无论成功还是失败，最后都要解锁按钮
       pendingMap.value[id] = false;
     }
   };
@@ -234,6 +250,7 @@ export const favoriteBatchStore = defineStore("favoriteBatch", () => {
   const handleLikeToggle = async (payload: FavoriteTogglePayload): Promise<LikeToggleResult> => {
     const id = payload.id;
     if (likePendingMap.value[id]) {
+      // 点赞也走同样的“请求中锁定”策略，避免短时间重复提交
       return { status: "ignored" as const };
     }
 
@@ -242,6 +259,7 @@ export const favoriteBatchStore = defineStore("favoriteBatch", () => {
     }
 
     const previous = Boolean(likeStatusMap.value[id]);
+  // 先更新本地状态，等接口返回后再用服务端真值纠正
     likePendingMap.value[id] = true;
     likeStatusMap.value[id] = payload.next;
 
@@ -251,9 +269,11 @@ export const favoriteBatchStore = defineStore("favoriteBatch", () => {
       return { status: "ok" as const, isLiked: res.is_liked, msg: res.msg };
     } catch (e) {
       console.error(e);
+      // 点赞失败时回滚，保证页面和数据库最终一致
       likeStatusMap.value[id] = previous;
       return { status: "failed" as const };
     } finally {
+      // 请求结束后释放锁，按钮才允许再次点击
       likePendingMap.value[id] = false;
     }
   };

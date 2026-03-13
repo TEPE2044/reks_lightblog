@@ -18,6 +18,7 @@ const musicFavorites = ref<FavoriteMusicItem[]>([]);
 const blogPendingMap = ref<Record<number, boolean>>({});
 const musicPendingMap = ref<Record<number, boolean>>({});
 
+// 统计一共有多少
 const activeCount = computed(() => {
     if (activeTab.value === "music") return musicFavorites.value.length;
     return blogFavorites.value.length;
@@ -26,6 +27,7 @@ const activeCount = computed(() => {
 const loadFavorites = async () => {
     loading.value = true;
     try {
+        // 批量请求
         const [blogRes, musicRes] = await Promise.all([
             queryMyFavorites<FavoriteBlogItem>("blog"),
             queryMyFavorites<FavoriteMusicItem>("music"),
@@ -39,13 +41,16 @@ const loadFavorites = async () => {
         loading.value = false;
     }
 };
-
+//切换状态
 const handleBlogFavoriteToggle = async (payload: { id: number; next: boolean }) => {
+    // 如果这一项的取消收藏请求还没结束，就先忽略后续点击，避免重复发请求
     if (blogPendingMap.value[payload.id]) return;
+    // 进入请求中状态后，卡片上的收藏按钮会被临时锁住
     blogPendingMap.value[payload.id] = true;
     try {
         const res = await setFavoriteState(payload.id, "blog", payload.next);
         if (!res.is_favorited) {
+            // 我的收藏页里，取消成功后直接把这张卡片从列表移除
             blogFavorites.value = blogFavorites.value.filter((item) => item.id !== payload.id);
             createToast(toast, "已取消收藏", res.msg, "success");
             return;
@@ -59,11 +64,14 @@ const handleBlogFavoriteToggle = async (payload: { id: number; next: boolean }) 
 };
 
 const handleMusicFavoriteToggle = async (payload: { id: number; next: boolean }) => {
+    // 音乐收藏也做同样的并发保护，防止连点导致多次提交
     if (musicPendingMap.value[payload.id]) return;
+    // 标记为请求中，等 finally 再恢复
     musicPendingMap.value[payload.id] = true;
     try {
         const res = await setFavoriteState(payload.id, "music", payload.next);
         if (!res.is_favorited) {
+            // 取消成功后，从“我的收藏”音乐列表里移除
             musicFavorites.value = musicFavorites.value.filter((item) => item.id !== payload.id);
             createToast(toast, "已取消收藏", res.msg, "success");
             return;
