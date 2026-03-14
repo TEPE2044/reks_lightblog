@@ -1,182 +1,86 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-
-type Ance = "Blog" | "Announce";
+import { computed, onMounted, ref } from "vue";
+import ActivityCard from "../Widgets/ActivityCard.vue";
+import { BButton, BButtonGroup } from "bootstrap-vue-next";
+import { storeToRefs } from "pinia";
+import dayjs from "dayjs";
+import { substore } from "../Store/subscribe";
+import { exportSubscribePdf } from "../Utils/subscribe-log";
 
 interface TimelineItem {
   id: number;
   time: string;
   title: string;
   detail: string;
-  type: Ance;
 }
 
-interface FollowUser {
-  id: string;
-  name: string;
-  tag: string;
-  color: string;
-}
-
-interface FeedCard {
+interface ActivityItem {
   id: number;
-  authorId: string;
   title: string;
   summary: string;
-  stamp: string;
-  likes: number;
-  comments: number;
-  level: "short" | "mid" | "tall";
+  meta: string;
+  badge: string;
+  tone: "warm" | "sky";
 }
 
-const activeFollowId = ref<string>("all");
+const { subscribeList } = storeToRefs(substore());
+const { initSubscribeList, removeallMessage } = substore();
 
-const follows = ref<FollowUser[]>([
-  { id: "all", name: "全部", tag: "ALL", color: "#303030" },
-  { id: "u1", name: "Mika", tag: "MK", color: "#8f5d42" },
-  { id: "u2", name: "Luna", tag: "LU", color: "#3c6382" },
-  { id: "u3", name: "Rex", tag: "RX", color: "#5f8d4e" },
-  { id: "u4", name: "Kite", tag: "KT", color: "#685a9f" },
-  { id: "u5", name: "Nova", tag: "NV", color: "#a25454" },
-]);
+const shownTimeline = computed<TimelineItem[]>(() => {
+  return subscribeList.value.map((item, idx) => ({
+    id: idx + 1,
+    time: dayjs(item.createdAt).format("MM-DD HH:mm"),
+    title: item.title,
+    detail: item.details,
+  }));
+});
 
-const timeline = ref<TimelineItem[]>([
+const handleClear = () => {
+  removeallMessage();
+};
+
+const handleExport = () => {
+  exportSubscribePdf(subscribeList.value);
+};
+
+onMounted(() => {
+  initSubscribeList();
+});
+
+const activities = ref<ActivityItem[]>([
   {
     id: 1,
-    time: "09:10",
-    title: "同步成功",
-    detail: "已完成 6 条新消息的本地索引。",
-    type: "Announce",
+    title: "了个关注大冒险积分冲刺",
+    summary: "教程视频、打卡挑战和加分项正在开放，速来参与。",
+    meta: "进行中",
+    badge: "精选",
+    tone: "sky",
   },
   {
     id: 2,
-    time: "10:22",
-    title: "关注变更",
-    detail: "你关注了 Luna 与 Rex。",
-    type: "Blog",
+    title: "话题周：春日创作计划",
+    summary: "发布指定标签内容可获得额外曝光推荐。",
+    meta: "今日截止",
+    badge: "推荐",
+    tone: "warm",
   },
   {
     id: 3,
-    time: "11:05",
-    title: "草稿恢复",
-    detail: "自动恢复上次未发布草稿。",
-    type: "Blog",
+    title: "互动任务：评论接力",
+    summary: "完成三次高质量互动可领取徽章与头像框。",
+    meta: "剩余 2 天",
+    badge: "任务",
+    tone: "sky",
   },
   {
     id: 4,
-    time: "12:46",
-    title: "系统提示",
-    detail: "你的消息中心已切换到增量刷新。",
-    type: "Announce",
-  },
-  {
-    id: 5,
-    time: "14:15",
-    title: "收藏更新",
-    detail: "你收藏的 2 篇博客有新评论。",
-    type: "Blog",
-  },
-  {
-    id: 6,
-    time: "16:30",
-    title: "安全提醒",
-    detail: "检测到新设备登录，已完成验证。",
-    type: "Announce",
+    title: "创作者加速营",
+    summary: "连续更新可进入加速营名单，获得专题位。",
+    meta: "即将开始",
+    badge: "预告",
+    tone: "warm",
   },
 ]);
-
-const feedCards = ref<FeedCard[]>([
-  {
-    id: 1001,
-    authorId: "u1",
-    title: "把旧站迁移到轻量架构",
-    summary: "拆掉冗余依赖之后，首屏渲染和消息轮询都更稳定。",
-    stamp: "5 分钟前",
-    likes: 22,
-    comments: 8,
-    level: "mid",
-  },
-  {
-    id: 1002,
-    authorId: "u2",
-    title: "交互草图复盘",
-    summary: "这次我先从信息密度入手，再做视觉补偿，减少了跳读负担。",
-    stamp: "16 分钟前",
-    likes: 41,
-    comments: 11,
-    level: "tall",
-  },
-  {
-    id: 1003,
-    authorId: "u3",
-    title: "关注分组小技巧",
-    summary: "把高频作者放前面，横向列表滚动成本会低很多。",
-    stamp: "20 分钟前",
-    likes: 12,
-    comments: 2,
-    level: "short",
-  },
-  {
-    id: 1004,
-    authorId: "u4",
-    title: "消息卡片的层级切分",
-    summary: "标题、摘要、行为按钮拆层后，视觉扫描路径会更直观。",
-    stamp: "34 分钟前",
-    likes: 17,
-    comments: 6,
-    level: "mid",
-  },
-  {
-    id: 1005,
-    authorId: "u5",
-    title: "一次离线缓存实验",
-    summary: "断网情况下保留关键状态，恢复后自动合并冲突。",
-    stamp: "45 分钟前",
-    likes: 29,
-    comments: 9,
-    level: "tall",
-  },
-  {
-    id: 1006,
-    authorId: "u2",
-    title: "滚动容器性能小记",
-    summary: "头像列表和瀑布流分离后，滚动抖动减少了不少。",
-    stamp: "1 小时前",
-    likes: 8,
-    comments: 1,
-    level: "short",
-  },
-  {
-    id: 1007,
-    authorId: "u3",
-    title: "关于消息中心的信息组织",
-    summary: "时间轴适合追踪动作历史，瀑布流适合快速扫读内容。",
-    stamp: "1 小时前",
-    likes: 14,
-    comments: 3,
-    level: "mid",
-  },
-]);
-
-const followMap = computed(() => {
-  return follows.value.reduce<Record<string, FollowUser>>((acc, cur) => {
-    acc[cur.id] = cur;
-    return acc;
-  }, {});
-});
-
-const shownTimeline = computed(() => timeline.value);
-
-const shownFeeds = computed(() => {
-  if (activeFollowId.value === "all") {
-    return feedCards.value;
-  }
-  return feedCards.value.filter((card) => card.authorId === activeFollowId.value);
-});
-
-const pickFollow = (id: string) => {
-  activeFollowId.value = id;
-};
 
 
 </script>
@@ -184,9 +88,17 @@ const pickFollow = (id: string) => {
 <template>
   <div class="announcement-panel">
     <main class="panel-main">
-      <aside class="timeline-area ">
-        <h3>本地操作记录</h3>
+      <aside class="timeline-area">
+        <div class="header mb-3 d-flex align-items-center justify-content-between gap-2 flex-row">
+          <div class="h5 fw-bold">订阅消息</div >
+          <BButtonGroup size="sm"> 
+            <BButton variant="outline-secondary" @click="handleClear">清空消息</BButton> 
+            <BButton variant="outline-secondary" @click="handleExport">导出</BButton> 
+          </BButtonGroup>
+        </div>
+        
         <div class="timeline-list">
+          <div v-if="!shownTimeline.length" class="empty-timeline">暂无日志</div>
           <article v-for="item in shownTimeline" :key="item.id" class="timeline-item">
             <div class="node" />
             <div class="content">
@@ -198,55 +110,18 @@ const pickFollow = (id: string) => {
         </div>
       </aside>
 
-      <section class="feed-area">
-        <div class="follow-strip" role="tablist" aria-label="关注列表">
-          <button
-            v-for="person in follows"
-            :key="person.id"
-            class="follow-avatar"
-            :class="{ chosen: activeFollowId === person.id }"
-            :style="{ '--avatar-bg': person.color }"
-            @click="pickFollow(person.id)"
-          >
-            <span class="symbol" v-if="person.id === 'all'">▲</span>
-            <span class="symbol" v-else>{{ person.tag }}</span>
-            <span class="name">{{ person.name }}</span>
-          </button>
-        </div>
-
-        <div class="feed-grid">
-          <article
-            v-for="card in shownFeeds"
-            :key="card.id"
-            class="feed-card"
-            :class="card.level"
-            :style="{ '--card-accent': followMap[card.authorId]?.color || '#4f6272' }"
-          >
-            <div class="card-head">
-              <div
-                class="mini-avatar"
-                :style="{ '--avatar-bg': followMap[card.authorId]?.color || '#666' }"
-              >
-                {{ followMap[card.authorId]?.tag || 'NA' }}
-              </div>
-              <div class="meta">
-                <strong>{{ followMap[card.authorId]?.name || 'Unknown' }}</strong>
-                <span>{{ card.stamp }}</span>
-              </div>
-            </div>
-
-            <h4>{{ card.title }}</h4>
-            <p>{{ card.summary }}</p>
-
-            <footer>
-              <span>赞 {{ card.likes }}</span>
-              <span>评 {{ card.comments }}</span>
-            </footer>
-          </article>
-
-          <div v-if="!shownFeeds.length" class="empty-state">
-            当前关注暂无内容。
-          </div>
+      <section class="activity-area">
+        <h3>活动板块</h3>
+        <div class="activity-grid">
+          <ActivityCard
+            v-for="item in activities"
+            :key="item.id"
+            :title="item.title"
+            :summary="item.summary"
+            :meta="item.meta"
+            :badge="item.badge"
+            :tone="item.tone"
+          />
         </div>
       </section>
     </main>
@@ -263,15 +138,16 @@ const pickFollow = (id: string) => {
 .panel-main {
   padding: 1rem;
   display: grid;
-  grid-template-columns: 250px minmax(0, 1fr);
+  grid-template-columns: 400px minmax(0, 1fr);
   gap: 1rem;
-  min-height: 660px;
+  min-height: 620px;
 }
 
 .timeline-area {
-   @extend %reks-card-box;
+  @extend %reks-card-box;
   padding: 0.9rem;
   overflow: hidden;
+  min-height: 580px;
 }
 
 .timeline-area h3 {
@@ -284,7 +160,7 @@ const pickFollow = (id: string) => {
   position: relative;
   height: calc(100% - 2rem);
   overflow-y: auto;
-  padding-right: 0.3rem;
+  padding-right: 1rem;
 }
 
 .timeline-list::before {
@@ -333,173 +209,36 @@ const pickFollow = (id: string) => {
   line-height: 1.45;
 }
 
-.feed-area {
+.empty-timeline {
+  color: #8e7a69;
+  font-size: 0.84rem;
+  padding-left: 0.4rem;
+}
+
+.activity-area {
   @extend %reks-card-box;
-  padding: 2rem;
+  padding: 0.9rem;
+  min-height: 580px;
+}
+
+
+.activity-grid {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 0.9rem;
-  min-width: 0;
-}
-
-.follow-strip {
-  display: flex;
-  gap: 0.85rem;
-  overflow-x: auto;
-  border: 1px solid #efcf9e;
-  background: rgba(178, 34, 34, 0.5);
-  padding: 0.7rem 0.8rem;
-  border-radius: 12px;
-}
-
-.follow-avatar {
-  border: none;
-  background: transparent;
-  color: #fff7ef;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.35rem;
-  cursor: pointer;
-  flex: 0 0 auto;
-}
-
-.follow-avatar .symbol {
-  width: 3.05rem;
-  height: 3.05rem;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: var(--avatar-bg);
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  font-size: 0.95rem;
-  font-weight: 800;
-}
-
-.follow-avatar .name {
-  font-size: 0.75rem;
-  letter-spacing: 0.02em;
-}
-
-.follow-avatar.chosen .symbol {
-  border-color: #ffffff;
-  box-shadow: 0 6px 14px rgba(86, 34, 9, 0.28);
-}
-
-.feed-grid {
-  padding: 0.85rem;
-  overflow-y: auto;
-  columns: 3 220px;
-  column-gap: 0.8rem;
-}
-
-.feed-card {
-  --card-accent: #496173;
-  break-inside: avoid;
-  display: inline-block;
-  width: 100%;
-  margin: 0 0 0.8rem;
-  background: #ffffff;
-  border: 1px solid #efdcc1;
-  border-top: 3px solid var(--card-accent);
-  border-radius: 10px;
-  padding: 0.75rem;
-  box-shadow: 0 8px 18px rgba(117, 72, 39, 0.08);
-}
-
-.feed-card.short {
-  min-height: 170px;
-}
-
-.feed-card.mid {
-  min-height: 220px;
-}
-
-.feed-card.tall {
-  min-height: 280px;
-}
-
-.card-head {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.mini-avatar {
-  --avatar-bg: #666;
-  width: 2rem;
-  height: 2rem;
-  border-radius: 50%;
-  background: var(--avatar-bg);
-  color: #f5f5f5;
-  font-size: 0.7rem;
-  font-weight: 700;
-  display: grid;
-  place-items: center;
-}
-
-.meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.12rem;
-}
-
-.meta strong {
-  font-size: 0.84rem;
-  color: #5a402e;
-}
-
-.meta span {
-  font-size: 0.73rem;
-  color: #91745c;
-}
-
-.feed-card h4 {
-  margin: 0.75rem 0 0.35rem;
-  font-size: 1rem;
-  color: #4a3120;
-}
-
-.feed-card p {
-  margin: 0;
-  font-size: 0.84rem;
-  line-height: 1.55;
-  color: #6e5645;
-}
-
-.feed-card footer {
-  margin-top: 0.7rem;
-  display: flex;
-  gap: 0.9rem;
-  font-size: 0.78rem;
-  color: #9b7860;
-}
-
-.empty-state {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  min-height: 220px;
-  background: #fff9f0;
-  border: 1px dashed #e8cda8;
-  color: #8a6b53;
-  font-size: 0.9rem;
-  border-radius: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
 }
 
 @media (max-width: 1100px) {
   .panel-main {
     grid-template-columns: 1fr;
-    min-height: auto;
   }
 
   .timeline-area {
-    max-height: 240px;
+    min-height: 460px;
   }
 
-  .feed-grid {
-    columns: 2 180px;
-    max-height: 560px;
+  .activity-area {
+    min-height: auto;
   }
 }
 
@@ -512,15 +251,8 @@ const pickFollow = (id: string) => {
     padding: 0.7rem;
   }
 
-  .follow-avatar .symbol {
-    width: 2.55rem;
-    height: 2.55rem;
-    font-size: 0.78rem;
-  }
-
-  .feed-grid {
-    columns: 1 220px;
-    max-height: 500px;
+  .activity-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

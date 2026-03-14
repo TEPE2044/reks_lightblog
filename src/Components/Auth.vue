@@ -8,12 +8,15 @@ import Vcode from "vue3-puzzle-vcode";
 import { useCountdown } from "@vueuse/core";
 import { userStore } from "../Store/user";
 import type { RNext } from "../Utils/reks-next-job";
+import { substore } from "../Store/subscribe";
+import { makeSubscribeMessage } from "../Utils/subscribe-log";
 
 const props = withDefaults(defineProps<{ showTrigger?: boolean }>(), {
   showTrigger: true,
 });
 
 const user = userStore();
+const { addSubscribeMessage } = substore();
 const emd = useToggle("easy-login-box");
 // 账号登录数据
 const toast = useToast();
@@ -169,6 +172,13 @@ const submitPhoneData = useDebounceFn(async () => {
       createToast(toast, "登录成功", "欢迎回来", "success");
       const user_info = await getUserProfile();
       user.storeUserInfo(user_info.data);
+      addSubscribeMessage(
+        makeSubscribeMessage(
+          "user.login",
+          `账号 ${user_info?.data?.username || "未知用户"} 登录成功`,
+        ),
+        user_info?.data?.reks_id ?? "guest",
+      );
       console.log("用户信息:", user_info);
       emd.hide();
       reset();
@@ -236,6 +246,13 @@ const sumbitAccountData = useDebounceFn(() => {
           createToast(toast, "登录成功", "欢迎回来", "success");
           const user_info = await getUserProfile();
           user.storeUserInfo(user_info.data);
+          addSubscribeMessage(
+            makeSubscribeMessage(
+              "user.login",
+              `账号 ${user_info?.data?.username || "未知用户"} 登录成功`,
+            ),
+            user_info?.data?.reks_id ?? "guest",
+          );
           console.log("用户信息:", user_info);
           emd.hide();
           reset();

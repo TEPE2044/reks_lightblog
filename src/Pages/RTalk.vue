@@ -3,7 +3,7 @@ import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const options = [
-  { text: "消息中心", value: "anmt" },
+  { text: "系统通知", value: "anmt" },
   { text: "我的消息", value: "mes" },
 ];
 
