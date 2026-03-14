@@ -3,8 +3,8 @@ import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const options = [
-  { text: "公告", value: "anmt" },
-  { text: "站内信", value: "mes" },
+  { text: "消息中心", value: "anmt" },
+  { text: "我的消息", value: "mes" },
 ];
 
 const route = useRoute();
@@ -35,7 +35,7 @@ watch(
         v-model="selected"
         :options="options"
         buttons
-        button-variant="light"
+        button-variant="outline-dark"
       >
       </BFormRadioGroup>
     </div>
@@ -52,6 +52,9 @@ watch(
 .rt-talk{
   margin-top: 7.3rem;
   @extend %reks-card-box;
+  border: 1px solid #dfe7ee;
+  border-radius: 18px;
+  box-shadow: 0 10px 26px rgba(34, 66, 93, 0.09);
 }
 
 
@@ -59,6 +62,41 @@ watch(
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.swap {
+  padding: 0.25rem;
+
+  border-radius: 999px;
+  border: 1px solid #d7e2ea;
+}
+
+.swap :deep(.btn) {
+  border: none;
+  border-radius: 999px !important;
+  padding: 0.46rem 1.15rem;
+}
+
+
+.rt-content {
+  padding-left: 1.2rem !important;
+  padding-right: 1.2rem !important;
+}
+
+@media (max-width: 768px) {
+  .rt-talk {
+    margin-top: 6.7rem;
+  }
+
+  .swap :deep(.btn) {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.86rem;
+  }
+
+  .rt-content {
+    padding-left: 0.6rem !important;
+    padding-right: 0.6rem !important;
+  }
 }
 
 </style>

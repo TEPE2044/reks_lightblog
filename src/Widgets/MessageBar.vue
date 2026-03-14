@@ -17,7 +17,11 @@ const pageToRtalk = () => {
 </script>
 <template>
   <div class="message-bar rounded d-flex justify-content-around align-items-center p-2 gap-2">
+    <BButton @click="pageToRtalk()" class="position-relative" variant="light" v-if="user.isLoggedIn">
+      <i-bi-bell />
 
+      <BBadge v-show="sys" dot-indicator variant="danger" class="position-absolute top-0 start-100 translate-middle" />
+    </BButton>
     <BButton @click="emd.show()" class="position-relative" variant="light" v-if="!user.isLoggedIn">
       <i-bi-person-circle />
     </BButton>
@@ -42,13 +46,9 @@ const pageToRtalk = () => {
       <BDropdownDivider />
       <BDropdownItem class="text-center" @click="user.userLogout">退出登录</BDropdownItem>
     </BDropdown>
-    <BButton @click="pageToRtalk()" class="position-relative" variant="light" v-if="user.isLoggedIn">
-      <i-bi-bell />
 
-      <BBadge v-show="sys" dot-indicator variant="danger" class="position-absolute top-0 start-100 translate-middle" />
-    </BButton>
-    <BButton title="写博客" class="position-relative" variant="secondary" @click="pageToUpload()" v-if="user.isLoggedIn">
-      <i-bi-upload /> &nbsp;写博客
+    <BButton title="博客" class="position-relative" variant="light" @click="pageToUpload()" v-if="user.isLoggedIn">
+      <i-bi-upload /> &nbsp;发布博客
     </BButton>
   </div>
 </template>
