@@ -1,18 +1,14 @@
 <script setup lang="ts">
-
-import { shallowRef } from "vue";
 import { userStore } from "../Store/user";
 import { useToggle } from "bootstrap-vue-next";
 import router from "../Router";
 const user = userStore();
-const sys = shallowRef(false);
 const emd = useToggle("easy-login-box");
 const pageToUpload = () => {
   router.push('/upload')
 }
 const pageToRtalk = () => {
   router.push('/rtalk')
-  sys.value = !sys.value
 }
 </script>
 <template>
@@ -20,7 +16,7 @@ const pageToRtalk = () => {
     <BButton @click="pageToRtalk()" class="position-relative" variant="light" v-if="user.isLoggedIn">
       <i-bi-bell />
 
-      <BBadge v-show="sys" dot-indicator variant="danger" class="position-absolute top-0 start-100 translate-middle" />
+      
     </BButton>
     <BButton @click="emd.show()" class="position-relative" variant="light" v-if="!user.isLoggedIn">
       <i-bi-person-circle />

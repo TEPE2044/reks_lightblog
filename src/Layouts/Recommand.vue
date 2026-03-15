@@ -8,8 +8,8 @@
         <BNav align="center" pills class="recommand-nav">
           <BNavItem to="/hub/main" exact exact-active-class="active">推荐
           </BNavItem>
-          <BNavItem to="/hub/subscribe" exact exact-active-class="active">订阅
-          </BNavItem>
+          <!-- <BNavItem to="/hub/subscribe" exact exact-active-class="active">订阅
+          </BNavItem> -->
         </BNav>
       </div>
 

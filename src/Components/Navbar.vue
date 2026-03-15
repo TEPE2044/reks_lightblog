@@ -1,9 +1,13 @@
 <script lang="ts" setup>
+import { computed } from "vue";
+import { substore } from "../Store/subscribe";
 
+const subscribe = substore();
+const hasUnread = computed(() => subscribe.hasUnreadFollowing());
 </script>
 
 <template>
-    <div class="navbar" >
+    <div class="navbar">
         <BContainer>
             <BNavbarNav class="main-nav flex-row gap-4 align-items-center">
                 <BNavItem class="section" id="home-item" to="/">
@@ -12,6 +16,13 @@
                 <BNavItem class="section" id="community-item" to="/hub">
                     <BLink to="/hub">社区</BLink>
                 </BNavItem>
+                <BNavItem class="section" id="follow-item" to="/subscribe">
+                    <BLink to="/subscribe">订阅</BLink>
+                    <div class="isnew position-relative">           
+                        <BBadge v-show="hasUnread" dot-indicator variant="danger" class="positon-absolute start" />
+                    </div>
+                </BNavItem>
+
             </BNavbarNav>
         </BContainer>
     </div>
