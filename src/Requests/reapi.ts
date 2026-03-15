@@ -30,7 +30,6 @@ reapi.interceptors.response.use(
     if(err.response?.status === 401) {
       const user = userStore();
       user.userLogout();
-      alert("身份验证失败，请重新登录");
       router.replace('/')
     }
     if(err.response?.status === 429){
