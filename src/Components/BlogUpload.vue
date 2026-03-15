@@ -8,6 +8,7 @@ import { useToast, useToggle } from "bootstrap-vue-next";
 import { editorStore } from "../Store/editor";
 import { upload_img } from "../Hooks/Editor";
 import { upload_blog, upload_mblog } from "../Hooks/Blog";
+import { formatDateTime } from "../Utils/reks-format-time";
 import { createToast } from "../Utils/reks-toast";
 import router from "../Router";
 import { userStore } from "../Store/user";
@@ -354,7 +355,7 @@ const previewMusic = computed(() => {
           />
         </template>
         <template #cell(created_at)="{ item }">
-          {{ new Date(item.created_at).toLocaleString() }}
+          {{ formatDateTime(item.created_at) }}
         </template>
         <template #cell(original)="{ item }">
           {{ item.original ? "是" : "否" }}

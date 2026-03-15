@@ -1,165 +1,142 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import type { BlogData } from "../Utils/reks-interface";
 import BlogCard from "../Widgets/BlogCard.vue";
+import Empty from "../Components/Empty.vue";
+import { query_blog_by_user_id } from "../Hooks/Blog";
+import { queryFollowingList, type FollowingUser } from "../Hooks/SubScribe";
+import { substore } from "../Store/subscribe";
 
 interface FollowUser {
-  id: string;
+  id: string | number;
+  rid: number | null;
   name: string;
-  tag: string;
-  color: string;
+  avatar: string;
 }
 
 interface FeedEntry {
   id: number;
-  authorId: string;
+  authorId: number;
   blog: BlogData;
 }
 
-const activeFollowId = ref<string>("all");
+const subscribe = substore();
+const activeFollowId = ref<string | number>("all");
+const follows = ref<FollowUser[]>([{ id: "all", rid: null, name: "全部", avatar: "/ai.webp" }]);
+const feedCards = ref<FeedEntry[]>([]);
+const loading = ref(false);
 
-const follows = ref<FollowUser[]>([
-  { id: "all", name: "全部", tag: "ALL", color: "#303030" },
-  { id: "u1", name: "Mika", tag: "MK", color: "#8f5d42" },
-  { id: "u2", name: "Luna", tag: "LU", color: "#3c6382" },
-  { id: "u3", name: "Rex", tag: "RX", color: "#5f8d4e" },
-  { id: "u4", name: "Kite", tag: "KT", color: "#685a9f" },
-  { id: "u5", name: "Nova", tag: "NV", color: "#a25454" },
-]);
+const sortByCreatedAtDesc = (items: FeedEntry[]) => {
+  return [...items].sort((a, b) => {
+    const ta = new Date(a.blog.created_at as unknown as string).getTime() || 0;
+    const tb = new Date(b.blog.created_at as unknown as string).getTime() || 0;
+    return tb - ta;
+  });
+};
 
-const feedCards = ref<FeedEntry[]>([
-  {
-    id: 1001,
-    authorId: "u1",
-    blog: {
-      id: 1001,
-      title: "把旧站迁移到轻量架构",
-      created_at: new Date("2026-03-14T09:10:00"),
-      cover: ["/ai.webp", "/ai.webp", "/ai.webp"],
-      type: 1,
-    },
-  },
-  {
-    id: 1002,
-    authorId: "u2",
-    blog: {
-      id: 1002,
-      title: "交互草图复盘",
-      created_at: new Date("2026-03-14T10:22:00"),
-      cover: ["/ai.webp", "/ai.webp", "/ai.webp"],
-      type: 1,
-    },
-  },
-  {
-    id: 1003,
-    authorId: "u3",
-    blog: {
-      id: 1003,
-      title: "关注分组小技巧",
-      created_at: new Date("2026-03-14T11:05:00"),
-      cover: ["/ai.webp", "/ai.webp"],
-      type: 1,
-    },
-  },
-  {
-    id: 1004,
-    authorId: "u4",
-    blog: {
-      id: 1004,
-      title: "消息卡片的层级切分",
-      created_at: new Date("2026-03-14T12:46:00"),
-      cover: ["/ai.webp"],
-      type: 1,
-    },
-  },
-  {
-    id: 1005,
-    authorId: "u5",
-    blog: {
-      id: 1005,
-      title: "一次离线缓存实验",
-      created_at: new Date("2026-03-14T14:15:00"),
-      cover: ["/ai.webp", "/ai.webp", "/ai.webp"],
-      type: 0,
-      music: {
-        id: 501,
-        name: "Amber Sunset",
-        cover: "/ai.webp",
-        audio: "/music.mp3",
-        username: "Nova",
-        avatar: "/ai.webp",
-      },
-    },
-  },
-  {
-    id: 1006,
-    authorId: "u2",
-    blog: {
-      id: 1006,
-      title: "滚动容器性能小记",
-      created_at: new Date("2026-03-14T15:05:00"),
-      cover: ["/ai.webp", "/ai.webp"],
-      type: 1,
-    },
-  },
-  {
-    id: 1007,
-    authorId: "u3",
-    blog: {
-      id: 1007,
-      title: "关于消息中心的信息组织",
-      created_at: new Date("2026-03-14T16:30:00"),
-      cover: ["/ai.webp", "/ai.webp", "/ai.webp"],
-      type: 1,
-    },
-  },
-]);
+const shownFeeds = computed(() => sortByCreatedAtDesc(feedCards.value));
+const latestFeed = computed(() => shownFeeds.value[0] ?? null);
+const historyFeeds = computed(() => shownFeeds.value.slice(1));
 
-const shownFeeds = computed(() => {
-  if (activeFollowId.value === "all") {
-    return feedCards.value;
-  }
-  return feedCards.value.filter((card) => card.authorId === activeFollowId.value);
+const mapFollowUser = (user: FollowingUser): FollowUser => ({
+  id: user.rid,
+  rid: user.rid,
+  name: user.username || `用户${user.rid}`,
+  avatar: user.avatar || "",
 });
 
-const pickFollow = (id: string) => {
-  activeFollowId.value = id;
+const fetchBlogsByRid = async (rid: number) => {
+  const res = await query_blog_by_user_id(rid);
+  const blogs = Array.isArray(res?.blogs) ? (res.blogs as BlogData[]) : [];
+  return blogs.map((blog) => ({
+    id: blog.id,
+    authorId: rid,
+    blog,
+  }));
 };
+
+const loadFeed = async (followId: string | number) => {
+  loading.value = true;
+  try {
+    if (followId === "all") {
+      const targets = follows.value.filter((item) => item.rid !== null) as Array<
+        FollowUser & { rid: number }
+      >;
+      const groups = await Promise.all(targets.map((item) => fetchBlogsByRid(item.rid)));
+      feedCards.value = groups.flat();
+      return;
+    }
+
+    const rid = Number(followId);
+    feedCards.value = await fetchBlogsByRid(rid);
+  } catch (e) {
+    console.error("加载订阅内容失败:", e);
+    feedCards.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
+const hasUserUnread = (rid: number | null) => {
+  if (rid === null) {
+    return subscribe.hasUnreadFollowing();
+  }
+  return subscribe.isFollowingRidUnread(rid);
+};
+
+const pickFollow = async (person: FollowUser) => {
+  activeFollowId.value = person.id;
+  if (person.rid !== null) {
+    subscribe.markFollowingRead(person.rid);
+  }
+  await loadFeed(person.id);
+};
+
+onMounted(async () => {
+  subscribe.initSubscribeList();
+  try {
+    const followings = await queryFollowingList();
+    follows.value = [
+      { id: "all", rid: null, name: "全部", avatar: "undefined" },
+      ...followings.map(mapFollowUser),
+    ];
+  } catch (e) {
+    console.error("加载关注列表失败:", e);
+  }
+  await loadFeed("all");
+});
 
 </script>
 
 <template>
-  <div class="ns p-4">
+  <div class="ns p-2">
     <section class="feed-area">
       <div class="follow-strip" role="tablist" aria-label="关注列表">
-        <button
-          v-for="person in follows"
-          :key="person.id"
-          class="follow-avatar"
-          :class="{ chosen: activeFollowId === person.id }"
-          :style="{ '--avatar-bg': person.color }"
-          @click="pickFollow(person.id)"
-        >
-          <span class="symbol" v-if="person.id === 'all'">▲</span>
-          <span class="symbol" v-else>{{ person.tag }}</span>
+        <button v-for="person in follows" :key="person.id" class="follow-avatar"
+          :class="{ chosen: activeFollowId === person.id }" @click="pickFollow(person)">
+          <span class="symbol">
+            <BAvatar :src="person.avatar || undefined" :text="person.name.slice(0, 1)" class="follow-bavatar" />
+            <BBadge v-show="hasUserUnread(person.rid)" dot-indicator variant="danger" class="avatar-dot" />
+          </span>
           <span class="name">{{ person.name }}</span>
         </button>
       </div>
 
-      <div class="feed-grid">
-        <BlogCard
-          v-for="card in shownFeeds"
-          :key="card.id"
-          :blog="card.blog"
-          :show-actions="false"
-          :show-like="false"
-          :show-favorite="false"
-        />
-
-        <div v-if="!shownFeeds.length" class="empty-state">
-          当前关注暂无内容。
-        </div>
+      <div v-if="latestFeed" class="latest-wrap">
+        <div class="section-title">最新更新</div>
+        <BlogCard :key="latestFeed.id" :blog="latestFeed.blog" :show-actions="false" :show-like="false"
+          :show-favorite="false" />
       </div>
+
+      <div v-if="latestFeed && historyFeeds.length" class="divider-line" />
+
+      <div class="feed-grid" v-if="historyFeeds.length">
+        <BlogCard v-for="card in historyFeeds" :key="card.id" :blog="card.blog" :show-actions="false" :show-like="false"
+          :show-favorite="false" />
+      </div>
+
+      <div v-if="loading" class="loading-state">加载中...</div>
+      <Empty v-else-if="!shownFeeds.length" title="当前关注暂无内容。" />
     </section>
   </div>
 </template>
@@ -168,6 +145,7 @@ const pickFollow = (id: string) => {
 @use "../Asset/CustomStyle/global.scss";
 
 .ns {
+  margin-top: 7.3rem;
   width: 100%;
 }
 
@@ -175,7 +153,7 @@ const pickFollow = (id: string) => {
   @extend %reks-card-box;
   padding: 1.4rem;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr);
   gap: 0.9rem;
   min-width: 0;
   min-height: 640px;
@@ -204,15 +182,27 @@ const pickFollow = (id: string) => {
 }
 
 .follow-avatar .symbol {
+  position: relative;
   width: 3.05rem;
   height: 3.05rem;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--avatar-bg);
+  overflow: hidden;
+  background: #8d5f42;
   border: 2px solid rgba(255, 255, 255, 0.35);
-  font-size: 0.95rem;
-  font-weight: 800;
+}
+
+.follow-bavatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.avatar-dot {
+  position: absolute;
+  right: -0.1rem;
+  top: -0.1rem;
 }
 
 .follow-avatar .name {
@@ -232,7 +222,23 @@ const pickFollow = (id: string) => {
   column-gap: 0.8rem;
 }
 
-.empty-state {
+.latest-wrap {
+  padding: 0.4rem 0.8rem 0;
+}
+
+.section-title {
+  margin-bottom: 0.65rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #7a2f0d;
+}
+
+.divider-line {
+  border-top: 1px solid #e7cfb4;
+  margin: 0.2rem 0.8rem;
+}
+
+.loading-state {
   display: grid;
   place-items: center;
   width: 100%;

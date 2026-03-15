@@ -11,7 +11,14 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
+import { createToast } from '../Utils/reks-toast';
+import { useToast } from 'bootstrap-vue-next';
+const toast = useToast()
 
+onMounted(() =>{
+  createToast(toast,"暂未开放","该页面仍在建造中，敬请期待",'warning')
+})
 
 </script>
 

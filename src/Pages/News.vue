@@ -3,7 +3,7 @@ import { useInfiniteScroll } from "@vueuse/core";
 import { onMounted, ref } from "vue";
 import { useToast } from "bootstrap-vue-next";
 import { storeToRefs } from "pinia";
-import { query_my_blog_cursor } from "../Hooks/Blog";
+import { query_hot_blog_cursor } from "../Hooks/Blog";
 import { favoriteBatchStore } from "../Store/favoriteBatch";
 import { createToast } from "../Utils/reks-toast";
 import type { BlogData } from "../Utils/reks-interface";
@@ -51,7 +51,7 @@ const loadMore = async () => {
   if (loadingMore.value || !hasMore.value) return;
   loadingMore.value = true;
   try {
-    const page = await query_my_blog_cursor(cursor.value, 9);
+    const page = await query_hot_blog_cursor(cursor.value, 9);
     const incoming = page.items || [];
     blogs.value = [...blogs.value, ...incoming];
     const likeSyncRes = await fav.syncLikeStatusForBlogs(incoming);
