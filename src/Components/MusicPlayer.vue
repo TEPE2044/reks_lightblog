@@ -139,7 +139,7 @@ const toggleHidden = () => {
 const toast = useToast()
 const toggleExpand = () => {
   if (playQueueLength.value === 0) {
-    createToast(toast, "暂无歌曲", "播发列表为空", "warning")
+    createToast(toast, "暂无歌曲", "播放列表为空", "warning")
     return
   }
   toggleTop();
