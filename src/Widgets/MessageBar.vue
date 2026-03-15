@@ -32,7 +32,7 @@ const pageToRtalk = () => {
           <BAvatar :src="user.userInfo.avatar || ''" size="lg" />
         </div>
         <div class="info d-flex flex justify-content-center align-items-center">
-          <p class="name mt-3 mb-1">梦璃東</p>
+          <p class="name mt-3 mb-1">{{ user.userInfo?.username || '访客' }}</p>
         </div>
       </div>
       <BDropdownDivider />
