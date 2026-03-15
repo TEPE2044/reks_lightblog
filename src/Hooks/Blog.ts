@@ -23,15 +23,30 @@ export const query_my_blog = async () => {
   return res.data;
 };
 
-export const query_hot_blog = async (limit = 10) => {
+export const query_hot_blog = async (_limit:number) => {
   const res = await reapi({
     url: "/blog/hot",
     method: "GET",
     params: {
-      limit,
+      m_limit: _limit,
     },
   });
   return res.data as HotBlogResponse;
+};
+
+export const query_hot_blog_cursor = async (
+  cursor: number | null,
+  limit = 9,
+) => {
+  const res = await reapi({
+    url: "/blog/hot/cursor",
+    method: "POST",
+    data: {
+      cursor,
+      limit,
+    },
+  });
+  return res.data as BlogCursorResponse;
 };
 
 export const query_my_draft = async () => {
@@ -64,7 +79,7 @@ export const query_blog_by_user_id = async (rid: number) => {
 export const query_blog_by_user_id_cursor = async (
   rid: number,
   cursor: number | null,
-  limit = 9,
+  limit = 9
 ) => {
   const res = await reapi({
     url: `/blog/user/${rid}/cursor`,
@@ -79,7 +94,7 @@ export const query_blog_by_user_id_cursor = async (
 
 export const query_my_blog_cursor = async (
   cursor: number | null,
-  limit = 9,
+  limit = 9
 ) => {
   const res = await reapi({
     url: "/blog/my-blog/cursor",
@@ -96,7 +111,7 @@ export const upload_mblog = async (
   content: string,
   cover: string[],
   tags: string[],
-  mid: number,
+  mid: number
 ) => {
   const res = await reapi({
     url: "blog/my-blog/new-mblog",
@@ -109,7 +124,7 @@ export const upload_mblog = async (
       music_id: mid,
     },
   });
-  return res.data
+  return res.data;
 };
 
 // blog_id是0表示新建博客，非0表示编辑博客
@@ -117,7 +132,7 @@ export const upload_blog = async (
   title: string,
   content: string,
   cover: string[],
-  tags: string[],
+  tags: string[]
 ) => {
   const res = await reapi({
     url: "/blog/my-blog/new",
@@ -129,7 +144,7 @@ export const upload_blog = async (
       tags: tags,
     },
   });
-  return res.data
+  return res.data;
 };
 
 export const update_blog = async (
@@ -137,7 +152,7 @@ export const update_blog = async (
   title: string,
   content: string,
   cover: string[],
-  tags: string[],
+  tags: string[]
 ) => {
   const res = await reapi({
     url: `/blog/my-blog/${id}`,

@@ -3,6 +3,26 @@ import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import type { SubscribeMessage } from "../Store/subscribe";
 
+export interface EventPayloadData {
+  authorId?: number;
+  authorName?: string;
+  title?: string;
+  name?: string;
+  kind?: string;
+}
+
+export const isFollowingEvent = (eventType: string) =>
+  eventType.startsWith("following.");
+
+export const parseEventPayload = (payload: string): EventPayloadData => {
+  try {
+    const data = JSON.parse(payload) as EventPayloadData;
+    return data || {};
+  } catch {
+    return {};
+  }
+};
+
 export const makeSubscribeMessage = (
   eventType: string,
   details: string,
@@ -28,12 +48,7 @@ export const resolveEventTitle = (eventType: string) => {
 
 export const formatEventDetails = (eventType: string, payload: string) => {
   try {
-    const data = JSON.parse(payload) as {
-      authorName?: string;
-      title?: string;
-      name?: string;
-      kind?: string;
-    };
+    const data = parseEventPayload(payload);
 
     if (eventType === "following.blog.published") {
       const author = data.authorName || "你关注的人";

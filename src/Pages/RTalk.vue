@@ -21,6 +21,9 @@ watch(
   (name) => {
     if (name === "anmt" || name === "mes") {
       selected.value = name;
+      if(name === "mes"){
+        alert("消息功能正在开发中，敬请期待！");
+      }
     }
   },
 );

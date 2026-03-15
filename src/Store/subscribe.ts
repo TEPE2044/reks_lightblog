@@ -10,6 +10,7 @@ export interface SubscribeMessage {
 }
 
 const storageKeyByRid = (rid: string | number) => `subscribeList:${rid}`;
+const unreadStorageKeyByRid = (rid: string | number) => `subscribeUnreadFollowing:${rid}`;
 
 const resolveRid = () => {
   try {
@@ -41,22 +42,35 @@ const normalizeMessage = (item: Partial<SubscribeMessage>): SubscribeMessage => 
 export const substore = defineStore("subscribe", () => {
   const subscribeList = ref<SubscribeMessage[]>([]);
   const activeRid = ref<string | number>("guest");
+  const unreadFollowingRidList = ref<number[]>([]);
 
   const initSubscribeList = (rid?: string | number) => {
     activeRid.value = rid ?? resolveRid();
+
     const raw = localStorage.getItem(storageKeyByRid(activeRid.value));
     if (!raw) {
       subscribeList.value = [];
-      return;
+    } else {
+      try {
+        const parsed = JSON.parse(raw) as Array<Partial<SubscribeMessage>>;
+        subscribeList.value = Array.isArray(parsed)
+          ? parsed.map((item) => normalizeMessage(item))
+          : [];
+      } catch (e) {
+        console.error("订阅日志解析失败:", e);
+        subscribeList.value = [];
+      }
     }
+
+    const unreadRaw = localStorage.getItem(unreadStorageKeyByRid(activeRid.value));
     try {
-      const parsed = JSON.parse(raw) as Array<Partial<SubscribeMessage>>;
-      subscribeList.value = Array.isArray(parsed)
-        ? parsed.map((item) => normalizeMessage(item))
+      const parsedUnread = unreadRaw ? (JSON.parse(unreadRaw) as number[]) : [];
+      unreadFollowingRidList.value = Array.isArray(parsedUnread)
+        ? parsedUnread.filter((item) => Number.isFinite(Number(item))).map((item) => Number(item))
         : [];
     } catch (e) {
-      console.error("订阅日志解析失败:", e);
-      subscribeList.value = [];
+      console.error("订阅未读状态解析失败:", e);
+      unreadFollowingRidList.value = [];
     }
   };
 
@@ -64,6 +78,13 @@ export const substore = defineStore("subscribe", () => {
     localStorage.setItem(
       storageKeyByRid(activeRid.value),
       JSON.stringify(subscribeList.value),
+    );
+  };
+
+  const persistUnread = () => {
+    localStorage.setItem(
+      unreadStorageKeyByRid(activeRid.value),
+      JSON.stringify(unreadFollowingRidList.value),
     );
   };
 
@@ -83,7 +104,35 @@ export const substore = defineStore("subscribe", () => {
       initSubscribeList(rid);
     }
     subscribeList.value = [];
+    unreadFollowingRidList.value = [];
     localStorage.removeItem(storageKeyByRid(activeRid.value));
+    localStorage.removeItem(unreadStorageKeyByRid(activeRid.value));
+  };
+
+  const hasUnreadFollowing = () => unreadFollowingRidList.value.length > 0;
+
+  const isFollowingRidUnread = (rid: number) =>
+    unreadFollowingRidList.value.includes(Number(rid));
+
+  const markFollowingUpdated = (rid: number) => {
+    const before = hasUnreadFollowing();
+    const targetRid = Number(rid);
+    if (!Number.isFinite(targetRid)) {
+      return false;
+    }
+    if (!unreadFollowingRidList.value.includes(targetRid)) {
+      unreadFollowingRidList.value.unshift(targetRid);
+      persistUnread();
+    }
+    return !before && hasUnreadFollowing();
+  };
+
+  const markFollowingRead = (rid: number) => {
+    const targetRid = Number(rid);
+    unreadFollowingRidList.value = unreadFollowingRidList.value.filter(
+      (item) => item !== targetRid,
+    );
+    persistUnread();
   };
 
   // const outputSubscribeMessage = (item:HTMLElement) => {
@@ -94,9 +143,14 @@ export const substore = defineStore("subscribe", () => {
   return {
     subscribeList,
     activeRid,
+    unreadFollowingRidList,
     initSubscribeList,
     addSubscribeMessage,
     removeallMessage,
+    hasUnreadFollowing,
+    isFollowingRidUnread,
+    markFollowingUpdated,
+    markFollowingRead,
     // outputSubscribeMessage
   };
 });

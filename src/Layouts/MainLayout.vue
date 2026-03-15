@@ -10,14 +10,20 @@ import { userStore } from "../Store/user";
 import { substore } from "../Store/subscribe";
 import {
   formatEventDetails,
+  isFollowingEvent,
   makeSubscribeMessage,
+  parseEventPayload,
   resolveEventTitle,
 } from "../Utils/subscribe-log";
 
 const toast = useToast();
 const user = userStore();
 const { userInfo, rcode, payload } = storeToRefs(user);
-const { initSubscribeList, addSubscribeMessage } = substore();
+const {
+  initSubscribeList,
+  addSubscribeMessage,
+  markFollowingUpdated,
+} = substore();
 // const notice = noticeStore();
 
 const resolveCurrentRid = () => {
@@ -53,7 +59,23 @@ function useEventSubscription() {
         // notice.setLatest(res);
         if (res) {
           const detail = formatEventDetails(res.eventType, res.payload);
-          createToast(toast, resolveEventTitle(res.eventType), detail, "primary");
+          const payloadData = parseEventPayload(res.payload);
+          const isFollowUpdate = isFollowingEvent(res.eventType);
+
+          if (isFollowUpdate && typeof payloadData.authorId === "number") {
+            const firstUnread = markFollowingUpdated(payloadData.authorId);
+            if (firstUnread) {
+              createToast(
+                toast,
+                "订阅更新",
+                "您关注的人发布了新内容",
+                "primary",
+              );
+            }
+          } else {
+            createToast(toast, resolveEventTitle(res.eventType), detail, "primary");
+          }
+
           addSubscribeMessage(
             makeSubscribeMessage(res.eventType, detail),
             resolveCurrentRid(),
