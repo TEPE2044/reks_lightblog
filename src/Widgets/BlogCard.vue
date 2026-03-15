@@ -6,6 +6,7 @@ import type { BlogData } from "../Utils/reks-interface";
 import router from "../Router";
 import { playerStore } from "../Store/player";
 import { detailStore } from "../Store/detail";
+import { formatDateTime } from "../Utils/reks-format-time";
 import { createToast } from "../Utils/reks-toast";
 
 
@@ -210,7 +211,7 @@ const casePlay = () => {
       <div class="rs-title h5" :title="b.title">
         <strong>{{ b.title }}</strong>
       </div>
-      <div class="rs-time mt-2">发布于{{ b.created_at }}</div>
+      <div class="rs-time mt-2">发布于{{ formatDateTime(b.created_at) }}</div>
     </div>
     <template #footer v-if="blogProps.showActions">
       <div class="controls d-inline-flex align-items-center gap-3">
