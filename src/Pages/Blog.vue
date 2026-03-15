@@ -1,13 +1,157 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
+import { useToast } from "bootstrap-vue-next";
 import { query_blog_by_id } from "../Hooks/Blog";
+import {
+    hasFavoriteAuthSession,
+    queryLikeCount,
+    queryFavoriteStatus,
+    queryLikeStatus,
+    setFavoriteState,
+    setLikeState,
+} from "../Hooks/Fav";
+import { createToast } from "../Utils/reks-toast";
 
 import { useRoute } from "vue-router";
 
 const route = useRoute()
+const toast = useToast()
 const response = ref()
+
 const isLiked = ref(false)
+const likeCount = ref(0)
+const likeReady = ref(false)
+const likePending = ref(false)
 const isFavorited = ref(false)
+const favoriteReady = ref(false)
+const favoritePending = ref(false)
+let favoriteSyncSeq = 0
+let favoriteMutationSeq = 0
+let likeSyncSeq = 0
+let likeMutationSeq = 0
+// 同步点赞状态
+const syncLikeStatus = async (id: number) => {
+    if (!hasFavoriteAuthSession()) {
+        likeReady.value = true
+        isLiked.value = false
+        return
+    }
+
+    likeReady.value = false
+    const syncSeq = ++likeSyncSeq
+    const mutationSeq = likeMutationSeq
+
+    try {
+        const res = await queryLikeStatus(id)
+        if (syncSeq !== likeSyncSeq || mutationSeq !== likeMutationSeq) return
+        isLiked.value = res.is_liked
+    } catch (e) {
+        console.error(e)
+    } finally {
+        if (syncSeq === likeSyncSeq && mutationSeq === likeMutationSeq) {
+            likeReady.value = true
+        }
+    }
+}
+
+const syncLikeCount = async (id: number) => {
+    try {
+        const res = await queryLikeCount(id)
+        likeCount.value = Number(res.like_count || 0)
+    } catch (e) {
+        console.error(e)
+        likeCount.value = 0
+    }
+}
+
+const syncFavoriteStatus = async (id: number) => {
+    if (!hasFavoriteAuthSession()) {
+        favoriteReady.value = true
+        isFavorited.value = false
+        return
+    }
+
+    favoriteReady.value = false
+    const syncSeq = ++favoriteSyncSeq
+    const mutationSeq = favoriteMutationSeq
+
+    try {
+        const res = await queryFavoriteStatus(id, "blog")
+        if (syncSeq !== favoriteSyncSeq || mutationSeq !== favoriteMutationSeq) return
+        isFavorited.value = res.is_favorited
+    } catch (e) {
+        console.error(e)
+    } finally {
+        if (syncSeq === favoriteSyncSeq && mutationSeq === favoriteMutationSeq) {
+            favoriteReady.value = true
+        }
+    }
+}
+
+const handleFavorite = async () => {
+    const blogId = Number(route.params.id)
+    if (Number.isNaN(blogId) || favoritePending.value || !favoriteReady.value) return
+
+    if (!hasFavoriteAuthSession()) {
+        createToast(toast, "请先登录", "登录后才能收藏博客", "warning")
+        return
+    }
+
+    const previous = isFavorited.value
+    const next = !previous
+    favoritePending.value = true
+    favoriteMutationSeq += 1
+    isFavorited.value = next
+
+    try {
+        const res = await setFavoriteState(blogId, "blog", next)
+        isFavorited.value = res.is_favorited
+        createToast(toast, res.is_favorited ? "收藏成功" : "取消收藏成功", res.msg, "success")
+    } catch (e) {
+        isFavorited.value = previous
+        console.error(e)
+        createToast(toast, "操作失败", "收藏状态更新失败，请稍后重试", "danger")
+    } finally {
+        favoritePending.value = false
+    }
+}
+
+const handleLike = async () => {
+    const blogId = Number(route.params.id)
+    if (Number.isNaN(blogId) || likePending.value || !likeReady.value) return
+
+    if (!hasFavoriteAuthSession()) {
+        createToast(toast, "请先登录", "登录后才能点赞博客", "warning")
+        return
+    }
+
+    const previous = isLiked.value //点赞前的状态 true/false
+    const previousLikeCount = likeCount.value //点赞前数量
+    // 乐观更新，当前状态取反，坐等更新
+    const next = !previous
+    // 请求期间锁住，不给瞎几把乱点
+    likePending.value = true
+    likeMutationSeq += 1
+    isLiked.value = next
+    // AI写的，如果是点赞+1，取消点赞-1
+    likeCount.value = Math.max(0, previousLikeCount + (next ? 1 : -1))
+
+    try {
+        const res = await setLikeState(blogId, next)
+        isLiked.value = res.is_liked
+        if (typeof res.like_count === "number") {
+            likeCount.value = Number(res.like_count)
+        }
+        createToast(toast, res.is_liked ? "点赞成功" : "取消点赞成功", res.msg, "success")
+    } catch (e) {
+        isLiked.value = previous
+        likeCount.value = previousLikeCount
+        console.error(e)
+        createToast(toast, "操作失败", "点赞状态更新失败，请稍后重试", "danger")
+    } finally {
+        likePending.value = false
+    }
+}
 
 // 封装加载函数
 const loadBlog = async (id: number | string) => {
@@ -17,6 +161,9 @@ const loadBlog = async (id: number | string) => {
 
     const res = await query_blog_by_id(numId)
     response.value = res
+    await syncLikeCount(numId)
+    await syncLikeStatus(numId)
+    await syncFavoriteStatus(numId)
     console.log(response.value)
 }
 
@@ -37,7 +184,6 @@ watch(
         <!-- 左侧主内容区 -->
         <div class="blog-main">
             <h2 class="blog-title">{{ response?.title }}</h2>
-
             <div class="tags">
                 <span v-for="tag in response?.tags" :key="tag" class="tag">
                     {{ tag }}
@@ -51,6 +197,8 @@ watch(
 
         <!-- 右侧用户卡片侧边栏 -->
         <aside class="author-sidebar">
+            <!-- TODO 关联歌曲组 -->
+
             <div class="author-card">
                 <BAvatar size="80" src="" />
                 <div class="author-name">{{ response?.author }}</div>
@@ -59,18 +207,28 @@ watch(
 
             <!-- 互动按钮组 -->
             <div class="action-buttons">
-                <button class="action-btn" :class="{ active: isLiked }" @click="isLiked = !isLiked">
+                <button
+                    class="action-btn"
+                    :class="{ active: isLiked, disabled: !likeReady || likePending }"
+                    :disabled="!likeReady || likePending"
+                    @click="handleLike"
+                >
                     <i-bi-hand-thumbs-up />
-                    <span>点赞</span>
+                    <span>{{ likePending ? "处理中" : `点赞 ${likeCount}` }}</span>
                 </button>
-                <button class="action-btn" :class="{ active: isFavorited }" @click="isFavorited = !isFavorited">
+                <button
+                    class="action-btn"
+                    :class="{ active: isFavorited, disabled: !favoriteReady || favoritePending }"
+                    :disabled="!favoriteReady || favoritePending"
+                    @click="handleFavorite"
+                >
                     <i-bi-heart />
-                    <span>收藏</span>
+                    <span>{{ favoritePending ? "处理中" : "收藏" }}</span>
                 </button>
             </div>
         </aside>
     </div>
-    <div class="blog" v-else>
+    <div class="blog mt-5" v-else>
         <Empty title="不存在该博客"></Empty>
     </div>
 </template>
@@ -202,6 +360,11 @@ watch(
                     &:hover {
                         background-color: #fff5f5;
                     }
+                }
+
+                &.disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
                 }
             }
         }

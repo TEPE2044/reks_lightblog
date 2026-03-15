@@ -15,6 +15,11 @@ const router = createRouter({
       component: () => import("../Pages/Blog.vue"),
     },
     {
+      path: "/subscribe",
+      name: "subscribe",
+      component: () => import("../Pages/Subscribe.vue"),
+    },
+    {
       path: "/hub",
       name: "hub",
       component: () => import("../Pages/Hub.vue"),
@@ -31,11 +36,6 @@ const router = createRouter({
           path: "main",
           name: "hub-main",
           component: () => import("../Pages/News.vue"),
-        },
-        {
-          path: "subscribe",
-          name: "hub-subscribe",
-          component: () => import("../Pages/Subscribe.vue"),
         },
       ],
     },
@@ -65,10 +65,10 @@ const router = createRouter({
           component: () => import("../Widgets/MusicForm.vue"),
         },
         {
-          path:"mblog",
-          name:'upload-mblog',
-          component:() => import("../Components/MBlog.vue")
-        }
+          path: "mblog",
+          name: "upload-mblog",
+          component: () => import("../Components/MBlog.vue"),
+        },
       ],
     },
     {

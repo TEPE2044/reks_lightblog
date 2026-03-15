@@ -21,7 +21,6 @@ const getAuthHeaders = () => {
   {
     const user = userStore();
     user.userLogout();
-    alert("身份验证失败，请重新登录");
     router.replace('/')
     return
   }

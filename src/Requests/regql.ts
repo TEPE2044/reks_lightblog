@@ -54,7 +54,6 @@ regql.interceptors.response.use(
             user.userLogout();
             localStorage.removeItem("rcode");
             localStorage.removeItem("payload");
-            alert("身份验证失败，请重新登录");
             router.replace('/')
         }
         return Promise.reject(err);

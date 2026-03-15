@@ -1,256 +1,257 @@
 <script setup lang="ts">
-// create by GPT-5.3-Codex
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import ActivityCard from "../Widgets/ActivityCard.vue";
+import { BButton, BButtonGroup } from "bootstrap-vue-next";
+import { storeToRefs } from "pinia";
+import dayjs from "dayjs";
+import { substore } from "../Store/subscribe";
+import { exportSubscribePdf } from "../Utils/subscribe-log";
 
-const announcements = ref([
+interface TimelineItem {
+  id: number;
+  time: string;
+  title: string;
+  detail: string;
+}
+
+interface ActivityItem {
+  id: number;
+  title: string;
+  summary: string;
+  meta: string;
+  badge: string;
+  tone: "warm" | "sky";
+}
+
+const { subscribeList } = storeToRefs(substore());
+const { initSubscribeList, removeallMessage } = substore();
+
+const shownTimeline = computed<TimelineItem[]>(() => {
+  return subscribeList.value.map((item, idx) => ({
+    id: idx + 1,
+    time: dayjs(item.createdAt).format("MM-DD HH:mm"),
+    title: item.title,
+    detail: item.details,
+  }));
+});
+
+const handleClear = () => {
+  removeallMessage();
+};
+
+const handleExport = () => {
+  exportSubscribePdf(subscribeList.value);
+};
+
+onMounted(() => {
+  initSubscribeList();
+});
+
+const activities = ref<ActivityItem[]>([
   {
     id: 1,
-    title: "系统维护通知",
-    content: "今晚 23:30-00:30 将进行系统维护，期间部分功能不可用。",
-    tag: "置顶",
-    time: "2分钟前",
+    title: "了个关注大冒险积分冲刺",
+    summary: "教程视频、打卡挑战和加分项正在开放，速来参与。",
+    meta: "进行中",
+    badge: "精选",
+    tone: "sky",
   },
   {
     id: 2,
-    title: "新增隐私设置",
-    content: "支持对关注列表和动态可见范围进行配置。",
-    tag: "更新",
-    time: "1小时前",
+    title: "话题周：春日创作计划",
+    summary: "发布指定标签内容可获得额外曝光推荐。",
+    meta: "今日截止",
+    badge: "推荐",
+    tone: "warm",
   },
   {
     id: 3,
-    title: "活动提醒",
-    content: "本周社区活动已上线，欢迎参与。",
-    tag: "活动",
-    time: "昨天",
-  },
-]);
-
-const subscriptions = ref([
-  {
-    id: 1,
-    name: "梦璃東",
-    latest: "发布了新博客：『风起云涌』",
-    time: "3分钟前",
-    unread: true,
-  },
-  {
-    id: 2,
-    name: "小林",
-    latest: "更新了随笔：『旅途』",
-    time: "18分钟前",
-    unread: true,
-  },
-  {
-    id: 3,
-    name: "阿泽",
-    latest: "发布了新博客：『工程札记』",
-    time: "2小时前",
-    unread: false,
+    title: "互动任务：评论接力",
+    summary: "完成三次高质量互动可领取徽章与头像框。",
+    meta: "剩余 2 天",
+    badge: "任务",
+    tone: "sky",
   },
   {
     id: 4,
-    name: "Mika",
-    latest: "更新了笔记：『本周总结』",
-    time: "昨天",
-    unread: false,
+    title: "创作者加速营",
+    summary: "连续更新可进入加速营名单，获得专题位。",
+    meta: "即将开始",
+    badge: "预告",
+    tone: "warm",
   },
 ]);
 
-const unreadCount = computed(() =>
-  subscriptions.value.filter((item) => item.unread).length,
-);
+
 </script>
 
 <template>
   <div class="announcement-panel">
-    <section class="announce-list">
-      <div class="panel-title">
-        <span>公告</span>
-        <span class="hint">最新系统通知与活动</span>
-      </div>
-      <div class="announce-card" v-for="item in announcements" :key="item.id">
-        <div class="card-top">
-          <div class="title">{{ item.title }}</div>
-          <span class="tag">{{ item.tag }}</span>
+    <main class="panel-main">
+      <aside class="timeline-area">
+        <div class="header mb-3 d-flex align-items-center justify-content-between gap-2 flex-row">
+          <div class="h5 fw-bold">订阅消息</div >
+          <BButtonGroup size="sm"> 
+            <BButton variant="outline-secondary" @click="handleClear">清空消息</BButton> 
+            <BButton variant="outline-secondary" @click="handleExport">导出</BButton> 
+          </BButtonGroup>
         </div>
-        <div class="content">{{ item.content }}</div>
-        <div class="time">{{ item.time }}</div>
-      </div>
-    </section>
+        
+        <div class="timeline-list">
+          <div v-if="!shownTimeline.length" class="empty-timeline">暂无日志</div>
+          <article v-for="item in shownTimeline" :key="item.id" class="timeline-item">
+            <div class="node" />
+            <div class="content">
+              <div class="time">{{ item.time }}</div>
+              <div class="title">{{ item.title }}</div>
+              <p>{{ item.detail }}</p>
+            </div>
+          </article>
+        </div>
+      </aside>
 
-    <aside class="subscribe-list">
-      <div class="panel-title">
-        <span>订阅列表</span>
-        <span class="badge" v-if="unreadCount">{{ unreadCount }}</span>
-      </div>
-
-      <div
-        class="subscribe-card"
-        v-for="item in subscriptions"
-        :key="item.id"
-      >
-        <div class="avatar">
-          <BAvatar />
-          <span class="dot" v-if="item.unread"></span>
+      <section class="activity-area">
+        <h3>活动板块</h3>
+        <div class="activity-grid">
+          <ActivityCard
+            v-for="item in activities"
+            :key="item.id"
+            :title="item.title"
+            :summary="item.summary"
+            :meta="item.meta"
+            :badge="item.badge"
+            :tone="item.tone"
+          />
         </div>
-        <div class="meta">
-          <div class="name">{{ item.name }}</div>
-          <div class="latest">{{ item.latest }}</div>
-        </div>
-        <div class="time">{{ item.time }}</div>
-      </div>
-    </aside>
+      </section>
+    </main>
   </div>
 </template>
 
 <style lang="scss" scoped>
+@use "../Asset/CustomStyle/global.scss";
+
 .announcement-panel {
+  padding: 1.1rem;
+}
+
+.panel-main {
+  padding: 1rem;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 1.5rem;
-  width: min(100%, 1100px);
-  margin: 0 auto;
+  grid-template-columns: 400px minmax(0, 1fr);
+  gap: 1rem;
+  min-height: 620px;
 }
 
-.panel-title {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-weight: 600;
+.timeline-area {
+  @extend %reks-card-box;
+  padding: 0.9rem;
+  overflow: hidden;
+  min-height: 580px;
+}
+
+.timeline-area h3 {
   font-size: 1rem;
-  color: #495057;
+  margin: 0 0 0.8rem;
+  font-weight: 800;
+}
+
+.timeline-list {
+  position: relative;
+  height: calc(100% - 2rem);
+  overflow-y: auto;
+  padding-right: 1rem;
+}
+
+.timeline-list::before {
+  content: "";
+  position: absolute;
+  left: 0.45rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #f0d7af;
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 1.6rem;
   margin-bottom: 0.9rem;
+}
 
-  .hint {
-    font-weight: 400;
-    font-size: 0.82rem;
-    color: #6c757d;
+.timeline-item .node {
+  position: absolute;
+  left: 0;
+  top: 0.45rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  border: 2px solid #d0722b;
+  background: #fffef8;
+  box-shadow: 0 0 0 4px rgba(208, 114, 43, 0.14);
+}
+
+.timeline-item .time {
+  font-size: 0.75rem;
+  color: #9b6f4f;
+}
+
+.timeline-item .title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #4e3625;
+}
+
+.timeline-item p {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  color: #6f5a4a;
+  line-height: 1.45;
+}
+
+.empty-timeline {
+  color: #8e7a69;
+  font-size: 0.84rem;
+  padding-left: 0.4rem;
+}
+
+.activity-area {
+  @extend %reks-card-box;
+  padding: 0.9rem;
+  min-height: 580px;
+}
+
+
+.activity-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+@media (max-width: 1100px) {
+  .panel-main {
+    grid-template-columns: 1fr;
   }
 
-  .badge {
-    margin-left: auto;
-    background: #dc3545;
-    color: #fff;
-    padding: 0.1rem 0.5rem;
-    font-size: 0.75rem;
-    border-radius: 999px;
+  .timeline-area {
+    min-height: 460px;
+  }
+
+  .activity-area {
+    min-height: auto;
   }
 }
 
-.announce-list {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 1rem;
-  padding: 1.2rem;
-
-  .announce-card {
-    padding: 1rem;
-    border-radius: 0.8rem;
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-
-    & + .announce-card {
-      margin-top: 0.9rem;
-    }
-
-    .card-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.8rem;
-      margin-bottom: 0.5rem;
-
-      .title {
-        font-weight: 600;
-        color: #212529;
-      }
-
-      .tag {
-        font-size: 0.72rem;
-        color: #0d6efd;
-        background: rgba(13, 110, 253, 0.12);
-        padding: 0.15rem 0.5rem;
-        border-radius: 999px;
-      }
-    }
-
-    .content {
-      color: #495057;
-      font-size: 0.92rem;
-      line-height: 1.5;
-    }
-
-    .time {
-      margin-top: 0.6rem;
-      font-size: 0.75rem;
-      color: #9aa0a6;
-    }
-  }
-}
-
-.subscribe-list {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 1rem;
-  padding: 1.2rem;
-
-  .subscribe-card {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 0.6rem;
-    align-items: center;
-    padding: 0.6rem 0.4rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-
-    &:last-child {
-      border-bottom: none;
-    }
-
-    .avatar {
-      position: relative;
-
-      .dot {
-        position: absolute;
-        right: -1px;
-        bottom: -1px;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: #dc3545;
-        border: 2px solid #fff;
-      }
-    }
-
-    .meta {
-      min-width: 0;
-
-      .name {
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #212529;
-      }
-
-      .latest {
-        font-size: 0.78rem;
-        color: #6c757d;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-
-    .time {
-      font-size: 0.75rem;
-      color: #9aa0a6;
-      white-space: nowrap;
-    }
-  }
-}
-
-@media (max-width: 960px) {
+@media (max-width: 680px) {
   .announcement-panel {
+    padding: 0.85rem;
+  }
+
+  .panel-main {
+    padding: 0.7rem;
+  }
+
+  .activity-grid {
     grid-template-columns: 1fr;
   }
 }

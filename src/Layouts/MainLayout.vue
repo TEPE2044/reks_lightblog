@@ -1,17 +1,53 @@
 <script setup lang="ts">
-import { onUnmounted,onMounted } from "vue";
+import { onUnmounted, onMounted, watch } from "vue";
 import { wsClient } from "../Requests/ws-regql";
 import { useToast } from "bootstrap-vue-next";
 import { createToast } from "../Utils/reks-toast";
 import type { EventSnapshot } from "../Utils/reks-interface";
-import { noticeStore } from "../Store/notice";
+// import { noticeStore } from "../Store/notice";
 import { storeToRefs } from "pinia";
 import { userStore } from "../Store/user";
+import { substore } from "../Store/subscribe";
+import {
+  formatEventDetails,
+  isFollowingEvent,
+  makeSubscribeMessage,
+  parseEventPayload,
+  resolveEventTitle,
+} from "../Utils/subscribe-log";
 
 const toast = useToast();
-const notice = noticeStore();
+const user = userStore();
+const { userInfo, rcode, payload } = storeToRefs(user);
+const {
+  initSubscribeList,
+  addSubscribeMessage,
+  markFollowingUpdated,
+} = substore();
+// const notice = noticeStore();
+
+const resolveCurrentRid = () => {
+  if (userInfo.value?.reks_id) {
+    return userInfo.value.reks_id;
+  }
+  try {
+    const raw = localStorage.getItem("userInfo");
+    if (!raw) return "guest";
+    const localUser = JSON.parse(raw) as { reks_id?: number | string };
+    return localUser?.reks_id ?? "guest";
+  } catch {
+    return "guest";
+  }
+};
+
+let unsubscribeFn: (() => void) | null = null;
 
 function useEventSubscription() {
+  if (unsubscribeFn) {
+    unsubscribeFn();
+    unsubscribeFn = null;
+  }
+
   // 开始订阅，拿到“关闭函数”
   const unsubscribe = wsClient.subscribe<{ pushEvent: EventSnapshot }>(
     {
@@ -20,24 +56,43 @@ function useEventSubscription() {
     {
       next: ({ data }) => {
         const res = data?.pushEvent ?? null;
-        notice.setLatest(res);
+        // notice.setLatest(res);
         if (res) {
-          createToast(toast, `${res.eventType}消息`, res.payload, "primary");
+          const detail = formatEventDetails(res.eventType, res.payload);
+          const payloadData = parseEventPayload(res.payload);
+          const isFollowUpdate = isFollowingEvent(res.eventType);
+
+          if (isFollowUpdate && typeof payloadData.authorId === "number") {
+            const firstUnread = markFollowingUpdated(payloadData.authorId);
+            if (firstUnread) {
+              createToast(
+                toast,
+                "订阅更新",
+                "您关注的人发布了新内容",
+                "primary",
+              );
+            }
+          } else {
+            createToast(toast, resolveEventTitle(res.eventType), detail, "primary");
+          }
+
+          addSubscribeMessage(
+            makeSubscribeMessage(res.eventType, detail),
+            resolveCurrentRid(),
+          );
         }
       },
       error: console.error,
       complete: () => {},
     },
   );
-
-  // 组件销毁时停止监听
-  onUnmounted(() => unsubscribe());
+  unsubscribeFn = unsubscribe;
 }
 
-useEventSubscription();
-
 onMounted(() => {
-  const { safeLevel } = storeToRefs(userStore());
+  const { safeLevel } = storeToRefs(user);
+  initSubscribeList(resolveCurrentRid());
+  useEventSubscription();
   try {
     if (safeLevel.value === "weak") {
       console.log(safeLevel.value);
@@ -51,6 +106,24 @@ onMounted(() => {
   } catch (e) {
     console.error(e);
   }
+});
+
+onUnmounted(() => {
+  if (unsubscribeFn) {
+    unsubscribeFn();
+    unsubscribeFn = null;
+  }
+});
+
+watch(
+  () => userInfo.value?.reks_id,
+  (rid) => {
+    initSubscribeList(rid ?? "guest");
+  },
+);
+
+watch([rcode, payload], () => {
+  useEventSubscription();
 });
 </script>
 

@@ -1,4 +1,16 @@
 import reapi from "../Requests/reapi";
+import type { BlogData, HotBlogItem } from "../Utils/reks-interface";
+
+export interface BlogCursorResponse {
+  items: BlogData[];
+  next_cursor: number | null;
+  has_more: boolean;
+}
+
+export interface HotBlogResponse {
+  msg: string;
+  blogs: HotBlogItem[];
+}
 
 export const query_my_blog = async () => {
   const res = await reapi({
@@ -9,6 +21,32 @@ export const query_my_blog = async () => {
     },
   });
   return res.data;
+};
+
+export const query_hot_blog = async (_limit:number) => {
+  const res = await reapi({
+    url: "/blog/hot",
+    method: "GET",
+    params: {
+      m_limit: _limit,
+    },
+  });
+  return res.data as HotBlogResponse;
+};
+
+export const query_hot_blog_cursor = async (
+  cursor: number | null,
+  limit = 9,
+) => {
+  const res = await reapi({
+    url: "/blog/hot/cursor",
+    method: "POST",
+    data: {
+      cursor,
+      limit,
+    },
+  });
+  return res.data as BlogCursorResponse;
 };
 
 export const query_my_draft = async () => {
@@ -29,12 +67,51 @@ export const query_blog_by_id = async (id: number) => {
   });
   return res.data;
 };
+
+export const query_blog_by_user_id = async (rid: number) => {
+  const res = await reapi({
+    url: `/blog/user/${rid}`,
+    method: "GET",
+  });
+  return res.data;
+};
+
+export const query_blog_by_user_id_cursor = async (
+  rid: number,
+  cursor: number | null,
+  limit = 9
+) => {
+  const res = await reapi({
+    url: `/blog/user/${rid}/cursor`,
+    method: "POST",
+    data: {
+      cursor,
+      limit,
+    },
+  });
+  return res.data as BlogCursorResponse;
+};
+
+export const query_my_blog_cursor = async (
+  cursor: number | null,
+  limit = 9
+) => {
+  const res = await reapi({
+    url: "/blog/my-blog/cursor",
+    method: "POST",
+    data: {
+      cursor,
+      limit,
+    },
+  });
+  return res.data as BlogCursorResponse;
+};
 export const upload_mblog = async (
   title: string,
   content: string,
   cover: string[],
   tags: string[],
-  mid: number,
+  mid: number
 ) => {
   const res = await reapi({
     url: "blog/my-blog/new-mblog",
@@ -47,7 +124,7 @@ export const upload_mblog = async (
       music_id: mid,
     },
   });
-  return res.data
+  return res.data;
 };
 
 // blog_id是0表示新建博客，非0表示编辑博客
@@ -55,7 +132,7 @@ export const upload_blog = async (
   title: string,
   content: string,
   cover: string[],
-  tags: string[],
+  tags: string[]
 ) => {
   const res = await reapi({
     url: "/blog/my-blog/new",
@@ -67,7 +144,7 @@ export const upload_blog = async (
       tags: tags,
     },
   });
-  return res.data
+  return res.data;
 };
 
 export const update_blog = async (
@@ -75,7 +152,7 @@ export const update_blog = async (
   title: string,
   content: string,
   cover: string[],
-  tags: string[],
+  tags: string[]
 ) => {
   const res = await reapi({
     url: `/blog/my-blog/${id}`,

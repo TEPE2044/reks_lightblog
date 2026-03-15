@@ -4,15 +4,14 @@
       <BImg width="500" src="/melo.webp" class="object-fit-cover" alt="image slot" />
       <div class="hub-caro-overlay">
         <span class="badge bg-danger mb-2">公告</span>
-        <h5 class="text-white m-0">ReKindlers开放测试</h5>
+        <h5 class="text-white m-0">ReKindlers 0.6.0 开发中</h5>
       </div>
     </div>
 
     <div class="clover">
       <div class="clover-box shadow-sm border border-2 rounded hot-content" v-for="tab in 4" :key="`4clover_${tab}`">
-        <img class="clover-img" src="/ysg2.jpg" alt="">
+        <img class="clover-img" src="/imagePlaceholder.webp" alt="">
         <div class="clover-overlay">
-          <div class="clover-tag">热门</div>
           <div class="clover-title">内容标题 {{ tab }}</div>
         </div>
       </div>
@@ -29,14 +28,15 @@
 
 .hub-header {
   display: grid;
-  grid-template-columns: 500px 1fr;
+  grid-template-columns: 400px 1fr;
   @extend %reks-card-box;
-  gap: 2rem;
+  gap: 3rem;
 
   .hub-caro {
     width: 500px;
-    max-height: 280px;
+    max-height: 320px;
     position: relative;
+    cursor: pointer;
     
     &::after {
       content: '';
@@ -70,7 +70,7 @@
     display: grid;
     gap: 1rem;
     grid-template-rows: 1fr 1fr;
-    grid-template-columns: 300px 220px;
+    grid-template-columns: 300px 300px;
 
     >div {
       cursor: pointer;
@@ -98,15 +98,6 @@
         opacity: 0;
         transition: all 0.3s ease;
         
-        .clover-tag {
-          display: inline-block;
-          font-size: 0.65rem;
-          padding: 0.2em 0.6em;
-          background: rgba(255,255,255,0.9);
-          color: #333;
-          border-radius: 4px;
-          margin-bottom: 0.4rem;
-        }
         
         .clover-title {
           color: white;

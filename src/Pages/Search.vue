@@ -135,16 +135,15 @@ const casePlay = (m: MusicResponse) => {
 
             <article
               v-if="searchType === 'keyword'"
-              class="row mb-3 border card-box atc g-0"
+              class="blog-grid-card"
+              :class="{ 'no-cover': !i.cover || String(i.cover).trim().length === 0 }"
               v-for="i in blogRes"
               :key="`rs${i.id}${i.author.id}`"
             >
-              <div class="col-md-5 p-3 img-meta">
-                <img :src="i.cover" class="card-img" :alt="`alt${i.cover}`" />
+              <div class="cover-wrap" v-if="i.cover && String(i.cover).trim().length > 0">
+                <img :src="i.cover" class="cover-img" :alt="`alt${i.cover}`" />
               </div>
-              <div
-                class="col-md-7 p-4 card-content d-flex flex-column justify-content-between"
-              >
+              <div class="card-content d-flex flex-column justify-content-between">
                 <router-link :to="`/blog/${i.id}`">
                   <h5 class="mt-0 fw-bold title-link">{{ i.title }}</h5>
                 </router-link>
@@ -324,6 +323,68 @@ const casePlay = (m: MusicResponse) => {
     .author {
       border-top: 1px dashed rgba(180, 180, 180, 0.6);
       padding-top: 0.85rem;
+    }
+  }
+}
+
+.blog-grid-card {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(220, 220, 220, 0.9);
+  background-color: rgba(255, 255, 255, 0.86);
+  margin-bottom: 0.9rem;
+
+  .cover-wrap {
+    height: 160px;
+
+    .cover-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 0.6rem;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  .card-content {
+    padding: 0.3rem 0.4rem;
+
+    .title-link {
+      color: #2f2f2f;
+      line-height: 1.35;
+      margin-bottom: 0.6rem;
+    }
+
+    .author {
+      margin-top: auto;
+      border-top: 1px dashed rgba(180, 180, 180, 0.6);
+      padding-top: 0.7rem;
+    }
+  }
+}
+
+.blog-grid-card.no-cover {
+  grid-template-columns: 1fr;
+
+  .card-content {
+    padding: 0.2rem 0.15rem;
+
+    .title-link {
+      font-size: 1.02rem;
+      margin-bottom: 0.9rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .blog-grid-card {
+    grid-template-columns: 1fr;
+
+    .cover-wrap {
+      height: 190px;
     }
   }
 }

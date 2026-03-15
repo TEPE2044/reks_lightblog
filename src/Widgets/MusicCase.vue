@@ -9,7 +9,19 @@ import { detailStore } from '../Store/detail';
 const { get_detail } = detailStore()
 const { addIntoPlayQueue, selectOutSide } = playerStore()
 const { currentIndex } = storeToRefs(playerStore())
-const props = defineProps<{ music: MusicResponse }>();
+const props = withDefaults(defineProps<{
+  music: MusicResponse;
+  showFavorite?: boolean;
+  favorited?: boolean;
+  favoriteDisabled?: boolean;
+}>(), {
+  showFavorite: false,
+  favorited: false,
+  favoriteDisabled: false,
+});
+const emit = defineEmits<{
+  (e: "favorite-toggle", payload: { id: number; next: boolean }): void;
+}>();
 const m = props.music;
 const toast = useToast()
 const {playQueueLength} = storeToRefs(playerStore())
@@ -37,6 +49,11 @@ const casePlay = () => {
     createToast(toast, "播放失败", "未知原因", "danger")
     console.error(e)
   }
+}
+
+const handleFavorite = () => {
+  if (props.favoriteDisabled) return;
+  emit("favorite-toggle", { id: m.id, next: !props.favorited });
 }
 </script>
 
@@ -68,7 +85,12 @@ const casePlay = () => {
         <button class="control-btn">
           <i-bi-plus-circle class="fs-4" @click="caseAdd()" />
         </button>
-        <button class="control-btn">
+        <button
+          v-if="props.showFavorite"
+          class="control-btn"
+          :class="{ active: props.favorited, disabled: props.favoriteDisabled }"
+          @click.stop="handleFavorite"
+        >
           <i-bi-heart class="fs-4" />
         </button>
       </div>
@@ -159,6 +181,15 @@ const casePlay = () => {
     &:hover {
       transform: scale(1.15);
       background: rgba(255, 255, 255, 0.1);
+    }
+
+    &.active {
+      color: #ff7b7b;
+    }
+
+    &.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
   }
 }

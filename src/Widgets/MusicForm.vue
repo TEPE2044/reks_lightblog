@@ -8,8 +8,13 @@ import { BButton, useToast } from "bootstrap-vue-next";
 import { ref } from "vue";
 import { upload_img } from "../Hooks/Editor";
 import { upload_music, upload_music_form } from "../Hooks/Music";
+import { userStore } from "../Store/user";
+import { substore } from "../Store/subscribe";
+import { makeSubscribeMessage } from "../Utils/subscribe-log";
 const { isOriginal, name, desc, audioFile, coverFile, coverURL, audioURL } =
   storeToRefs(musicStore());
+const { userInfo } = storeToRefs(userStore());
+const { addSubscribeMessage } = substore();
 
 const toast = useToast();
 const pre_audio = ref<string | null>(null);
@@ -102,6 +107,13 @@ const upload_new_music = async (data: MusicData) => {
 
     const formRes = await upload_music_form(completeData);
     console.log(formRes);
+    addSubscribeMessage(
+      makeSubscribeMessage(
+        "self.music.uploaded",
+        `你发布了音频《${completeData.name}》`,
+      ),
+      userInfo.value?.reks_id ?? "guest",
+    );
     // TODO:加一个确认上传界面
     // TODO:重置表单
     createToast(

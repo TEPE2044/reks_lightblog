@@ -1,46 +1,91 @@
 <script setup lang="ts">
+import { useInfiniteScroll } from "@vueuse/core";
 import { onMounted, ref } from "vue";
-import { query_my_blog } from "../Hooks/Blog";
+import { useToast } from "bootstrap-vue-next";
+import { storeToRefs } from "pinia";
+import { query_my_blog_cursor } from "../Hooks/Blog";
+import { favoriteBatchStore } from "../Store/favoriteBatch";
+import { createToast } from "../Utils/reks-toast";
 import type { BlogData } from "../Utils/reks-interface";
-import { useToggle } from "@vueuse/core";
-
 
 const blogs = ref<BlogData[]>([]);
-const loading = ref(true)
-const [empty, setEmpty] = useToggle()
-onMounted(async () => {
-  // 先读缓存
-  const cached = localStorage.getItem('blogs')
-  if (cached) {
-    blogs.value = JSON.parse(cached)
-    loading.value = false  // 立即显示，无需等待
-    console.log(loading.value)
-  }
+const loading = ref(false);
+const loadingMore = ref(false);
+const hasMore = ref(true);
+const cursor = ref<number | null>(null);
+const toast = useToast();
+const fav = favoriteBatchStore();
+const {
+  favoriteStatusMap,
+  favoriteReadyMap,
+  favoritePendingMap,
+} = storeToRefs(fav);
 
-  // 再请求新数据
-  const res = await query_my_blog()
-  blogs.value = res?.blogs
-  if (res == null) {
-    setEmpty(true)
+const handleFavoriteToggle = async (payload: { id: number; next: boolean }) => {
+  const res = await fav.handleFavoriteToggle(payload);
+  if (res.status === "not_logged_in") {
+    createToast(toast, "请先登录", "登录后才能收藏博客", "warning");
+    return;
   }
-  if (blogs.value?.length === 0) {
-    setEmpty(true)
-  } else {
-    setEmpty(false)
+  if (res.status === "failed") {
+    createToast(toast, "操作失败", "收藏状态更新失败，请稍后重试", "danger");
   }
-  localStorage.setItem('blogs', JSON.stringify(res?.blogs))
-  loading.value = false
-})
+};
+
+const loadMore = async () => {
+  if (loadingMore.value || !hasMore.value) return;
+  loadingMore.value = true;
+  try {
+    const page = await query_my_blog_cursor(cursor.value, 9);
+    const incoming = page.items || [];
+    blogs.value = [...blogs.value, ...incoming];
+    const syncRes = await fav.syncFavoriteStatusForBlogs(incoming);
+    if (syncRes === "degraded-first") {
+      createToast(toast, "状态降级", "收藏状态加载失败，已使用默认状态", "warning");
+    }
+    cursor.value = page.next_cursor;
+    hasMore.value = !!page.has_more;
+  } finally {
+    loading.value = false;
+    loadingMore.value = false;
+  }
+};
+
+onMounted(async () => {
+  fav.resetFavoriteState();
+  loading.value = true;
+  await loadMore();
+});
+
+useInfiniteScroll(
+  window,
+  () => {
+    void loadMore();
+  },
+  {
+    distance: 10,
+    canLoadMore: () => !loadingMore.value && hasMore.value,
+  },
+);
 
 
 </script>
 
 <template>
-  <div class="myblog-empty" v-if="empty">
+  <div class="myblog-empty" v-if="!loading && blogs.length === 0">
     <Empty title="您还没有发布过博客哦~" />
   </div>
-  <div class="myblog" v-if="!empty && !loading">
-    <BlogCard v-for="blog in blogs" :key="blog.id" :blog="blog" />
+  <div class="myblog" v-if="blogs.length > 0">
+    <BlogCard
+      v-for="blog in blogs"
+      :key="blog.id"
+      :blog="blog"
+      :favorited="favoriteStatusMap[blog.id]"
+      :favorite-ready="favoriteReadyMap[blog.id]"
+      :favorite-disabled="favoritePendingMap[blog.id]"
+      @favorite-toggle="handleFavoriteToggle"
+    />
+    <div v-if="loadingMore" class="load-more-tip">加载中...</div>
   </div>
 
 </template>
@@ -69,5 +114,14 @@ onMounted(async () => {
     column-count: 2;
     padding: 2rem;
   }
+}
+
+.load-more-tip {
+  break-inside: avoid;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  color: #6b6b6b;
+  padding: 0.75rem 0;
 }
 </style>

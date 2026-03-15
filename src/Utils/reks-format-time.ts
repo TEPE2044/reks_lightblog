@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export const formatPlayerTime = (time: number) => {
   // 计算小时、分钟、秒
   const hours = Math.floor(time / 3600);
@@ -14,4 +16,20 @@ export const formatPlayerTime = (time: number) => {
     // MM:SS 格式
     return `${pad(minutes)}:${pad(seconds)}`;
   }
+};
+
+export const formatDateTime = (
+  value: string | number | Date | null | undefined,
+  pattern = "YYYY-MM-DD HH:mm",
+) => {
+  if (!value) {
+    return "--";
+  }
+
+  const date = dayjs(value);
+  if (!date.isValid()) {
+    return "--";
+  }
+
+  return date.format(pattern);
 };

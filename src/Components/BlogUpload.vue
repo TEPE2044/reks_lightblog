@@ -8,23 +8,26 @@ import { useToast, useToggle } from "bootstrap-vue-next";
 import { editorStore } from "../Store/editor";
 import { upload_img } from "../Hooks/Editor";
 import { upload_blog, upload_mblog } from "../Hooks/Blog";
+import { formatDateTime } from "../Utils/reks-format-time";
 import { createToast } from "../Utils/reks-toast";
 import router from "../Router";
 import { userStore } from "../Store/user";
 import { set } from "@vueuse/core";
 import { searchMusic } from "../Hooks/Search";
 import type { MusicResponse } from "../Utils/reks-interface";
+import { substore } from "../Store/subscribe";
+import { makeSubscribeMessage } from "../Utils/subscribe-log";
 
-const options = withDefaults(
-  defineProps<{ mblog?: boolean; upload: "mblog" | "" }>(),
-  {
-    mblog: false,
-    upload: "",
-  },
-);
+withDefaults(defineProps<{ mblog?: boolean; upload: "mblog" | "" }>(), {
+  mblog: false,
+  upload: "",
+});
 
 const toast = useToast();
 const { userInfo } = storeToRefs(userStore());
+const { addSubscribeMessage } = substore();
+
+const resolveCurrentRid = () => userInfo.value?.reks_id ?? "guest";
 
 // 状态管理
 const { editor, valueHTML, pub_tags, pub_title, coverImages, music_id } =
@@ -137,6 +140,13 @@ const handleSubmit = async () => {
       createToast(toast, "发布成功", "发布成功！期待上热门哦", "success");
 
       if (res?.msg) {
+        addSubscribeMessage(
+          makeSubscribeMessage(
+            "self.blog.published",
+            `你发布了音乐博客《${pub_title.value}》`,
+          ),
+          resolveCurrentRid(),
+        );
         set(pub_title, "");
         set(valueHTML, "");
         set(coverImages, []);
@@ -160,6 +170,13 @@ const handleSubmit = async () => {
         pub_tags.value,
       );
       if (res?.msg) {
+        addSubscribeMessage(
+          makeSubscribeMessage(
+            "self.blog.published",
+            `你发布了博客《${pub_title.value}》`,
+          ),
+          resolveCurrentRid(),
+        );
         set(pub_title, "");
         set(valueHTML, "");
         set(coverImages, []);
@@ -338,7 +355,7 @@ const previewMusic = computed(() => {
           />
         </template>
         <template #cell(created_at)="{ item }">
-          {{ new Date(item.created_at).toLocaleString() }}
+          {{ formatDateTime(item.created_at) }}
         </template>
         <template #cell(original)="{ item }">
           {{ item.original ? "是" : "否" }}
