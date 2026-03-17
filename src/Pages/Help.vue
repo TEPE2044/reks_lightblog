@@ -14,7 +14,7 @@
         </div>
         <div class="qa mb-2">
           <h5 class="fw-bold">Q: 我的手机号已经不再使用</h5>
-          <p>请点击<span title="找回密码" class="reset"><b>此处</b></span>通过邮箱验证重置密码。</p>
+          <p>请点击<span title="找回密码" class="reset" @click="fb.toggle()"><b>此处</b></span>通过邮箱验证重置密码。</p>
         </div>
       </BAccordionItem>
       <BAccordionItem title="我要反馈一些问题">
@@ -34,12 +34,30 @@
         </div>
       </BAccordionItem>
     </BAccordion>
+
+    <BModal id="fb" title="重置手机号" no-close-on-backdrop cancel-title="取消" ok-title="确定重置" @ok="" @cancel="">
+      <BFormGroup label="邮箱">
+        <BFormInput class="mb-2" type="email" placeholder="请输入邮箱"/>
+      </BFormGroup>
+      <BFormGroup class="mt-2" label="重置手机号">
+        <BFormInput class="mb-2" type="email" placeholder="旧手机号"/>
+        <BFormInput class="mb-2" type="tel" placeholder="新手机号"/>
+      </BFormGroup>
+    </BModal>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useToggle } from 'bootstrap-vue-next';
 
+const fb = useToggle('fb')
 
+const findBack = () => {
+  //TODO: 前端校验邮箱、新旧手机号
+  //发往后端比对，查看是否有此人(email&old)
+  //向邮箱发送一封带有校验信息邮件，确认之后，重置手机号
+  //最后返回请重新登录
+}
 </script>
 
 <style lang="scss" scoped>

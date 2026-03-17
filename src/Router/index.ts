@@ -160,7 +160,7 @@ router.beforeEach((to, from, next) => {
   const isAuthenticated = rcode && payload;
 
   // 未登录 & 当前不在首页 → 强制回到首页
-  if (!isAuthenticated && to.path !== "/") {
+  if (!isAuthenticated && to.path !== "/" && to.path !== "/help") {
     next("/");
     return;
   }
