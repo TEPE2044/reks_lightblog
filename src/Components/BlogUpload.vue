@@ -137,7 +137,6 @@ const handleSubmit = async () => {
         music_id.value,
       );
       console.log("发布成功:", res);
-      createToast(toast, "发布成功", "发布成功！期待上热门哦", "success");
 
       if (res?.msg) {
         addSubscribeMessage(

@@ -295,6 +295,13 @@ watch(
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        .music-card {
+            @extend %reks-card-box;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
         .author-card {
             @extend %reks-card-box;

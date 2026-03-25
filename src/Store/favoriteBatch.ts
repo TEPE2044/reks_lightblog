@@ -202,7 +202,7 @@ export const favoriteBatchStore = defineStore("favoriteBatch", () => {
   const syncLikeStatusForBlogs = async (items: FavoriteItemLike[]) => {
     return syncLikeStatusByIds(items.map((item) => item.id));
   };
-
+  // Record<number,boolean> 纯对象
   const handleTargetFavoriteToggle = async (
     payload: FavoriteTogglePayload,
     targetType: FavoriteTargetType,
