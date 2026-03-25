@@ -52,12 +52,12 @@ import { useToggle } from 'bootstrap-vue-next';
 
 const fb = useToggle('fb')
 
-const findBack = () => {
-  //TODO: 前端校验邮箱、新旧手机号
-  //发往后端比对，查看是否有此人(email&old)
-  //向邮箱发送一封带有校验信息邮件，确认之后，重置手机号
-  //最后返回请重新登录
-}
+// const findBack = () => {
+//   //TODO: 前端校验邮箱、新旧手机号
+//   //发往后端比对，查看是否有此人(email&old)
+//   //向邮箱发送一封带有校验信息邮件，确认之后，重置手机号
+//   //最后返回请重新登录
+// }
 </script>
 
 <style lang="scss" scoped>
