@@ -14,10 +14,12 @@ const props = withDefaults(defineProps<{
   showFavorite?: boolean;
   favorited?: boolean;
   favoriteDisabled?: boolean;
+  enableDelete?:boolean;
 }>(), {
   showFavorite: false,
   favorited: false,
   favoriteDisabled: false,
+  enableDelete:false
 });
 const emit = defineEmits<{
   (e: "favorite-toggle", payload: { id: number; next: boolean }): void;
@@ -54,6 +56,10 @@ const casePlay = () => {
 const handleFavorite = () => {
   if (props.favoriteDisabled) return;
   emit("favorite-toggle", { id: m.id, next: !props.favorited });
+}
+
+const handleDelete = () => {
+  console.log('delete')
 }
 </script>
 
@@ -92,6 +98,13 @@ const handleFavorite = () => {
           @click.stop="handleFavorite"
         >
           <i-bi-heart class="fs-4" />
+        </button>
+         <button
+          v-if="props.enableDelete"
+          class="control-btn"
+          @click.stop="handleDelete"
+        >
+          <i-bi-trash class="fs-4" />
         </button>
       </div>
     </div>

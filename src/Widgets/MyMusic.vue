@@ -77,6 +77,7 @@ useInfiniteScroll(
             :music="music"
             :show-favorite="true"
             :favorited="musicFavoriteStatusMap[music.id]"
+            :enable-delete="true"
             :favorite-disabled="!musicFavoriteReadyMap[music.id] || musicFavoritePendingMap[music.id]"
             @favorite-toggle="handleMusicFavoriteToggle"
         />

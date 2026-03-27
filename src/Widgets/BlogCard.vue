@@ -27,6 +27,7 @@ const blogProps = withDefaults(defineProps<{
   showLike?: boolean;
   showFavorite?: boolean;
   showActions?: boolean;
+  enableDelete?:boolean;
 }>(), {
   liked: false,
   likeReady: true,
@@ -37,6 +38,7 @@ const blogProps = withDefaults(defineProps<{
   showLike: true,
   showFavorite: true,
   showActions: true,
+  enableDelete: false
 });
 const emit = defineEmits<{
   (e: "like-toggle", payload: FavoriteTogglePayload): void;
@@ -67,6 +69,10 @@ const handleFavorite = async () => {
   if (favoritePending.value || !favoriteReady.value) return;
   emit("favorite-toggle", { id: b.id, next: !isFavorited.value });
 };
+
+const handleDelete = async () => {
+  console.log('deleted')
+}
 
 const readBlog = async (id: number) => {
   try {
@@ -230,6 +236,13 @@ const casePlay = () => {
           @click.stop="handleFavorite"
         >
           <i-bi-heart />
+        </div>
+         <div
+          v-if="blogProps.enableDelete"
+          class="cion mt-1"
+          @click.stop="handleDelete"
+        >
+          <i-bi-trash />
         </div>
       </div>
     </template>
