@@ -166,3 +166,11 @@ export const update_blog = async (
   });
   return res;
 };
+
+export const delete_blog = async (blog_id: Number) => {
+  const res = await reapi({
+    url:`/blog/delete/${blog_id}`,
+    method:'DELETE'
+  })
+  return res;
+}
