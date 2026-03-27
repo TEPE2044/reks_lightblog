@@ -1,5 +1,4 @@
-import { createRouter, createWebHashHistory } from "vue-router";
-
+import { createRouter,createWebHashHistory } from "vue-router";
 const router = createRouter({
   history: createWebHashHistory(),
   // 路由滚动行为：默认进入页面回到顶部；返回/前进恢复历史位置；带 hash 时定位锚点
@@ -153,10 +152,12 @@ const router = createRouter({
     { path: "/:pathMatch(.*)*", redirect: "/404" },
   ],
 });
-const rcode = localStorage.getItem("rcode");
-const payload = localStorage.getItem("payload");
+let rcode = localStorage.getItem("rcode");
+let payload = localStorage.getItem("payload");
 router.beforeEach((to, from, next) => {
   console.log(from.path);
+  rcode = localStorage.getItem("rcode")
+  payload = localStorage.getItem("payload");
   const isAuthenticated = rcode && payload;
 
   // 未登录 & 当前不在首页 → 强制回到首页
@@ -167,4 +168,5 @@ router.beforeEach((to, from, next) => {
 
   next(); // 其他情况正常放行（包括已在首页的情况）
 });
+
 export default router;
