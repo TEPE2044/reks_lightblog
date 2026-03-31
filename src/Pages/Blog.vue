@@ -207,7 +207,7 @@ watch(
 
             <!-- 互动按钮组 -->
             <div class="action-buttons">
-                <button
+                <BButton
                     class="action-btn"
                     :class="{ active: isLiked, disabled: !likeReady || likePending }"
                     :disabled="!likeReady || likePending"
@@ -215,8 +215,8 @@ watch(
                 >
                     <i-bi-hand-thumbs-up />
                     <span>{{ likePending ? "处理中" : `点赞 ${likeCount}` }}</span>
-                </button>
-                <button
+                </BButton>
+                <BButton
                     class="action-btn"
                     :class="{ active: isFavorited, disabled: !favoriteReady || favoritePending }"
                     :disabled="!favoriteReady || favoritePending"
@@ -224,7 +224,11 @@ watch(
                 >
                     <i-bi-heart />
                     <span>{{ favoritePending ? "处理中" : "收藏" }}</span>
-                </button>
+                </BButton>
+                <BButton class="action-btn">
+                    <i-bi-gear/>
+                </BButton>
+
             </div>
         </aside>
     </div>
