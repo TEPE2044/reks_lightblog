@@ -65,3 +65,11 @@ export const checkSafe = async() => {
   })
   return res.data?.level
 }
+
+export const changePhone = async() => {
+  const res = await reapi({
+    method:'POST',
+    url:"/auth/change-phone-safety"
+  })
+  return res.data
+}
