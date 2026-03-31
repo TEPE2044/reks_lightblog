@@ -68,6 +68,11 @@ const router = createRouter({
           name: "upload-mblog",
           component: () => import("../Components/MBlog.vue"),
         },
+        {
+          path:"draft",
+          name:"draft",
+          component:() => import("../Pages/Draft.vue")
+        }
       ],
     },
     {
