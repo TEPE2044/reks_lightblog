@@ -1,74 +1,95 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { MusicResponse } from '../Utils/reks-interface';
-import { playerStore } from '../Store/player';
-import { storeToRefs } from 'pinia';
+import { ref } from "vue";
+import type { MusicResponse } from "../Utils/reks-interface";
+import { playerStore } from "../Store/player";
+import { storeToRefs } from "pinia";
 import { createToast } from "../Utils/reks-toast";
 import { useToast } from "bootstrap-vue-next";
-import { detailStore } from '../Store/detail';
-const { get_detail } = detailStore()
-const { addIntoPlayQueue, selectOutSide } = playerStore()
-const { currentIndex } = storeToRefs(playerStore())
-const props = withDefaults(defineProps<{
-  music: MusicResponse;
-  showFavorite?: boolean;
-  favorited?: boolean;
-  favoriteDisabled?: boolean;
-  enableDelete?:boolean;
-}>(), {
-  showFavorite: false,
-  favorited: false,
-  favoriteDisabled: false,
-  enableDelete:false
-});
+import { detailStore } from "../Store/detail";
+const { get_detail } = detailStore();
+const { addIntoPlayQueue, selectOutSide } = playerStore();
+const { currentIndex } = storeToRefs(playerStore());
+const props = withDefaults(
+  defineProps<{
+    music: MusicResponse;
+    showFavorite?: boolean;
+    favorited?: boolean;
+    favoriteDisabled?: boolean;
+    enableDelete?: boolean;
+  }>(),
+  {
+    showFavorite: false,
+    favorited: false,
+    favoriteDisabled: false,
+    enableDelete: false,
+  },
+);
 const emit = defineEmits<{
   (e: "favorite-toggle", payload: { id: number; next: boolean }): void;
 }>();
 const m = props.music;
-const toast = useToast()
-const {playQueueLength} = storeToRefs(playerStore())
+const toast = useToast();
+const { playQueueLength } = storeToRefs(playerStore());
 
 const imageLoad = ref(false);
 
 const caseAdd = () => {
   if (playQueueLength.value === 0) {
-    get_detail({ title: m?.name, author: m?.username, cover: m?.cover })
+    get_detail({ title: m?.name, author: m?.username, cover: m?.cover });
   }
-  const res = addIntoPlayQueue({ cover: m?.cover, songURL: m?.audio, title: m?.name, author: m?.username }, currentIndex.value)
+  const res = addIntoPlayQueue(
+    { cover: m?.cover, songURL: m?.audio, title: m?.name, author: m?.username },
+    currentIndex.value,
+  );
   if (res) {
-    createToast(toast, "添加成功", "歌曲添加成功", "success")
+    createToast(toast, "添加成功", "歌曲添加成功", "success");
   } else {
-    createToast(toast, "重复添加", "歌曲重复添加", "success")
+    createToast(toast, "重复添加", "歌曲重复添加", "success");
   }
-}
+};
 
 const casePlay = () => {
   try {
-    selectOutSide({ cover: m?.cover, songURL: m?.audio, title: m?.name, author: m?.username })
-    get_detail({ title: m?.name, author: m?.username, cover: m?.cover })
-    createToast(toast, "播放成功", `正在播放 ${m?.username} - ${m?.name}`, "success")
+    selectOutSide({
+      cover: m?.cover,
+      songURL: m?.audio,
+      title: m?.name,
+      author: m?.username,
+    });
+    get_detail({ title: m?.name, author: m?.username, cover: m?.cover });
+    createToast(
+      toast,
+      "播放成功",
+      `正在播放 ${m?.username} - ${m?.name}`,
+      "success",
+    );
   } catch (e) {
-    createToast(toast, "播放失败", "未知原因", "danger")
-    console.error(e)
+    createToast(toast, "播放失败", "未知原因", "danger");
+    console.error(e);
   }
-}
+};
 
 const handleFavorite = () => {
   if (props.favoriteDisabled) return;
   emit("favorite-toggle", { id: m.id, next: !props.favorited });
-}
+};
 
 const handleDelete = () => {
-  console.log('delete')
-}
+  console.log("delete");
+};
 </script>
 
 <template>
   <BCard no-body no-header class="music-card position-relative" v-skeleton-item>
     <!-- 封面区域 -->
     <div class="cover-wrapper" v-skeleton="!imageLoad">
-      <img :src="m?.cover" :alt="`cover of ${m?.name || 'unknown'}`" @load="imageLoad = true" v-show="imageLoad"
-        class="cover-img" />
+      <img
+        :src="m?.cover"
+        :alt="`cover of ${m?.name || 'unknown'}`"
+        @load="imageLoad = true"
+        v-show="imageLoad"
+        class="cover-img"
+      />
     </div>
 
     <!-- 悬停层 -->
@@ -77,14 +98,16 @@ const handleDelete = () => {
         <BAvatar size="40" :src="m?.avatar" />
         <div class="info flex-grow-1">
           <div class="title fw-semibold text-white text-truncate">
-            {{ m?.name || 'Unknown' }}
+            {{ m?.name || "Unknown" }}
           </div>
           <p class="author text-white-50 mb-0 small">{{ m?.username }}</p>
         </div>
         <BButton size="sm" variant="light">+ 关注</BButton>
       </div>
 
-      <div class="controls d-flex align-items-center justify-content-center gap-4 mt-auto">
+      <div
+        class="controls d-flex align-items-center justify-content-center gap-4 mt-auto"
+      >
         <button class="control-btn">
           <i-bi-play-circle-fill class="fs-2" @click.stop="casePlay()" />
         </button>
@@ -99,13 +122,19 @@ const handleDelete = () => {
         >
           <i-bi-heart class="fs-4" />
         </button>
-         <button
-          v-if="props.enableDelete"
-          class="control-btn"
-          @click.stop="handleDelete"
-        >
-          <i-bi-trash class="fs-4" />
-        </button>
+        <BPopover placement="bottom">
+          <template #target>
+            <button
+              v-if="props.enableDelete"
+              class="control-btn"
+            >
+              <i-bi-trash class="fs-4" />
+            </button>
+          </template>
+          <BButton variant="outline-danger" @click.stop="handleDelete">
+            确认删除
+          </BButton>
+        </BPopover>
       </div>
     </div>
   </BCard>
@@ -152,7 +181,9 @@ const handleDelete = () => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease, filter 0.3s ease;
+  transition:
+    transform 0.5s ease,
+    filter 0.3s ease;
   display: block;
 }
 
@@ -164,7 +195,9 @@ const handleDelete = () => {
   backdrop-filter: blur(8px);
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    visibility 0.3s ease;
 }
 
 .header {
@@ -185,7 +218,9 @@ const handleDelete = () => {
     color: white;
     padding: 0.5rem;
     border-radius: 50%;
-    transition: transform 0.2s ease, background 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      background 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;

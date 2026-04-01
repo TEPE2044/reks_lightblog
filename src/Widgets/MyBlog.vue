@@ -83,7 +83,6 @@ useInfiniteScroll(
       :favorited="favoriteStatusMap[blog.id]"
       :favorite-ready="favoriteReadyMap[blog.id]"
       :favorite-disabled="favoritePendingMap[blog.id]"
-      :enable-delete="true"
       @favorite-toggle="handleFavoriteToggle"
     />
     <div v-if="loadingMore" class="load-more-tip">加载中...</div>
