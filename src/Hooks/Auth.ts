@@ -37,7 +37,7 @@ export const getUserProfile = async () => {
   return res.data;
 };
 
-export const loginbyAccount = async (data:AccountData) => {
+export const loginbyAccount = async (data: AccountData) => {
   const res = await reapi({
     method: "POST",
     // url: "/auth/login-by-account",
@@ -50,26 +50,41 @@ export const loginbyAccount = async (data:AccountData) => {
   return res.data;
 };
 
-export const loginOut = async() => {
+export const loginOut = async () => {
   const res = await reapi({
-    method:'GET',
-    url:"/auth/logout"
-  })
-  return res
+    method: "GET",
+    url: "/auth/logout",
+  });
+  return res;
+};
+
+export const checkSafe = async () => {
+  const res = await reapi({
+    method: "GET",
+    url: "/user/safety-level",
+  });
+  return res.data?.level;
+};
+
+export const changePhone = async () => {
+  const res = await reapi({
+    method: "POST",
+    url: "/auth/change-phone-safety",
+  });
+  return res.data;
+};
+
+export interface ResetData {
+  email: string;
+  old_phone: string;
+  new_phone: string;
 }
 
-export const checkSafe = async() => {
+export const findBack = async (data: ResetData) => {
   const res = await reapi({
-    method:'GET',
-    url:"/user/safety-level"
-  })
-  return res.data?.level
-}
-
-export const changePhone = async() => {
-  const res = await reapi({
-    method:'POST',
-    url:"/auth/change-phone-safety"
-  })
-  return res.data
-}
+    method: "POST",
+    url: "/auth/find-back",
+    data: data,
+  });
+  return res.data;
+};
