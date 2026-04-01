@@ -6,7 +6,7 @@
     <div class="recommand-tab mb-4">
       <div class="recommand-nav-wrap">
         <BNav align="center" pills class="recommand-nav">
-          <BNavItem to="/hub/main" exact exact-active-class="active">推荐
+          <BNavItem to="/hub/main" exact exact-active-class="active">内容推荐
           </BNavItem>
           <!-- <BNavItem to="/hub/subscribe" exact exact-active-class="active">订阅
           </BNavItem> -->
