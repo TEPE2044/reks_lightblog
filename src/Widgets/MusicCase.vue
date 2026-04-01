@@ -6,6 +6,7 @@ import { storeToRefs } from "pinia";
 import { createToast } from "../Utils/reks-toast";
 import { useToast } from "bootstrap-vue-next";
 import { detailStore } from "../Store/detail";
+import { delete_music } from "../Hooks/Music";
 const { get_detail } = detailStore();
 const { addIntoPlayQueue, selectOutSide } = playerStore();
 const { currentIndex } = storeToRefs(playerStore());
@@ -26,12 +27,14 @@ const props = withDefaults(
 );
 const emit = defineEmits<{
   (e: "favorite-toggle", payload: { id: number; next: boolean }): void;
+  (e: "deleted", payload: { id: number }): void;
 }>();
 const m = props.music;
 const toast = useToast();
 const { playQueueLength } = storeToRefs(playerStore());
 
 const imageLoad = ref(false);
+const deletePending = ref(false);
 
 const caseAdd = () => {
   if (playQueueLength.value === 0) {
@@ -74,8 +77,22 @@ const handleFavorite = () => {
   emit("favorite-toggle", { id: m.id, next: !props.favorited });
 };
 
-const handleDelete = () => {
-  console.log("delete");
+const handleDelete = async (id: number) => {
+  if (deletePending.value) return;
+  deletePending.value = true;
+  try {
+    const res = await delete_music(id);
+    if (res.data) {
+      createToast(toast, "删除成功", "该歌曲已删除", "success");
+      emit("deleted", { id });
+    } else {
+      createToast(toast, "删除失败", "删除未生效，请稍后重试", "danger");
+    }
+  } catch (e) {
+    createToast(toast, "删除失败", "未知原因", "danger");
+  } finally {
+    deletePending.value = false;
+  }
 };
 </script>
 
@@ -124,15 +141,16 @@ const handleDelete = () => {
         </button>
         <BPopover placement="bottom">
           <template #target>
-            <button
-              v-if="props.enableDelete"
-              class="control-btn"
-            >
+            <button v-if="props.enableDelete" class="control-btn">
               <i-bi-trash class="fs-4" />
             </button>
           </template>
-          <BButton variant="outline-danger" @click.stop="handleDelete">
-            确认删除
+          <BButton
+            variant="outline-danger"
+            :disabled="deletePending"
+            @click.stop="handleDelete(m.id)"
+          >
+            {{ deletePending ? "删除中" : "确认删除" }}
           </BButton>
         </BPopover>
       </div>

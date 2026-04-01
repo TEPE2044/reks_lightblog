@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useToast } from "bootstrap-vue-next";
-import { query_blog_by_id } from "../Hooks/Blog";
+import { delete_blog, query_blog_by_id } from "../Hooks/Blog";
 import {
   hasFavoriteAuthSession,
   queryLikeCount,
@@ -12,13 +12,14 @@ import {
 } from "../Hooks/Fav";
 import { createToast } from "../Utils/reks-toast";
 
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { userStore } from "../Store/user";
 import { storeToRefs } from "pinia";
 
 const { userInfo } = storeToRefs(userStore());
 
 const route = useRoute();
+const router = useRouter();
 const toast = useToast();
 const response = ref();
 
@@ -29,6 +30,7 @@ const likePending = ref(false);
 const isFavorited = ref(false);
 const favoriteReady = ref(false);
 const favoritePending = ref(false);
+const deletePending = ref(false);
 let favoriteSyncSeq = 0;
 let favoriteMutationSeq = 0;
 let likeSyncSeq = 0;
@@ -90,6 +92,31 @@ const syncFavoriteStatus = async (id: number) => {
     if (syncSeq === favoriteSyncSeq && mutationSeq === favoriteMutationSeq) {
       favoriteReady.value = true;
     }
+  }
+};
+
+const handleDelete = async (id: number) => {
+  if (deletePending.value) return;
+  deletePending.value = true;
+  try {
+    const res = await delete_blog(id);
+    if (res.data) {
+      createToast(toast, "删除成功", "该博客已删除", "success");
+      // 删除成功后离开详情页，避免继续操作已删除内容。
+      setTimeout(() => {
+        if (window.history.length > 1) {
+          router.back();
+        } else {
+          router.push("/");
+        }
+      }, 600);
+    } else {
+      createToast(toast, "删除失败", "删除未生效，请稍后重试", "danger");
+    }
+  } catch (e) {
+    createToast(toast, "删除失败", "未知原因", "danger");
+  } finally {
+    deletePending.value = false;
   }
 };
 
@@ -259,10 +286,16 @@ watch(
             <template #target>
               <BButton class="me-2" variant="danger" title="删除">
                 <i-bi-trash /> 删除
-              </BButton></template
-            >
+              </BButton>
+            </template>
             <template #title>是否要删除?</template>
-            <BButton variant="danger" title="yes">确认删除</BButton>
+            <BButton
+              :disabled="deletePending"
+              variant="danger"
+              title="yes"
+              @click.stop="handleDelete(Number(route.params.id))"
+              >{{ deletePending ? "删除中" : "确认删除" }}</BButton
+            >
           </BPopover>
         </BPopover>
       </div>

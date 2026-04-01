@@ -169,8 +169,11 @@ export const update_blog = async (
 
 export const delete_blog = async (blog_id: Number) => {
   const res = await reapi({
-    url:`/blog/delete/${blog_id}`,
-    method:'DELETE'
+    url:`/blog/delete`,
+    method:'DELETE',
+    params:{
+      blog_id
+    }
   })
   return res;
 }

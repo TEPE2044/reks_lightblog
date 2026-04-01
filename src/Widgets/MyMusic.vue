@@ -33,6 +33,10 @@ const handleMusicFavoriteToggle = async (payload: { id: number; next: boolean })
     }
 }
 
+const handleMusicDeleted = (payload: { id: number }) => {
+    musicList.value = musicList.value.filter((item) => item.id !== payload.id)
+}
+
 const loadMore = async () => {
     if (loadingMore.value || !hasMore.value) return
     loadingMore.value = true
@@ -80,6 +84,7 @@ useInfiniteScroll(
             :enable-delete="true"
             :favorite-disabled="!musicFavoriteReadyMap[music.id] || musicFavoritePendingMap[music.id]"
             @favorite-toggle="handleMusicFavoriteToggle"
+            @deleted="handleMusicDeleted"
         />
         <div v-if="loadingMore" class="load-more-tip">加载中...</div>
     </div>
