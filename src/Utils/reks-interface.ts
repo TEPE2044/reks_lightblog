@@ -79,6 +79,7 @@ export interface MusicTwice {
   isOriginal: boolean;
   name: string;
   desc: string;
+  type: number;
   coverURL: string | undefined;
   audioURL: string | undefined;
 }
@@ -87,6 +88,7 @@ export interface MusicData {
   isOriginal: boolean;
   name: string;
   desc: string;
+  type: number;
 }
 
 export interface MusicResponse {
@@ -97,6 +99,8 @@ export interface MusicResponse {
   id: number;
   name: string;
   original: boolean;
+  type: number;
+  related: number;
   rid: number;
   state: number;
   username: string;
