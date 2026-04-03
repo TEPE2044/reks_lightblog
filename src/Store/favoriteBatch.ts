@@ -35,8 +35,8 @@ type LikeToggleResult =
 
 export const favoriteBatchStore = defineStore("favoriteBatch", () => {
   // statusMap: 当前是否已点赞/已收藏，是最终要展示的结果本身
-  // readyMap: 这一项的初始状态是否已经从后端同步回来
-  // pendingMap: 这一项是否正在提交切换请求，用来防止重复点击
+  // readyMap: 这一项的初始状态是否已经从后端同步回来，同步锁
+  // pendingMap: 请求锁
   const favoriteStatusMap = ref<Record<number, boolean>>({});
   const favoriteReadyMap = ref<Record<number, boolean>>({});
   const favoritePendingMap = ref<Record<number, boolean>>({});

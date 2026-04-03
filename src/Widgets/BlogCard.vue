@@ -14,7 +14,7 @@ type FavoriteTogglePayload = {
   id: number;
   next: boolean;
 };
-
+// const props = withDefaults(defineProps<{key?:type}>(),{*key:default value*})
 // type 0是音乐博客，1普通博客
 const blogProps = withDefaults(defineProps<{
   blog: BlogData;
@@ -26,8 +26,9 @@ const blogProps = withDefaults(defineProps<{
   favoriteDisabled?: boolean;
   showLike?: boolean;
   showFavorite?: boolean;
+  showEdit?:boolean;
   showActions?: boolean;
-  enableVisit?:boolean
+  enableVisit?:boolean;
 }>(), {
   liked: false,
   likeReady: true,
@@ -37,9 +38,13 @@ const blogProps = withDefaults(defineProps<{
   favoriteDisabled: false,
   showLike: true,
   showFavorite: true,
+  showEdit:false,
   showActions: true,
   enableVisit:true
 });
+// 子传父
+// 当子组件触发 favorite-toggle 事件时，调用 handleFavoriteToggle 方法 @favorite-toggle="handleFavoriteToggle"
+// const emit = defineEmit<{(e:*"event"*,payload:*data*):type;}>()
 const emit = defineEmits<{
   (e: "like-toggle", payload: FavoriteTogglePayload): void;
   (e: "favorite-toggle", payload: FavoriteTogglePayload): void;
@@ -63,6 +68,7 @@ const favoritePending = computed(() => Boolean(blogProps.favoriteDisabled));
 const handleLike = async () => {
   if (likePending.value || !likeReady.value) return;
   emit("like-toggle", { id: b.id, next: !isLiked.value });
+  // emit("event",{payload1:data,payload2:data})
 };
 
 const handleFavorite = async () => {
@@ -233,6 +239,11 @@ const casePlay = () => {
         >
           <i-bi-heart />
         </div>
+        <div v-if="blogProps.showEdit" class="cion mt-1" > 
+          <i-bi-pen/> TODO:draft内可编辑
+        </div>
+
+        
       </div>
     </template>
   </BCard>

@@ -10,7 +10,9 @@ import type { BlogData } from "../Utils/reks-interface";
 
 const blogs = ref<BlogData[]>([]);
 const loading = ref(false);
+// 加载更多
 const loadingMore = ref(false);
+// 还有吗变量
 const hasMore = ref(true);
 const cursor = ref<number | null>(null);
 const toast = useToast();
@@ -31,11 +33,12 @@ const handleFavoriteToggle = async (payload: { id: number; next: boolean }) => {
     createToast(toast, "操作失败", "收藏状态更新失败，请稍后重试", "danger");
   }
 };
-
+// 还有吗
 const loadMore = async () => {
   if (loadingMore.value || !hasMore.value) return;
   loadingMore.value = true;
   try {
+    // 首次发送，没有游标，让后台给
     const page = await query_my_blog_cursor(cursor.value, 9);
     const incoming = page.items || [];
     blogs.value = [...blogs.value, ...incoming];
