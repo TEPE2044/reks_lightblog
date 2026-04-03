@@ -49,15 +49,19 @@ export const query_hot_blog_cursor = async (
   return res.data as BlogCursorResponse;
 };
 
-export const query_my_draft = async () => {
+export const query_my_draft = async (
+  cursor: number | null,
+  limit = 9
+) => {
   const res = await reapi({
-    url: "/blog/my-blog",
-    method: "GET",
-    params: {
-      state_: 0,
+    url: "/blog/my-draft/cursor",
+    method: "POST",
+    data: {
+      cursor,
+      limit
     },
   });
-  return res.data;
+  return res.data as BlogCursorResponse;
 };
 
 export const query_blog_by_id = async (id: number) => {

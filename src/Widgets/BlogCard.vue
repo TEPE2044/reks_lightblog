@@ -27,6 +27,7 @@ const blogProps = withDefaults(defineProps<{
   showLike?: boolean;
   showFavorite?: boolean;
   showActions?: boolean;
+  enableVisit?:boolean
 }>(), {
   liked: false,
   likeReady: true,
@@ -36,7 +37,8 @@ const blogProps = withDefaults(defineProps<{
   favoriteDisabled: false,
   showLike: true,
   showFavorite: true,
-  showActions: true
+  showActions: true,
+  enableVisit:true
 });
 const emit = defineEmits<{
   (e: "like-toggle", payload: FavoriteTogglePayload): void;
@@ -207,7 +209,7 @@ const casePlay = () => {
       </div>
     </div>
 
-    <div class="rs-card-content mt-4" v-skeleton-item @click="readBlog(b.id)">
+    <div class="rs-card-content mt-4" v-skeleton-item @click="readBlog(b.id)" v-if="blogProps.enableVisit === true">
       <div class="rs-title h5" :title="b.title">
         <strong>{{ b.title }}</strong>
       </div>
