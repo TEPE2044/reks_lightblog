@@ -83,7 +83,7 @@ onMounted(async () => {
 <template>
   <div class="showcase">
     <div class="scroll-bar w-100 mb-4 p-4">
-      <div class="case-title h5">电台上新</div>
+      <div class="case-title h5">歌曲上新 这个玩意做两个，一个是官方的，一个是普通用户的，普用放上面</div>
       <div ref="showcase" class="case py-4 mt-4" v-if="!empty">
         <MusicCase
           v-for="music in musicList"
