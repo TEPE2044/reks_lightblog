@@ -104,6 +104,7 @@ export interface MusicResponse {
   rid: number;
   state: number;
   username: string;
+  reks_id:number;
   avatar: string;
 }
 

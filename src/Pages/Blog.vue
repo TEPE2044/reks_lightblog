@@ -12,6 +12,8 @@ import {
 } from "../Hooks/Fav";
 import { followStore } from "../Store/follow";
 import { createToast } from "../Utils/reks-toast";
+import { playerStore } from "../Store/player";
+import { detailStore } from "../Store/detail";
 
 import { useRoute, useRouter } from "vue-router";
 import { userStore } from "../Store/user";
@@ -24,6 +26,10 @@ const router = useRouter();
 const toast = useToast();
 const response = ref();
 const follow = followStore();
+const player = playerStore();
+const { addIntoPlayQueue, selectOutSide } = player;
+const { currentIndex, playQueueLength } = storeToRefs(player);
+const { get_detail } = detailStore();
 
 const isLiked = ref(false);
 const likeCount = ref(0);
@@ -53,6 +59,51 @@ const toggleSubscribe = () => {
     canFollow: !isOwnBlog.value,
     toast,
   });
+};
+
+const caseAddMusic = () => {
+  const m = response.value.song;
+  if (!m?.audio) {
+    createToast(toast, "添加失败", "当前音乐缺少音频链接", "danger");
+    return;
+  }
+
+  if (playQueueLength.value === 0) {
+    get_detail({ title: m.name, author: m.username, cover: m.cover });
+  }
+
+  const res = addIntoPlayQueue(
+    { cover: m.cover, songURL: m.audio, title: m.name, author: m.username },
+    currentIndex.value,
+  );
+
+  if (res) {
+    createToast(toast, "添加成功", "歌曲添加成功", "success");
+  } else {
+    createToast(toast, "重复添加", "歌曲重复添加", "success");
+  }
+};
+
+const casePlayMusic = () => {
+  const m = response.value?.song;
+  if (!m?.audio) {
+    createToast(toast, "播放失败", "当前音乐缺少音频链接", "danger");
+    return;
+  }
+
+  try {
+    selectOutSide({
+      cover: m.cover,
+      songURL: m.audio,
+      title: m.name,
+      author: m.username,
+    });
+    get_detail({ title: m.name, author: m.username, cover: m.cover });
+    createToast(toast, "播放成功", `正在播放 ${m.username} - ${m.name}`, "success");
+  } catch (e) {
+    createToast(toast, "播放失败", "未知原因", "danger");
+    console.error(e);
+  }
 };
 // 同步点赞状态
 const syncLikeStatus = async (id: number) => {
@@ -239,6 +290,10 @@ watch(
   { immediate: true }, // 立即执行，替代 onMounted
 );
 
+const toAuthorSpace = () => {
+  router.push(`/centre/user/${response.value.user_id}`)
+}
+
 </script>
 
 <template>
@@ -252,6 +307,27 @@ watch(
         </span>
       </div>
 
+      <section v-if="response.song" class="blog-music-embed">
+        <div class="embed-cover-wrap">
+          <img :src="response.song?.cover" :alt="response.song?.name || 'blog-music-cover'" class="embed-cover" />
+        </div>
+        <div class="embed-content">
+          <div class="embed-title">{{ response.song?.name }}</div>
+          <div class="embed-author d-flex align-items-center gap-2">
+            <BAvatar :src="response.song?.avatar || response?.avatar || ''" size="32" />
+            <span>{{ response.song?.username || response?.author }}</span>
+          </div>
+          <div class="embed-actions mt-3 d-flex align-items-center gap-2">
+            <BButton variant="dark" size="sm" @click.stop="casePlayMusic">
+              <i-bi-play-circle-fill class="me-1" /> 播放
+            </BButton>
+            <BButton variant="outline-secondary" size="sm" @click.stop="caseAddMusic">
+              <i-bi-plus-circle class="me-1" /> 添加队列
+            </BButton>
+          </div>
+        </div>
+      </section>
+
       <hr />
 
       <div class="blog-body" v-html="response?.content"></div>
@@ -263,14 +339,14 @@ watch(
 
       <div class="author-card">
         <BAvatar size="80" :src="response?.avatar || ''" />
-        <div class="author-name">{{ response?.author }}</div>
+        <div class="author-name" @click="toAuthorSpace()">{{ response?.author }}</div>
         <BButton
           variant="outline-secondary"
           size="sm"
           :disabled="subscribePending || isOwnBlog"
           @click="toggleSubscribe"
         >
-          {{ isOwnBlog ? "自己" : subscribed ? "已关注" : "+ 关注" }}
+          {{ isOwnBlog ? "关注" : subscribed ? "已关注" : "+ 关注" }}
         </BButton>
       </div>
 
@@ -388,6 +464,45 @@ watch(
         }
       }
     }
+
+    .blog-music-embed {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 1rem;
+      padding: 0.9rem;
+      border-radius: 0.8rem;
+      border: 1px solid rgba(220, 220, 220, 0.9);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(248, 248, 248, 0.9));
+
+      .embed-cover-wrap {
+        width: 100%;
+        height: 128px;
+
+        .embed-cover {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 0.65rem;
+          box-shadow: 0 8px 14px rgba(0, 0, 0, 0.12);
+        }
+      }
+
+
+
+      .embed-title {
+        font-size: 1.03rem;
+        font-weight: 700;
+        color: #2f2f2f;
+        margin-bottom: 0.45rem;
+      }
+
+      .embed-author {
+        color: #666;
+        font-size: 0.9rem;
+      }
+    }
   }
 
   .author-sidebar {
@@ -418,6 +533,10 @@ watch(
         font-weight: bold;
         font-size: 1.25rem;
         text-align: center;
+        cursor: pointer;
+        &:hover{
+          text-decoration: underline;
+        }
       }
     }
 
@@ -493,6 +612,16 @@ watch(
         justify-content: flex-start;
         padding: 1rem;
         gap: 1.5rem;
+      }
+
+      .blog-main {
+        .blog-music-embed {
+          grid-template-columns: 1fr;
+
+          .embed-cover-wrap {
+            height: 180px;
+          }
+        }
       }
 
       .action-buttons {

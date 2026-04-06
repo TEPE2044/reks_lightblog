@@ -8,6 +8,7 @@ import { playerStore } from "../Store/player";
 import { BButtonGroup, useToast } from "bootstrap-vue-next";
 import { createToast } from "../Utils/reks-toast";
 import { detailStore } from "../Store/detail";
+import router from "../Router";
 
 const { playQueueLength, currentIndex } = storeToRefs(playerStore());
 const { selectOutSide, addIntoPlayQueue } = playerStore();
@@ -108,6 +109,10 @@ const casePlay = (m: MusicResponse) => {
     console.error(e);
   }
 };
+
+const toAuthor = (id:number) => {
+  router.push(`/centre/user/${id}`)
+}
 </script>
 
 <template>
@@ -152,7 +157,7 @@ const casePlay = (m: MusicResponse) => {
                 </router-link>
                 <div class="author d-flex flex-row align-items-center gap-3">
                   <BAvatar :src="i.author.avatar" size="40" />
-                  <div class="username text-secondary">
+                  <div class="username text-secondary" @click="toAuthor(i.author.id)">
                     {{ i.author.username }}
                   </div>
                 </div>
@@ -169,8 +174,8 @@ const casePlay = (m: MusicResponse) => {
                 <div class="music-desc text-secondary">{{ m.desc }}</div>
 
                 <div class="music-meta d-flex align-items-center gap-3">
-                  <BAvatar :src="m.avatar" size="36" />
-                  <span class="text-secondary">{{ m.username }}</span>
+                  <BAvatar :src="m.avatar || ''" size="36" />
+                  <span class="text-secondary username"  @click="toAuthor(m?.reks_id)">{{ m.username }}</span>
                 </div>
                 <BButtonGroup class="control-btn mt-3 py-2">
                   <BButton variant="light" size="sm" class="control-btn-item" @click.stop="casePlay(m)">
@@ -302,6 +307,7 @@ const casePlay = (m: MusicResponse) => {
     .author {
       border-top: 1px dashed rgba(180, 180, 180, 0.6);
       padding-top: 0.85rem;
+      cursor: pointer;
     }
   }
 }
@@ -409,6 +415,9 @@ const casePlay = (m: MusicResponse) => {
   .music-meta {
     flex-wrap: wrap;
     padding-top: 0.25rem;
+    .username{
+      cursor: pointer;
+    }
 
     span {
       font-size: 0.92rem;

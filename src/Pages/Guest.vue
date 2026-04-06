@@ -228,11 +228,8 @@ useInfiniteScroll(
 	<div class="guest w-100">
 		<BContainer class="guest-header mt-5 px-4 py-4 d-flex align-items-center">
 			<div class="d-flex align-items-center gap-3 guest-base-info">
-				<BAvatar
-					size="82px"
-					:src="guestProfile.avatar || ''"
-					style="box-shadow: rgba(0, 0, 0, 0.15) 2px 4px 10px"
-				/>
+				<BAvatar size="82px" :src="guestProfile.avatar || ''"
+					style="box-shadow: rgba(0, 0, 0, 0.15) 2px 4px 10px" />
 				<div class="guest-text">
 					<div class="guest-name fw-bold">{{ guestProfile.username }}</div>
 					<div class="guest-sign text-secondary">{{ guestProfile.sign }}</div>
@@ -245,12 +242,7 @@ useInfiniteScroll(
 			</div>
 
 			<div class="guest-actions ms-auto d-flex align-items-center">
-				<BButton
-					variant="outline-secondary"
-					class="me-2"
-					:disabled="subscribePending"
-					@click="toggleSubscribe"
-				>
+				<BButton variant="outline-secondary" class="me-2" :disabled="subscribePending" @click="toggleSubscribe">
 					{{ subscribed ? "已关注" : "关注" }}
 				</BButton>
 
@@ -266,25 +258,16 @@ useInfiniteScroll(
 
 		<BContainer class="guest-body px-0 mt-4">
 			<div class="guest-tab d-flex align-items-center gap-2 px-3 py-3">
-				<BButton
-					:variant="activeTab === 'blog' ? 'danger' : 'outline-secondary'"
-					size="sm"
-					@click="switchTab('blog')"
-				>
+				<BButton :variant="activeTab === 'blog' ? 'danger' : 'outline-secondary'" size="sm"
+					@click="switchTab('blog')">
 					博客
 				</BButton>
-				<BButton
-					:variant="activeTab === 'music' ? 'danger' : 'outline-secondary'"
-					size="sm"
-					@click="switchTab('music')"
-				>
+				<BButton :variant="activeTab === 'music' ? 'danger' : 'outline-secondary'" size="sm"
+					@click="switchTab('music')">
 					音乐
 				</BButton>
-				<BButton
-					:variant="activeTab === 'fav' ? 'danger' : 'outline-secondary'"
-					size="sm"
-					@click="switchTab('fav')"
-				>
+				<BButton :variant="activeTab === 'fav' ? 'danger' : 'outline-secondary'" size="sm"
+					@click="switchTab('fav')">
 					收藏
 				</BButton>
 
@@ -297,18 +280,12 @@ useInfiniteScroll(
 				</div>
 
 				<div v-if="activeTab === 'fav'" class="fav-subtab d-flex align-items-center gap-2 pb-3">
-					<BButton
-						:variant="favoriteTab === 'blog' ? 'danger' : 'outline-secondary'"
-						size="sm"
-						@click="switchFavoriteTab('blog')"
-					>
+					<BButton :variant="favoriteTab === 'blog' ? 'danger' : 'outline-secondary'" size="sm"
+						@click="switchFavoriteTab('blog')">
 						博客收藏
 					</BButton>
-					<BButton
-						:variant="favoriteTab === 'music' ? 'danger' : 'outline-secondary'"
-						size="sm"
-						@click="switchFavoriteTab('music')"
-					>
+					<BButton :variant="favoriteTab === 'music' ? 'danger' : 'outline-secondary'" size="sm"
+						@click="switchFavoriteTab('music')">
 						音乐收藏
 					</BButton>
 				</div>
@@ -318,11 +295,7 @@ useInfiniteScroll(
 				</div>
 
 				<div class="waterfall-box" v-else-if="activeTab === 'blog' && guestBlogList.length > 0">
-					<div
-						class="waterfall-item"
-						v-for="item in guestBlogList"
-						:key="`guest-blog-${item.id}`"
-					>
+					<div class="waterfall-item" v-for="item in guestBlogList" :key="`guest-blog-${item.id}`">
 						<BlogCard :blog="item" :show-actions="false" :show-favorite="false" />
 					</div>
 				</div>
@@ -331,11 +304,8 @@ useInfiniteScroll(
 				</div>
 
 				<div class="music-grid-box" v-else-if="activeTab === 'music' && guestMusicList.length > 0">
-					<div
-						class="music-grid-item music-item"
-						v-for="item in guestMusicList"
-						:key="`guest-music-${item.id}`"
-					>
+					<div class="music-grid-item music-item" v-for="item in guestMusicList"
+						:key="`guest-music-${item.id}`">
 						<MusicCase :music="item" />
 					</div>
 				</div>
@@ -347,22 +317,17 @@ useInfiniteScroll(
 					<Empty title="收藏加载中..." />
 				</div>
 
-				<div class="waterfall-box" v-else-if="activeTab === 'fav' && favoriteTab === 'blog' && guestFavBlogList.length > 0">
-					<div
-						class="waterfall-item"
-						v-for="item in guestFavBlogList"
-						:key="`guest-fav-blog-${item.id}`"
-					>
+				<div class="waterfall-box"
+					v-else-if="activeTab === 'fav' && favoriteTab === 'blog' && guestFavBlogList.length > 0">
+					<div class="waterfall-item" v-for="item in guestFavBlogList" :key="`guest-fav-blog-${item.id}`">
 						<BlogCard :blog="item" :show-actions="false" :show-favorite="false" />
 					</div>
 				</div>
 
-				<div class="music-grid-box" v-else-if="activeTab === 'fav' && favoriteTab === 'music' && guestFavMusicList.length > 0">
-					<div
-						class="music-grid-item music-item"
-						v-for="item in guestFavMusicList"
-						:key="`guest-fav-music-${item.id}`"
-					>
+				<div class="music-grid-box"
+					v-else-if="activeTab === 'fav' && favoriteTab === 'music' && guestFavMusicList.length > 0">
+					<div class="music-grid-item music-item" v-for="item in guestFavMusicList"
+						:key="`guest-fav-music-${item.id}`">
 						<MusicCase :music="item" :show-favorite="false" />
 					</div>
 				</div>
@@ -438,11 +403,9 @@ useInfiniteScroll(
 
 		.guest-tab {
 			border-bottom: 1px solid rgba(170, 170, 170, 0.2);
-			background: linear-gradient(
-				180deg,
-				rgba(255, 255, 255, 0.92) 0%,
-				rgba(249, 249, 249, 0.8) 100%
-			);
+			background: linear-gradient(180deg,
+					rgba(255, 255, 255, 0.92) 0%,
+					rgba(249, 249, 249, 0.8) 100%);
 		}
 
 		.badge-count {
@@ -457,10 +420,10 @@ useInfiniteScroll(
 		.waterfall-box {
 			margin-top: 0.7rem;
 			column-count: 3;
-			column-gap: 1rem;
+			column-gap: 20px;
+			padding: 1.5rem;
 
 			.waterfall-item {
-				display: inline-block;
 				width: 100%;
 				break-inside: avoid;
 				margin-bottom: 1rem;
