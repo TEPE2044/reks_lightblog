@@ -181,3 +181,12 @@ export const delete_blog = async (blog_id: Number) => {
   })
   return res;
 }
+
+
+export const get_hot_tags = async() => {
+  const res = await reapi({
+    url:`/blog/tags/hot`,
+    method:`GET`
+  })
+  return res.data.tags
+}

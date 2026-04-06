@@ -12,20 +12,23 @@
       <aside class="hub-side p-3">
         <div class="side-head">
           <h5>热门标签</h5>
-          <span>像翻百科一样探索内容</span>
         </div>
 
-        <ul class="entry-list">
-          <li v-for="entry in entries" :key="entry.title">
-            <p class="entry-title">{{ entry.title }}</p>
-            <span class="entry-meta">{{ entry.meta }}</span>
+        <ul class="entry-list" aria-label="热门标签">
+          <li
+            v-for="entry in entries"
+            :key="entry.name"
+            class="entry-item"
+            :class="getTagWeightClass(entry.count)"
+          >
+            
+            <p class="entry-title"><i-bi-tag/>{{ entry.name }}</p>
           </li>
         </ul>
 
-        <div class="random-entry">
+        <BButton class="random-entry" variant="outline-info">
           <h6>随机词条</h6>
-          <p>{{ randomEntry }}</p>
-        </div>
+        </BButton>
       </aside>
     </section>
 
@@ -36,14 +39,37 @@
 </template>
 
 <script setup lang="ts">
-const entries = [
-  { title: "词条：如何写一篇可持续更新的专栏", meta: "编辑区 · 12次修订" },
-  { title: "词条：首页卡片排版规范", meta: "设计区 · 8次修订" },
-  { title: "词条：音乐推荐格式模板", meta: "音乐区 · 15次修订" },
-  { title: "词条：内容标签命名规则", meta: "维护区 · 6次修订" },
-];
+import { computed, onMounted, ref } from 'vue';
+import { get_hot_tags } from '../Hooks/Blog';
 
-const randomEntry = "词条：如何在 1200 字内讲清一个真实故事";
+interface TagResponse{
+  name:string,
+  count:number
+}
+
+const entries = ref<TagResponse[]>([])
+
+onMounted(async() => {
+  try {
+    entries.value = await get_hot_tags()
+  } catch {
+    entries.value = []
+  }
+})
+
+const maxCount = computed(() => {
+  if (entries.value.length === 0) return 1
+  return Math.max(...entries.value.map((item) => Number(item.count || 0)), 1)
+})
+
+const getTagWeightClass = (count: number) => {
+  const ratio = Number(count || 0) / maxCount.value
+  if (ratio >= 0.75) return 'weight-xl'
+  if (ratio >= 0.5) return 'weight-lg'
+  if (ratio >= 0.25) return 'weight-md'
+  return 'weight-sm'
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -93,45 +119,111 @@ const randomEntry = "词条：如何在 1200 字内讲清一个真实故事";
     padding: 0;
     margin: 0;
     display: grid;
-    gap: 0.5rem;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-auto-rows: minmax(34px, auto);
+    grid-auto-flow: dense;
+    gap: 0.45rem;
+    height: 240px;
+    overflow: auto;
+    padding-right: 0.25rem;
 
-    li {
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background-color: rgba(60, 80, 67, 0.25);
+    }
+
+    .entry-item {
       border-radius: 10px;
-      padding: 0.55rem 0.6rem;
-      background: rgba(255, 255, 255, 0.65);
+      padding: 0.42rem 0.5rem;
+      background: rgb(237, 212, 190);
       box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-width: 0;
+      cursor: pointer;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow:
+          inset 0 0 0 1px rgba(255, 255, 255, 0.42),
+          0 6px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      &.weight-xl {
+        grid-column: span 3;
+        grid-row: span 2;
+
+        .entry-title {
+          font-size: 1rem;
+          font-weight: 700;
+        }
+      }
+
+      &.weight-lg {
+        grid-column: span 2;
+        grid-row: span 2;
+
+        .entry-title {
+          font-size: 0.92rem;
+          font-weight: 650;
+        }
+      }
+
+      &.weight-md {
+        grid-column: span 2;
+
+        .entry-title {
+          font-size: 0.86rem;
+        }
+      }
+
+      &.weight-sm {
+        grid-column: span 1;
+
+        .entry-title {
+          font-size: 0.8rem;
+        }
+      }
+
+      &:first-child{
+        &::before{
+          content: '🔥';
+        }
+      }
     }
 
     .entry-title {
       margin: 0;
       color: #2a3d30;
-      font-size: 0.9rem;
-      line-height: 1.35;
-    }
-
-    .entry-meta {
-      color: #5a6c5d;
-      font-size: 0.78rem;
+      line-height: 1.2;
+      display: -webkit-box;
+      line-clamp: 2;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
   }
 
   .random-entry {
     margin-top: 0.85rem;
     border-radius: 10px;
-    background: #f8f5ec;
     padding: 0.6rem;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.56);
 
     h6 {
       margin: 0;
       color: #24352a;
       font-size: 0.85rem;
     }
-
-    p {
-      margin: 0.35rem 0 0;
-      font-size: 0.88rem;
-      color: #44584a;
+    &:hover{
+      transition: transform 0.1s ease ;
+      transform: scale(1.03);
     }
   }
 }
@@ -157,6 +249,29 @@ const randomEntry = "词条：如何在 1200 字内讲清一个真实故事";
 @media (max-width: 1100px) {
   .hub-shell {
     grid-template-columns: 1fr;
+  }
+
+  .hub-side {
+    .entry-list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .hub-side {
+    .entry-list {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      height: 220px;
+    }
+
+    .entry-item {
+      &.weight-xl,
+      &.weight-lg,
+      &.weight-md {
+        grid-column: span 2;
+      }
+    }
   }
 }
 </style>

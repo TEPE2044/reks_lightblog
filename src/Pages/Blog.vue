@@ -294,6 +294,10 @@ const toAuthorSpace = () => {
   router.push(`/centre/user/${response.value.user_id}`)
 }
 
+const toTagTheme = () => {
+  console.log("你好")
+}
+
 </script>
 
 <template>
@@ -302,7 +306,7 @@ const toAuthorSpace = () => {
     <div class="blog-main">
       <h2 class="blog-title">{{ response?.title }}</h2>
       <div class="tags">
-        <span v-for="tag in response?.tags" :key="tag" class="tag">
+        <span v-for="tag in response?.tags" :key="tag" class="tag" @click="toTagTheme()">
           {{ tag }}
         </span>
       </div>
