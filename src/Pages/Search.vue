@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref,watch} from "vue";
 import type { MusicResponse, PageWrapper } from "../Utils/reks-interface";
 import { searchStore } from "../Store/search";
 import { storeToRefs } from "pinia";
@@ -33,8 +33,19 @@ const activeListLength = computed(() => {
 });
 
 const empty = computed(
-  () => pages.value.rows === 0 || activeListLength.value === 0,
+  () => pages.value.rows === 0 || activeListLength.value === 0
 );
+
+watch(
+  [searchType, blogRes, musicRes, userRes, () => pages.value.rows],
+  () => {
+    if (empty.value) {
+      createToast(toast, "空空如也", "没有检索到当前信息", "warning");
+    }
+  },
+  { deep: true },
+)
+
 
 const currentPage = computed({
   get: () => pages.value.currentPage,
@@ -99,21 +110,9 @@ const casePlay = (m: MusicResponse) => {
       <BCard class="result-nav" title="Card Title" no-body>
         <BCardHeader class="result-nav-header" header-tag="result-header-nav">
           <BTabs>
-            <BTab
-              title="博客"
-              :active="searchType === 'keyword'"
-              @click.stop="switchSearchType('keyword')"
-            />
-            <BTab
-              title="音乐"
-              :active="searchType === 'music'"
-              @click.stop="switchSearchType('music')"
-            />
-            <BTab
-              title="用户"
-              :active="searchType === 'user'"
-              @click.stop="switchSearchType('user')"
-            />
+            <BTab title="博客" :active="searchType === 'keyword'" @click.stop="switchSearchType('keyword')" />
+            <BTab title="音乐" :active="searchType === 'music'" @click.stop="switchSearchType('music')" />
+            <BTab title="用户" :active="searchType === 'user'" @click.stop="switchSearchType('user')" />
           </BTabs>
         </BCardHeader>
 
@@ -123,9 +122,7 @@ const casePlay = (m: MusicResponse) => {
           </div>
 
           <div class="result-item" v-else>
-            <div
-              class="result-summary d-flex align-items-center justify-content-between"
-            >
+            <div class="result-summary d-flex align-items-center justify-content-between">
               <div class="summary-title">{{ tabTitle }}</div>
               <div class="summary-count">共 {{ pages.rows }} 条</div>
             </div>
@@ -133,13 +130,9 @@ const casePlay = (m: MusicResponse) => {
               当前页：第 {{ pages.currentPage }} 页
             </div>
 
-            <article
-              v-if="searchType === 'keyword'"
-              class="blog-grid-card"
-              :class="{ 'no-cover': !i.cover || String(i.cover).trim().length === 0 }"
-              v-for="i in blogRes"
-              :key="`rs${i.id}${i.author.id}`"
-            >
+            <article v-if="searchType === 'keyword'" class="blog-grid-card"
+              :class="{ 'no-cover': !i.cover || String(i.cover).trim().length === 0 }" v-for="i in blogRes"
+              :key="`rs${i.id}${i.author.id}`">
               <div class="cover-wrap" v-if="i.cover && String(i.cover).trim().length > 0">
                 <img :src="i.cover" class="cover-img" :alt="`alt${i.cover}`" />
               </div>
@@ -156,12 +149,7 @@ const casePlay = (m: MusicResponse) => {
               </div>
             </article>
 
-            <article
-              v-if="searchType === 'music'"
-              class="music-box mb-3"
-              v-for="m in musicRes"
-              :key="`music-${m.id}`"
-            >
+            <article v-if="searchType === 'music'" class="music-box mb-3" v-for="m in musicRes" :key="`music-${m.id}`">
               <div class="music-cover">
                 <img :src="m.cover" :alt="`music-${m.id}`" />
               </div>
@@ -175,33 +163,18 @@ const casePlay = (m: MusicResponse) => {
                   <span class="text-secondary">{{ m.username }}</span>
                 </div>
                 <BButtonGroup class="control-btn mt-3 py-2">
-                  <BButton
-                    variant="light"
-                    size="sm"
-                    class="control-btn-item"
-                    @click.stop="casePlay(m)"
-                  >
+                  <BButton variant="light" size="sm" class="control-btn-item" @click.stop="casePlay(m)">
                     <i-bi-play-circle-fill class="fs-4" />
                   </BButton>
-                  <BButton
-                    variant="light"
-                    size="sm"
-                    class="control-btn-item"
-                    @click.stop="caseAdd(m)"
-                  >
+                  <BButton variant="light" size="sm" class="control-btn-item" @click.stop="caseAdd(m)">
                     <i-bi-plus-circle class="fs-5" />
                   </BButton>
                 </BButtonGroup>
               </div>
             </article>
 
-            <RouterLink
-              v-if="searchType === 'user'"
-              class="user-link"
-              v-for="u in userRes"
-              :key="`user-${u.reks_id}`"
-              :to="{ name: 'guest-centre', params: { id: u.reks_id } }"
-            >
+            <RouterLink v-if="searchType === 'user'" class="user-link" v-for="u in userRes" :key="`user-${u.reks_id}`"
+              :to="{ name: 'guest-centre', params: { id: u.reks_id } }">
               <article class="user-box mb-3 d-flex align-items-center">
                 <BAvatar :src="u.avatar" size="56" />
                 <div class="user-content ms-3">
@@ -215,13 +188,8 @@ const casePlay = (m: MusicResponse) => {
           </div>
         </BCardBody>
         <BCardFooter>
-          <BPagination
-            class="d-flex align-items-center justify-content-center mt-3 page-style"
-            v-model="currentPage"
-            :total-rows="pages?.rows"
-            :per-page="pages?.perPage"
-            last-number
-          />
+          <BPagination class="d-flex align-items-center justify-content-center mt-3 page-style" v-model="currentPage"
+            :total-rows="pages?.rows" :per-page="pages?.perPage" last-number />
         </BCardFooter>
       </BCard>
     </div>
@@ -236,12 +204,15 @@ const casePlay = (m: MusicResponse) => {
   color: black !important;
   z-index: 0;
 }
+
 :deep(.page-item.active) {
   background-color: rgba(178, 34, 34, 0.589) !important;
 }
+
 :deep(.nav-link.active) {
   color: firebrick !important;
 }
+
 :deep(.card-header) {
   background-color: rgba(255, 236, 201, 0.219) !important;
 }
@@ -251,11 +222,9 @@ const casePlay = (m: MusicResponse) => {
 }
 
 .result-body {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.75) 0%,
-    rgba(255, 255, 255, 0.6) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(255, 255, 255, 0.75) 0%,
+      rgba(255, 255, 255, 0.6) 100%);
 }
 
 .result-summary {

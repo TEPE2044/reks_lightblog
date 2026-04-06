@@ -4,6 +4,7 @@ import { searchBlog, searchBlogTag, searchMusic, searchUser } from "../Hooks/Sea
 import type { PageWrapper } from "../Utils/reks-interface";
 import { searchStore } from "../Store/search";
 import { storeToRefs } from "pinia";
+import { useDebounceFn } from "@vueuse/core";
 
 const props = defineProps<{
   activeTab: "keyword" | "music" | "user";
@@ -108,7 +109,7 @@ const queryUser = async () => {
   setMusicRes([]);
 };
 
-const runSearchByTab = async () => {
+const runSearchByTab = useDebounceFn(async () => {
   if (props.activeTab === "keyword") {
     if (mode.value === "tag") {
       await queryTags();
@@ -124,7 +125,7 @@ const runSearchByTab = async () => {
   }
 
   await queryUser();
-};
+}, 1000);
 
 watch(
   () => pages.value?.currentPage,
@@ -160,20 +161,9 @@ watch(mode, (value) => {
   <div class="radio-selector">
     <section class="tag mt-2" v-if="activeTab === 'keyword' && mode === 'tag'">
       <BInputGroup>
-        <BFormTags
-          v-model="lazyTags"
-          :limit="5"
-          remove-on-delete
-          add-button-text="Add"
-          limit-tags-text="最多只能设置5个标签噢"
-          input-id="tags-basic"
-          placeholder="添加标签(使用回车确定标签)"
-        />
-        <BButton
-          @click.stop="runSearchByTab"
-          variant="outline-success"
-          class="d-flex align-items-center gap-1"
-        >
+        <BFormTags v-model="lazyTags" :limit="5" remove-on-delete add-button-text="Add" limit-tags-text="最多只能设置5个标签噢"
+          input-id="tags-basic" placeholder="添加标签(使用回车确定标签)" @keydown.enter.stop="runSearchByTab" />
+        <BButton @click.stop="runSearchByTab" variant="outline-success" class="d-flex align-items-center gap-1">
           <i-bi-search /> 搜索
         </BButton>
       </BInputGroup>
@@ -181,24 +171,15 @@ watch(mode, (value) => {
 
     <section class="keyword mt-2" v-else>
       <BInputGroup>
-        <BFormInput type="text" :placeholder="inputPlaceholder" v-model="lazyText" />
-        <BButton
-          @click.stop="runSearchByTab"
-          variant="outline-success"
-          class="d-flex align-items-center gap-1"
-        >
+        <BFormInput type="text" :placeholder="inputPlaceholder" v-model="lazyText" @keydown.enter.stop="runSearchByTab" />
+        <BButton @click.stop="runSearchByTab" variant="outline-success" class="d-flex align-items-center gap-1">
           <i-bi-search /> 搜索
         </BButton>
       </BInputGroup>
     </section>
 
-    <BFormRadioGroup
-      v-show="activeTab === 'keyword'"
-      class="mt-3"
-      v-model="mode"
-      :options="options"
-      name="search-type"
-    />
+    <BFormRadioGroup v-show="activeTab === 'keyword'" class="mt-3" v-model="mode" :options="options"
+      name="search-type" />
   </div>
 </template>
 
