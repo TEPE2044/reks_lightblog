@@ -7,11 +7,11 @@ type TimelineItem = {
   big?: string;
 };
 
-const hotTopics = [
-  { title: "沉浸式长文的封面策略", desc: "讨论如何让标题与首图形成叙事关系。" },
-  { title: "社区播客栏目提案", desc: "围绕“慢读”和“慢聊”的新栏目征集。" },
-  { title: "个人主页信息架构", desc: "关于展示作品、动态、收藏的模块组织。" },
-];
+// const hotTopics = [
+//   { title: "沉浸式长文的封面策略", desc: "讨论如何让标题与首图形成叙事关系。" },
+//   { title: "社区播客栏目提案", desc: "围绕“慢读”和“慢聊”的新栏目征集。" },
+//   { title: "个人主页信息架构", desc: "关于展示作品、动态、收藏的模块组织。" },
+// ];
 
 const timeline = ref<TimelineItem[]>([]);
 
@@ -35,7 +35,7 @@ onMounted(async () => {
     <BContainer class="home-content mt-4">
       <ShowCase />
     </BContainer>
-    <BContainer class="home-lens mt-4 mb-4">
+    <!-- <BContainer class="home-lens mt-4 mb-4">
       <article class="hub-timeline p-3">
         <h5>网站动态</h5>
         <ul>
@@ -62,7 +62,7 @@ onMounted(async () => {
           </div>
         </div>
       </article>
-    </BContainer>
+    </BContainer> -->
     <BContainer class="home-hotlist mt-4">
       <HotList />
     </BContainer>

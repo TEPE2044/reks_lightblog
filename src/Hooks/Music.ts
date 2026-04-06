@@ -87,3 +87,11 @@ export const delete_music = async (music_id: Number) => {
   })
   return res
 }
+
+export const get_hot_music = async () => {
+  const res = await reapi({
+    url:`/music/hot`,
+    method:'GET'
+  })
+  return res.data
+}

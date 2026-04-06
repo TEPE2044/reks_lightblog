@@ -5,7 +5,7 @@ import { storeToRefs } from "pinia";
 import type { MusicResponse } from "../Utils/reks-interface";
 import { useEventListener, useToggle } from "@vueuse/core";
 import Empty from "../Components/Empty.vue";
-import { query_my_music } from "../Hooks/Music";
+import { get_hot_music } from "../Hooks/Music";
 import { favoriteBatchStore } from "../Store/favoriteBatch";
 import { createToast } from "../Utils/reks-toast";
 
@@ -45,7 +45,7 @@ const handleMusicFavoriteToggle = async (payload: { id: number; next: boolean })
 onMounted(async () => {
   fav.resetMusicFavoriteState();
   try {
-    const res = await query_my_music();
+    const res = await get_hot_music();
 
     // 防御性检查：res 可能为 null/undefined
     if (!res) {
@@ -83,7 +83,8 @@ onMounted(async () => {
 <template>
   <div class="showcase">
     <div class="scroll-bar w-100 mb-4 p-4">
-      <div class="case-title h5">歌曲上新 这个玩意做两个，一个是官方的，一个是普通用户的，普用放上面</div>
+      <div class="case-title h5">歌曲上新</div>
+       <!-- 这个玩意做两个，一个是官方的，一个是普通用户的，普用放上面 -->
       <div ref="showcase" class="case py-4 mt-4" v-if="!empty">
         <MusicCase
           v-for="music in musicList"
