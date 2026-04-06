@@ -139,7 +139,7 @@ const getTagWeightClass = (count: number) => {
     .entry-item {
       border-radius: 10px;
       padding: 0.42rem 0.5rem;
-      background: rgb(237, 212, 190);
+      background: rgba(237, 212, 190, 0.361);
       box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.42);
       transition: transform 0.15s ease, box-shadow 0.15s ease;
       display: flex;
