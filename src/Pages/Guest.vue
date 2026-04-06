@@ -1,20 +1,15 @@
 <script setup lang="ts">
-import { useDebounceFn, useInfiniteScroll } from "@vueuse/core";
+import { useInfiniteScroll } from "@vueuse/core";
 import { useToast } from "bootstrap-vue-next";
 import { storeToRefs } from "pinia";
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import {
-	handleFollow,
-	handleUnFollow,
-	queryFollowStatsByRid,
-	queryFollowingList,
-} from "../Hooks/SubScribe";
 import { queryUserFavorites } from "../Hooks/Fav";
 import { guestFeedStore } from "../Store/guestFeed";
 import { query_profile_by_user_id } from "../Hooks/User";
 import { createToast } from "../Utils/reks-toast";
 import type { FavoriteBlogItem, FavoriteMusicItem } from "../Utils/reks-interface";
+import { followStore } from "../Store/follow";
 
 type GuestTab = "blog" | "music" | "fav";
 type FavoriteTab = "blog" | "music";
@@ -23,6 +18,7 @@ const PAGE_LIMIT = 9;
 const route = useRoute();
 const toast = useToast();
 const feed = guestFeedStore();
+const follow = followStore();
 const {
 	blogList: guestBlogList,
 	musicList: guestMusicList,
@@ -31,16 +27,28 @@ const {
 	blogLoadingMore,
 	musicLoadingMore,
 } = storeToRefs(feed);
+const { followStatsByRid } = storeToRefs(follow);
 
 const activeTab = ref<GuestTab>("blog");
 const favoriteTab = ref<FavoriteTab>("blog");
-const subscribed = ref(false);
-const subscribePending = ref(false);
 const guestLoading = ref(false);
-const guestFollowStats = ref<{ followingCount: number; followerCount: number } | null>(null);
 const guestFavoriteLoading = ref(false);
 
 const targetUserId = computed(() => Number(route.params.id));
+const subscribed = computed(() => follow.isSubscribed(targetUserId.value));
+const subscribePending = computed(() => follow.isFollowPending(targetUserId.value));
+const guestFollowStats = computed(() => {
+	const rid = targetUserId.value;
+	return followStatsByRid.value[rid] || null;
+});
+
+const syncSubscribeState = async () => {
+	await follow.syncSubscribeStateByRid(targetUserId.value);
+};
+
+const toggleSubscribe = () => {
+	void follow.toggleSubscribeByRid({ rid: targetUserId.value, toast });
+};
 
 const guestProfile = ref({
 	username: "访客用户",
@@ -60,7 +68,6 @@ const resetGuestData = () => {
 	feed.resetFeed();
 	guestFavBlogList.value = [];
 	guestFavMusicList.value = [];
-	guestFollowStats.value = null;
 };
 
 const loadGuestFavorites = async () => {
@@ -122,21 +129,6 @@ const switchFavoriteTab = (tab: FavoriteTab) => {
 	favoriteTab.value = tab;
 };
 
-const syncSubscribeState = async () => {
-	const fid = targetUserId.value;
-	if (!Number.isInteger(fid) || fid <= 0) {
-		subscribed.value = false;
-		return;
-	}
-
-	try {
-		const list = await queryFollowingList();
-		subscribed.value = list.some((item) => item.rid === fid);
-	} catch {
-		subscribed.value = false;
-	}
-};
-
 const loadMoreBlog = async () => {
 	const rid = targetUserId.value;
 	if (!Number.isInteger(rid) || rid <= 0) return;
@@ -179,51 +171,13 @@ const loadGuestData = async () => {
 	} catch {
 		createToast(toast, "加载失败", "无法获取该用户主页数据", "danger");
 	} finally {
-		try {
-			guestFollowStats.value = await queryFollowStatsByRid(rid);
-		} catch {
-			guestFollowStats.value = null;
-		}
+		void follow.fetchFollowStatsByRid(rid);
 
 		guestLoading.value = false;
 		// 兜底：首屏初始化阶段若因时序没有拿到数据，结束后再尝试拉取一页。
 		void loadActiveTabFirstPage();
 	}
 };
-
-const doToggleSubscribe = async () => {
-	if (subscribePending.value) return;
-
-	const fid = targetUserId.value;
-	if (!Number.isInteger(fid) || fid <= 0) {
-		createToast(toast, "关注失败", "无效的用户 ID", "danger");
-		return;
-	}
-
-	subscribePending.value = true;
-	try {
-		const actionRes = subscribed.value
-			? await handleUnFollow(fid)
-			: await handleFollow(fid);
-
-		if (actionRes.status === 200) {
-			subscribed.value = !subscribed.value;
-			createToast(toast, "操作成功", actionRes.msg, "success");
-			return;
-		}
-
-		createToast(toast, "操作失败", actionRes.msg || "请稍后重试", "danger");
-		await syncSubscribeState();
-	} catch {
-		createToast(toast, "操作失败", "网络错误，请稍后重试", "danger");
-	} finally {
-		subscribePending.value = false;
-	}
-};
-
-const toggleSubscribe = useDebounceFn(() => {
-	void doToggleSubscribe();
-}, 300);
 
 watch(
 	() => route.params.id,

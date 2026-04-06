@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useToast } from "bootstrap-vue-next";
 import { delete_blog, query_blog_by_id } from "../Hooks/Blog";
 import {
@@ -10,6 +10,7 @@ import {
   setFavoriteState,
   setLikeState,
 } from "../Hooks/Fav";
+import { followStore } from "../Store/follow";
 import { createToast } from "../Utils/reks-toast";
 
 import { useRoute, useRouter } from "vue-router";
@@ -22,6 +23,7 @@ const route = useRoute();
 const router = useRouter();
 const toast = useToast();
 const response = ref();
+const follow = followStore();
 
 const isLiked = ref(false);
 const likeCount = ref(0);
@@ -35,6 +37,23 @@ let favoriteSyncSeq = 0;
 let favoriteMutationSeq = 0;
 let likeSyncSeq = 0;
 let likeMutationSeq = 0;
+
+const authorRid = computed(() => Number(response.value?.user_id));
+const isOwnBlog = computed(() => authorRid.value === Number(userInfo.value?.reks_id));
+const subscribed = computed(() => follow.isSubscribed(authorRid.value));
+const subscribePending = computed(() => follow.isFollowPending(authorRid.value));
+
+const syncSubscribeState = async () => {
+  await follow.syncSubscribeStateByRid(authorRid.value, !isOwnBlog.value);
+};
+
+const toggleSubscribe = () => {
+  void follow.toggleSubscribeByRid({
+    rid: authorRid.value,
+    canFollow: !isOwnBlog.value,
+    toast,
+  });
+};
 // 同步点赞状态
 const syncLikeStatus = async (id: number) => {
   if (!hasFavoriteAuthSession()) {
@@ -207,6 +226,7 @@ const loadBlog = async (id: number | string) => {
   await syncLikeCount(numId);
   await syncLikeStatus(numId);
   await syncFavoriteStatus(numId);
+  await syncSubscribeState();
   console.log(response.value);
 };
 
@@ -218,6 +238,7 @@ watch(
   },
   { immediate: true }, // 立即执行，替代 onMounted
 );
+
 </script>
 
 <template>
@@ -241,9 +262,16 @@ watch(
       <!-- TODO 关联歌曲组 -->
 
       <div class="author-card">
-        <BAvatar size="80" src="" />
+        <BAvatar size="80" :src="response?.avatar || ''" />
         <div class="author-name">{{ response?.author }}</div>
-        <BButton variant="outline-secondary" size="sm">+ 关注</BButton>
+        <BButton
+          variant="outline-secondary"
+          size="sm"
+          :disabled="subscribePending || isOwnBlog"
+          @click="toggleSubscribe"
+        >
+          {{ isOwnBlog ? "自己" : subscribed ? "已关注" : "+ 关注" }}
+        </BButton>
       </div>
 
       <!-- 互动按钮组 -->
