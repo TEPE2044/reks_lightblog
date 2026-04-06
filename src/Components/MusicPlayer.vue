@@ -376,7 +376,7 @@ onUnmounted(() => {
         <div class="rs-song-info user-select-none p-3">
           <div class="rs-title fw-bold h3">{{ dtitle || '无题' }}</div>
           <div class="rs-info d-flex gap-4 text-secondary mb-5">
-            <span>作者：{{ dauthor || '无名氏' }}</span>
+            <span>发布者：{{ dauthor || '无名氏' }}</span>
           </div>
           <div class="lyrics d-flex flex-column align-items-start gap-4">
             <span v-for="ls in lyrics">{{ ls }}</span>

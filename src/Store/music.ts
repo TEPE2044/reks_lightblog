@@ -8,6 +8,8 @@ export const musicStore = defineStore('music',() => {
     const desc = ref<string>('')
     // 是否原创
     const isOriginal = ref<boolean>(false)
+    // 上传类型：默认素材
+    const type = ref<number>(0)
     // 音频文件
     const audioFile = ref<File|null>(null)
     const coverFile = ref<File|null>(null)
@@ -21,6 +23,7 @@ export const musicStore = defineStore('music',() => {
         name,
         desc,
         isOriginal,
+        type,
         audioFile,
         coverFile,
         audioURL,

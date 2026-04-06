@@ -11,7 +11,7 @@ import { upload_music, upload_music_form } from "../Hooks/Music";
 import { userStore } from "../Store/user";
 import { substore } from "../Store/subscribe";
 import { makeSubscribeMessage } from "../Utils/subscribe-log";
-const { isOriginal, name, desc, audioFile, coverFile, coverURL, audioURL } =
+const { isOriginal, type, name, desc, audioFile, coverFile, coverURL, audioURL } =
   storeToRefs(musicStore());
 const { userInfo } = storeToRefs(userStore());
 const { addSubscribeMessage } = substore();
@@ -19,6 +19,9 @@ const { addSubscribeMessage } = substore();
 const toast = useToast();
 const pre_audio = ref<string | null>(null);
 const coverPreview = ref<string | null>(null);
+const isUploading = ref(false);
+const audioInput = ref<HTMLInputElement | null>(null);
+const coverInput = ref<HTMLInputElement | null>(null);
 
 // 封面上传
 const handleCoverUpload = (e: Event) => {
@@ -60,13 +63,37 @@ const handleAudioUpload = (e: Event) => {
     set(name, audioFile?.value?.name);
   }
 };
+
+const resetForm = () => {
+  isOriginal.value = false;
+  type.value = 0;
+  name.value = "";
+  desc.value = "";
+  audioFile.value = null;
+  coverFile.value = null;
+  audioURL.value = undefined;
+  coverURL.value = undefined;
+  pre_audio.value = null;
+  coverPreview.value = null;
+  if (audioInput.value) {
+    audioInput.value.value = "";
+  }
+  if (coverInput.value) {
+    coverInput.value.value = "";
+  }
+};
+
 // 音频上传
 const upload_new_music = async (data: MusicData) => {
+  if (isUploading.value) {
+    return;
+  }
   if (!data.name) {
     createToast(toast, "上传失败", "未上传任何数据", "warning");
     return;
   }
 
+  isUploading.value = true;
   try {
     // 1. 上传图片
     const imgForm = new FormData();
@@ -115,13 +142,15 @@ const upload_new_music = async (data: MusicData) => {
       userInfo.value?.reks_id ?? "guest",
     );
     // TODO:加一个确认上传界面
-    // TODO:重置表单
+    // 重置表单
     createToast(
       toast,
       "正在上传",
       "上传已开始，上传成功后将会通知您",
       "success",
     );
+
+    resetForm();
 
     // TODO:用订阅队列返回消息
     //createToast(toast, "上传成功", "音乐上传成功", "success");
@@ -137,6 +166,8 @@ const upload_new_music = async (data: MusicData) => {
       "danger",
     );
     return; // 阻止后续执行
+  } finally {
+    isUploading.value = false;
   }
 };
 </script>
@@ -149,6 +180,7 @@ const upload_new_music = async (data: MusicData) => {
       <div class="h5 mb-3">上传音频 <i-bi-file-music /></div>
       <div class="input-group">
         <input
+          ref="audioInput"
           type="file"
           id="uploadAudio"
           class="form-control"
@@ -173,24 +205,43 @@ const upload_new_music = async (data: MusicData) => {
           ></audio>
         </div>
         <div class="flex-fill">
-          <div class="btn-group mt-3 mb-3" id="isor" role="group">
-            <input
-              type="radio"
-              class="btn-check"
-              id="original"
-              v-model="isOriginal"
-              value="true"
+          <div class="choice-row mb-3">
+            <div class="choice-box">
+            <label class="form-label d-block mb-2">上传类型</label>
+            <BFormRadioGroup
+              v-model="type"
+              :options="[
+                { text: '素材', value: 0 },
+                { text: '歌曲', value: 1 },
+              ]"
+              buttons
+              button-variant="outline-primary"
+              name="music-type"
             />
-            <label class="btn btn-outline-primary" for="original">原创</label>
+            </div>
 
-            <input
-              type="radio"
-              class="btn-check"
-              id="repost"
-              v-model="isOriginal"
-              value="false"
-            />
-            <label class="btn btn-outline-primary" for="repost">转载</label>
+            <div class="choice-box">
+              <label class="form-label d-block mb-2">是否原创</label>
+              <div class="btn-group" id="isor" role="group">
+                <input
+                  type="radio"
+                  class="btn-check"
+                  id="original"
+                  v-model="isOriginal"
+                  value="true"
+                />
+                <label class="btn btn-outline-primary" for="original">原创</label>
+
+                <input
+                  type="radio"
+                  class="btn-check"
+                  id="repost"
+                  v-model="isOriginal"
+                  value="false"
+                />
+                <label class="btn btn-outline-primary" for="repost">转载</label>
+              </div>
+            </div>
           </div>
           <div class="mb-3">
             <label for="uploadTitle" class="form-label">歌曲名称</label>
@@ -217,6 +268,7 @@ const upload_new_music = async (data: MusicData) => {
           <div class="mb-3">
             <label class="form-label">添加歌曲封面</label>
             <input
+              ref="coverInput"
               type="file"
               id="uploadIcon"
               class="form-control"
@@ -228,8 +280,9 @@ const upload_new_music = async (data: MusicData) => {
           <div class="d-flex align-items-center gap-3">
             <BButton
               variant="primary"
-              @click.stop="upload_new_music({ isOriginal, name, desc })"
-              >确认上传
+              :disabled="isUploading"
+              @click.stop="upload_new_music({ isOriginal, type, name, desc })"
+              >{{ isUploading ? "上传中..." : "确认上传" }}
             </BButton>
             <div
               v-if="coverPreview"
@@ -258,5 +311,15 @@ audio::-webkit-media-controls-enclosure::-webkit-media-controls-download-button 
 
 audio::-internal-media-controls-download-button {
   display: none !important;
+}
+
+.choice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.choice-box {
+  flex: 1 1 240px;
 }
 </style>

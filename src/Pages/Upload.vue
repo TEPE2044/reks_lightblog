@@ -3,13 +3,17 @@ import { ref, watch } from "vue";
 import { type UploadIcon, uploadIconMap } from "../Utils/reks-icon-map";
 import router from "../Router";
 import { useRoute } from "vue-router";
-const route = useRoute()
-const curPath = ref<string>('/upload/blog')
+const route = useRoute();
+const curPath = ref<string>("/upload/blog");
 // 针对非响应式对象的watch写法
-watch(() => route.fullPath, (newPath) => {
-  curPath.value = newPath
-  console.log(curPath.value)
-}, { immediate: true })
+watch(
+  () => route.fullPath,
+  (newPath) => {
+    curPath.value = newPath;
+    console.log(curPath.value);
+  },
+  { immediate: true },
+);
 
 interface Selection {
   name: string;
@@ -24,32 +28,43 @@ const selections = ref<Selection[]>([
 ]);
 
 const switchPost = (rpath: string) => {
-  router.push(rpath)
+  router.push(rpath);
 };
 
+const toDraft = () => {
+  router.push("/upload/draft");
+};
 </script>
 <template>
-  <!-- 优化项 TODO:换成upload/blog upload/music upload/mblog 的路由形式 -->
   <div class="upload">
     <div class="sidebar">
       <div class="selection d-flex flex-column gap-3">
-        <!-- <p class="title">上传格式</p> -->
+        <div class="h5">投稿</div>
         <BButton
           class="select-item d-flex flex-row gap-3 align-items-center justify-content-center rounded-3 border-0"
-          v-for="(s) in selections"
-          :class="{slt:curPath === s.path }"
+          v-for="s in selections"
+          :class="{ slt: curPath === s.path }"
           :key="`selecetion${s}`"
           @click="switchPost(s.path)"
         >
           <div class="sname">{{ s.name }}</div>
           <component :is="uploadIconMap[s.iconKey]" style="font-size: 1.4rem" />
         </BButton>
+
+        <div class="h5 mt-3">草稿</div>
+        <BButton
+          @click="toDraft()"
+          :class="{ slt: curPath === '/upload/draft' }"
+          class="select-item d-flex flex-row gap-3 align-items-center justify-content-center rounded-3 border-0"
+        >
+          <div class="sname">草稿箱</div>
+          <i-bi-file-earmark-post />
+        </BButton>
       </div>
     </div>
 
     <div class="textarea mt-3 mb-3 px-2">
-      <RouterView/>
-      <!-- <Editor v-model="postType" /> -->
+      <RouterView />
     </div>
   </div>
 </template>

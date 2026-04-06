@@ -123,7 +123,7 @@ onMounted(async () => {
       </div>
 
       <div v-if="latestFeed" class="latest-wrap">
-        <div class="section-title">最新更新</div>
+        <div class="section-title">最新内容</div>
         <BlogCard :key="latestFeed.id" :blog="latestFeed.blog" :show-actions="false" :show-like="false"
           :show-favorite="false" />
       </div>

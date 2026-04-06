@@ -10,17 +10,15 @@ const pswGroup = reactive<PasswordGroup>({
   auth_psw: "",
 });
 const nemail = ref();
+const new_phone = ref<string>()
 
-// const esp = useToggle("easy-set-code");
 const espw = useToggle("easy-set-password");
 const ese = useToggle("easy-set-email");
+const ecp = useToggle("easy-change-phone");
 
 const pswVisible = ref(false);
 const eyes = computed(() => (pswVisible.value ? "text" : "password"));
 
-const getRecoverCode = () => {
-  console.log("oops！");
-};
 const toast = useToast();
 const setPassword = async (oldp: string, newp: string) => {
   if (oldp !== newp) {
@@ -70,6 +68,7 @@ const setEmail = async (email: string) => {
     nemail.value = "";
   }
 };
+
 </script>
 <template>
   <div class="safe-settings p-3">
@@ -97,7 +96,7 @@ const setEmail = async (email: string) => {
       <BCol
         class="safe-box d-flex align-items-center justify-content-center gap-3 offset-1"
         ><i-bi-telephone style="font-size: 1.5rem" />
-        <BButton variant="outline-primary">更换手机号</BButton>
+        <BButton variant="outline-primary" @click="ecp.toggle()">更换手机号</BButton>
       </BCol>
     </BRow>
 
@@ -121,21 +120,6 @@ const setEmail = async (email: string) => {
       </BCol>
     </BRow>
   </div>
-
-  <BModal id="easy-set-code" title="申请恢复码" no-footer>
-    <BButton pill variant="primary" @click="getRecoverCode()"
-      >开启恢复码验证</BButton
-    >
-    <BAlert show variant="primary">
-      该恢复码只会申请后出现一次，请妥善保存！
-    </BAlert>
-    <BButton pill variant="primary" @click="getRecoverCode()"
-      >申请恢复码</BButton
-    >
-    <div class="result text-center mt-3 mb-3">
-      <code>juqiskfal</code>
-    </div>
-  </BModal>
 
   <BModal id="easy-set-password" title="设置密码">
     <BAlert show variant="info" dismissible>
@@ -185,6 +169,15 @@ const setEmail = async (email: string) => {
         <BButton variant="success" @click.stop="setEmail(nemail)">确定</BButton>
       </div>
     </template>
+  </BModal>
+
+  <BModal id="easy-change-phone" title="更换手机号" no-footer>
+    <BAlert show variant="warning">
+      更换手机号码后，您需要重新登录
+    </BAlert>
+    <BInputGroup>
+      <BFormInput v-model="new_phone" type="tel" placeholder="更换您的手机号码" />
+    </BInputGroup>
   </BModal>
 </template>
 

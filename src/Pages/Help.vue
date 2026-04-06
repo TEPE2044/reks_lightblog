@@ -14,34 +14,23 @@
         </div>
         <div class="qa mb-2">
           <h5 class="fw-bold">Q: 我的手机号已经不再使用</h5>
-          <p>请点击<span title="找回密码" class="reset" @click="fb.toggle()"><b>此处</b></span>通过邮箱验证重置密码。</p>
+          <p>请点击<span title="找回密码" class="reset" @click="fb.toggle()"><b class="text-warning">此处</b></span>通过邮箱验证重置密码。</p>
         </div>
       </BAccordionItem>
       <BAccordionItem title="我要反馈一些问题">
-        <b>您可以通过下面的输入框反馈问题</b>
-        <BInputGroup class="mt-4">
-          <BFormTextarea
-            placeholder="请输入您的反馈内容..."
-            rows="3"
-            max-rows="3"
-          ></BFormTextarea>
-          <BButton variant="primary" @click="">提交反馈</BButton>
-        </BInputGroup>
-
-        <div class="mail mt-4">
-          <b>也可以通过邮箱联系我：</b
-          ><a href="mailto:JackyView2004@163.com">JackyView2004@163.com</a>
-        </div>
+        <a class="mail" href="mailto:TEPE2044@outlook.com"> 
+          <b>点击<b class="text-warning">此处</b>通过邮箱联系我</b>
+        </a>
       </BAccordionItem>
     </BAccordion>
 
-    <BModal id="fb" title="重置手机号" no-close-on-backdrop cancel-title="取消" ok-title="确定重置" @ok="" @cancel="">
+    <BModal id="fb" title="重置手机号" no-close-on-backdrop cancel-title="取消" ok-title="确定重置" @ok="fbs(fbd)">
       <BFormGroup label="邮箱">
-        <BFormInput class="mb-2" type="email" placeholder="请输入邮箱"/>
+        <BFormInput class="mb-2" v-model="fbd.email" type="email" placeholder="请输入邮箱"/>
       </BFormGroup>
       <BFormGroup class="mt-2" label="重置手机号">
-        <BFormInput class="mb-2" type="email" placeholder="旧手机号"/>
-        <BFormInput class="mb-2" type="tel" placeholder="新手机号"/>
+        <BFormInput class="mb-2" v-model="fbd.old_phone" type="tel" placeholder="旧手机号"/>
+        <BFormInput class="mb-2" v-model="fbd.new_phone" type="tel" placeholder="新手机号"/>
       </BFormGroup>
     </BModal>
   </div>
@@ -49,15 +38,22 @@
 
 <script setup lang="ts">
 import { useToggle } from 'bootstrap-vue-next';
+import { reactive } from 'vue';
+import { findBack, type ResetData } from '../Hooks/Auth';
 
 const fb = useToggle('fb')
 
-// const findBack = () => {
-//   //TODO: 前端校验邮箱、新旧手机号
-//   //发往后端比对，查看是否有此人(email&old)
-//   //向邮箱发送一封带有校验信息邮件，确认之后，重置手机号
-//   //最后返回请重新登录
-// }
+const fbd = reactive({
+  email: '',
+  old_phone: '',
+  new_phone:''
+})
+
+const fbs = async(fbd:ResetData) => {
+  console.log("耍你的")
+  const res = await findBack(fbd)
+  alert(res)
+}
 </script>
 
 <style lang="scss" scoped>

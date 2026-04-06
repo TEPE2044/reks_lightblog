@@ -49,15 +49,19 @@ export const query_hot_blog_cursor = async (
   return res.data as BlogCursorResponse;
 };
 
-export const query_my_draft = async () => {
+export const query_my_draft = async (
+  cursor: number | null,
+  limit = 9
+) => {
   const res = await reapi({
-    url: "/blog/my-blog",
-    method: "GET",
-    params: {
-      state_: 0,
+    url: "/blog/my-draft/cursor",
+    method: "POST",
+    data: {
+      cursor,
+      limit
     },
   });
-  return res.data;
+  return res.data as BlogCursorResponse;
 };
 
 export const query_blog_by_id = async (id: number) => {
@@ -166,3 +170,23 @@ export const update_blog = async (
   });
   return res;
 };
+
+export const delete_blog = async (blog_id: Number) => {
+  const res = await reapi({
+    url:`/blog/delete`,
+    method:'DELETE',
+    params:{
+      blog_id
+    }
+  })
+  return res;
+}
+
+
+export const get_hot_tags = async() => {
+  const res = await reapi({
+    url:`/blog/tags/hot`,
+    method:`GET`
+  })
+  return res.data.tags
+}

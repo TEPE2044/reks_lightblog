@@ -162,7 +162,7 @@ onBeforeUnmount(() => {
       </div>
       <Toolbar class="editor-toolbar" :editor="editor" :default-config="toolbarConfig" mode="default" />
       <Editor v-model="valueHTML" class="editor-content" :default-config="editorConfig" mode="default"
-        @on-created="handleCreated" @on-change="handleChange" />
+        @on-created="handleCreated" @on-change="handleChange"/>
     </section>
 
     <section class="tags-section" v-if="postType !== 'audio'">
@@ -249,7 +249,7 @@ $border-radius: 5px;
 // ==================== 容器 ====================
 .editor-container {
   width: 100%;
-  min-height: 200px;
+  min-height: 500px;
   padding: 20px;
   background-color: white;
   display: flex;
@@ -286,8 +286,8 @@ section {
   }
 
   .editor-content {
-    min-height: 301px;
-    max-height: 650px;
+    min-height: 400px;
+    // max-height: 650px;
     overflow-y: auto;
     border-top: 1px solid $border-color;
     border-bottom: 2px solid gainsboro;

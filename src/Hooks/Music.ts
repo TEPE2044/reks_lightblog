@@ -76,3 +76,22 @@ export const upload_music_form = async (data: MusicData) => {
   });
   return res.data;
 };
+
+export const delete_music = async (music_id: Number) => {
+  const res = await reapi({
+    url: `/music/delete`,
+    method:'DELETE',
+    params:{
+      music_id
+    }
+  })
+  return res
+}
+
+export const get_hot_music = async () => {
+  const res = await reapi({
+    url:`/music/hot`,
+    method:'GET'
+  })
+  return res.data
+}
