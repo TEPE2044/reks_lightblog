@@ -10,6 +10,10 @@ const props = defineProps<{
   activeTab: "keyword" | "music" | "user";
 }>();
 
+const emit = defineEmits<{
+  searched: [];
+}>();
+
 const store = searchStore();
 const { setBlogRes, setMusicRes, setUserRes, clearSearchResult } = store;
 const { searchType } = storeToRefs(store);
@@ -110,6 +114,16 @@ const queryUser = async () => {
 };
 
 const runSearchByTab = useDebounceFn(async () => {
+  const canSearchKeyword = mode.value === "tag"
+    ? lazyTags.value.length > 0
+    : lazyText.value.trim().length > 0;
+  const canSearchOther = lazyText.value.trim().length > 0;
+
+  if (props.activeTab === "keyword" && !canSearchKeyword) return;
+  if ((props.activeTab === "music" || props.activeTab === "user") && !canSearchOther) return;
+
+  emit("searched");
+
   if (props.activeTab === "keyword") {
     if (mode.value === "tag") {
       await queryTags();

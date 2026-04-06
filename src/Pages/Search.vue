@@ -25,6 +25,7 @@ const pages = ref<PageWrapper>({
 });
 
 const toast = useToast();
+const hasSearched = ref(false);
 
 const activeListLength = computed(() => {
   if (searchType.value === "music") return musicRes.value.length;
@@ -39,12 +40,21 @@ const empty = computed(
 watch(
   [searchType, blogRes, musicRes, userRes, () => pages.value.rows],
   () => {
+    if (!hasSearched.value) return;
     if (empty.value) {
       createToast(toast, "空空如也", "没有检索到当前信息", "warning");
     }
   },
   { deep: true },
 )
+
+watch(searchType, () => {
+  hasSearched.value = false;
+});
+
+const onSearched = () => {
+  hasSearched.value = true;
+};
 
 
 const currentPage = computed({
@@ -103,7 +113,7 @@ const casePlay = (m: MusicResponse) => {
 <template>
   <div class="search d-flex flex-column align-items-center">
     <div class="search-input mt-5 w-75">
-      <RadioSelector v-model="pages" :active-tab="searchType" />
+      <RadioSelector v-model="pages" :active-tab="searchType" @searched="onSearched" />
     </div>
 
     <div class="result mt-5 w-75">
