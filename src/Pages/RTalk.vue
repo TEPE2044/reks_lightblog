@@ -3,13 +3,13 @@ import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const options = [
-  { text: "系统通知", value: "anmt" },
+  { text: "系统通知", value: "notif" },
   { text: "我的消息", value: "mes" },
 ];
 
 const route = useRoute();
 const router = useRouter();
-const selected = ref(route.name === "mes" ? "mes" : "anmt");
+const selected = ref(route.name === "mes" ? "mes" : "notif");
 
 watch(selected, (value) => {
   if (value === route.name) return;
@@ -19,7 +19,7 @@ watch(selected, (value) => {
 watch(
   () => route.name,
   (name) => {
-    if (name === "anmt" || name === "mes") {
+    if (name === "notif" || name === "mes") {
       selected.value = name;
       if(name === "mes"){
         alert("消息功能正在开发中，敬请期待！");
