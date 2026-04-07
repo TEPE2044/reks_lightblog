@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
+import dompdf from "dompdf.js";
 import type { SubscribeMessage } from "../Store/subscribe";
 
 export interface EventPayloadData {
@@ -81,105 +80,179 @@ const escapeHtml = (text: string) =>
     .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#39;");
 
-export const exportSubscribePdf = async (list: SubscribeMessage[]) => {
-  const doc = new jsPDF({ unit: "pt", format: "a4" });
-  const now = dayjs();
-  const filename = `ReKindlers${now.format("YYYYMMDD_HHmmss")}日志.pdf`;
+const downloadBlob = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.style.display = "none";
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+};
 
+const buildSubscribeExportElement = (
+  list: SubscribeMessage[],
+  exportedAt: string,
+) => {
   const wrapper = document.createElement("div");
-  wrapper.style.width = "780px";
-  wrapper.style.padding = "20px";
+  wrapper.style.position = "fixed";
+  wrapper.style.left = "-100000px";
+  wrapper.style.top = "0";
+  wrapper.style.width = "794px";
+  wrapper.style.padding = "28px";
+  wrapper.style.boxSizing = "border-box";
   wrapper.style.background = "#ffffff";
   wrapper.style.color = "#1f2937";
-  wrapper.style.fontSize = "14px";
-  wrapper.style.lineHeight = "1.7";
   wrapper.style.fontFamily =
-    "'Microsoft YaHei','PingFang SC','Noto Sans CJK SC',sans-serif";
-  wrapper.style.position = "fixed";
-  wrapper.style.left = "-10000px";
-  wrapper.style.top = "0";
-  wrapper.style.zIndex = "-1";
-
-  const header = `
-    <h2 style="margin:0 0 8px 0;font-size:18px;">ReKindlers 日志</h2>
-    <div style="margin-bottom:14px;color:#6b7280;">
-      导出时间：${now.format("YYYY-MM-DD HH:mm:ss")}
-    </div>
-  `;
+    "'Alibaba-PuHuiTi-Medium', 'Microsoft YaHei', 'PingFang SC', 'Noto Sans CJK SC', sans-serif";
+  wrapper.style.fontSize = "14px";
+  wrapper.style.lineHeight = "1.75";
 
   const rows = list.length
     ? list
-        .map((item) => {
+        .map((item, index) => {
           const time = dayjs(item.createdAt).format("YYYY-MM-DD HH:mm:ss");
           return `
-            <div style="padding:10px 0;border-top:1px solid #e5e7eb;">
-              <div style="font-weight:600;">${escapeHtml(item.title)}</div>
-              <div style="color:#374151;">${escapeHtml(item.details)}</div>
-              <div style="color:#9ca3af;font-size:12px;">${time}</div>
-            </div>
+            <article class="subscribe-export__item">
+              <div class="subscribe-export__index">${index + 1}</div>
+              <div class="subscribe-export__body">
+                <div class="subscribe-export__title">${escapeHtml(item.title)}</div>
+                <div class="subscribe-export__detail">${escapeHtml(item.details)}</div>
+                <div class="subscribe-export__time">${time}</div>
+              </div>
+            </article>
           `;
         })
         .join("")
-    : `<div style="padding:10px 0;border-top:1px solid #e5e7eb;color:#6b7280;">暂无日志</div>`;
+    : `<div class="subscribe-export__empty">暂无日志</div>`;
 
-  wrapper.innerHTML = `${header}${rows}`;
+  wrapper.innerHTML = `
+    <style>
+      .subscribe-export {
+        width: 100%;
+      }
+
+      .subscribe-export__header {
+        margin-bottom: 18px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .subscribe-export__title-main {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 800;
+        color: #111827;
+      }
+
+      .subscribe-export__meta {
+        margin-top: 6px;
+        color: #6b7280;
+        font-size: 12px;
+      }
+
+      .subscribe-export__list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .subscribe-export__item {
+        display: flex;
+        gap: 12px;
+        padding: 14px 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .subscribe-export__index {
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: #f3f4f6;
+        color: #4b5563;
+        font-size: 12px;
+        font-weight: 700;
+        display: grid;
+        place-items: center;
+      }
+
+      .subscribe-export__body {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .subscribe-export__title {
+        font-size: 15px;
+        font-weight: 800;
+        color: #111827;
+      }
+
+      .subscribe-export__detail {
+        margin-top: 4px;
+        color: #374151;
+        word-break: break-word;
+      }
+
+      .subscribe-export__time {
+        margin-top: 8px;
+        color: #9ca3af;
+        font-size: 12px;
+      }
+
+      .subscribe-export__empty {
+        padding: 18px 0;
+        color: #6b7280;
+      }
+    </style>
+    <section class="subscribe-export">
+      <header class="subscribe-export__header">
+        <h1 class="subscribe-export__title-main">ReKindlers 日志</h1>
+        <div class="subscribe-export__meta">导出时间：${exportedAt}</div>
+      </header>
+      <div class="subscribe-export__list">
+        ${rows}
+      </div>
+    </section>
+  `;
+
+  return wrapper;
+};
+
+export const exportSubscribePdf = async (list: SubscribeMessage[]) => {
+  const now = dayjs();
+  const filename = `ReKindlers${now.format("YYYYMMDD_HHmmss")}日志.pdf`;
+  const wrapper = buildSubscribeExportElement(list, now.format("YYYY-MM-DD HH:mm:ss"));
   document.body.appendChild(wrapper);
 
   try {
-    const canvas = await html2canvas(wrapper, {
-      scale: 2,
-      useCORS: true,
+    const result = await dompdf(wrapper, {
+      pagination: true,
+      format: "a4",
       backgroundColor: "#ffffff",
     });
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 20;
-    const printableWidth = pageWidth - margin * 2;
-    const printableHeight = pageHeight - margin * 2;
+    const blob =
+      result instanceof Blob
+        ? result
+        : await new Promise<Blob>((resolve, reject) => {
+            result.toBlob((canvasBlob) => {
+              if (canvasBlob) {
+                resolve(canvasBlob);
+                return;
+              }
 
-    const pxPerPt = canvas.width / printableWidth;
-    const pageSlicePx = Math.floor(printableHeight * pxPerPt);
+              reject(new Error("Failed to create PDF blob."));
+            });
+          });
 
-    let offsetPx = 0;
-    let firstPage = true;
-
-    while (offsetPx < canvas.height) {
-      const sliceHeightPx = Math.min(pageSlicePx, canvas.height - offsetPx);
-      const pageCanvas = document.createElement("canvas");
-      pageCanvas.width = canvas.width;
-      pageCanvas.height = sliceHeightPx;
-      const ctx = pageCanvas.getContext("2d");
-      if (!ctx) {
-        break;
-      }
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-      ctx.drawImage(
-        canvas,
-        0,
-        offsetPx,
-        canvas.width,
-        sliceHeightPx,
-        0,
-        0,
-        canvas.width,
-        sliceHeightPx,
-      );
-
-      const imgData = pageCanvas.toDataURL("image/png");
-      const renderedHeight = sliceHeightPx / pxPerPt;
-
-      if (!firstPage) {
-        doc.addPage();
-      }
-      firstPage = false;
-
-      doc.addImage(imgData, "PNG", margin, margin, printableWidth, renderedHeight);
-      offsetPx += sliceHeightPx;
-    }
-
-    doc.save(filename);
+    downloadBlob(blob, filename);
   } finally {
     document.body.removeChild(wrapper);
   }

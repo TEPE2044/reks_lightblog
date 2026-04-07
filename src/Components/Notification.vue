@@ -40,7 +40,9 @@ const handleClear = () => {
 };
 
 const handleExport = () => {
-  exportSubscribePdf(subscribeList.value);
+  void exportSubscribePdf(subscribeList.value).catch((error) => {
+    console.error("导出日志失败", error);
+  });
 };
 
 onMounted(() => {
