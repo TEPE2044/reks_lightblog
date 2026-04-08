@@ -140,12 +140,12 @@ const router = createRouter({
         {
           path: "",
           name: "rstalk",
-          redirect: { name: "anmt" },
+          redirect: { name: "notif" },
         },
         {
-          path: "anmt",
-          name: "anmt",
-          component: () => import("../Components/AnnouncementPanel.vue"),
+          path: "notif",
+          name: "notif",
+          component: () => import("../Components/Notification.vue"),
         },
         {
           path: "mes",

@@ -40,7 +40,9 @@ const handleClear = () => {
 };
 
 const handleExport = () => {
-  exportSubscribePdf(subscribeList.value);
+  void exportSubscribePdf(subscribeList.value).catch((error) => {
+    console.error("导出日志失败", error);
+  });
 };
 
 onMounted(() => {
@@ -81,25 +83,35 @@ const activities = ref<ActivityItem[]>([
     tone: "warm",
   },
 ]);
-
-
 </script>
 
 <template>
-  <div class="announcement-panel">
+  <div class="notif">
     <main class="panel-main">
       <aside class="timeline-area">
-        <div class="header mb-3 d-flex align-items-center justify-content-between gap-2 flex-row">
-          <div class="h5 fw-bold">订阅消息</div >
-          <BButtonGroup size="sm"> 
-            <BButton variant="outline-secondary" @click="handleClear">清空消息</BButton> 
-            <BButton variant="outline-secondary" @click="handleExport">导出</BButton> 
+        <div
+          class="header mb-3 d-flex align-items-center justify-content-between gap-2 flex-row"
+        >
+          <h5 class="header-h5">消息列表</h5>
+          <BButtonGroup size="sm">
+            <BButton variant="outline-secondary" @click="handleClear"
+              >清空消息</BButton
+            >
+            <BButton variant="outline-secondary" @click="handleExport"
+              >导出</BButton
+            >
           </BButtonGroup>
         </div>
-        
+
         <div class="timeline-list">
-          <div v-if="!shownTimeline.length" class="empty-timeline">暂无日志</div>
-          <article v-for="item in shownTimeline" :key="item.id" class="timeline-item">
+          <div v-if="!shownTimeline.length" class="empty-timeline">
+            暂无日志
+          </div>
+          <article
+            v-for="item in shownTimeline"
+            :key="item.id"
+            class="timeline-item"
+          >
             <div class="node" />
             <div class="content">
               <div class="time">{{ item.time }}</div>
@@ -111,7 +123,7 @@ const activities = ref<ActivityItem[]>([
       </aside>
 
       <section class="activity-area">
-        <h3>活动板块</h3>
+        <h5 class="header-h5">活动板块</h5>
         <div class="activity-grid">
           <ActivityCard
             v-for="item in activities"
@@ -131,7 +143,7 @@ const activities = ref<ActivityItem[]>([
 <style lang="scss" scoped>
 @use "../Asset/CustomStyle/global.scss";
 
-.announcement-panel {
+.notif {
   padding: 1.1rem;
 }
 
@@ -142,9 +154,12 @@ const activities = ref<ActivityItem[]>([
   gap: 1rem;
   min-height: 620px;
 }
-
+.header-h5 {
+  @extend %reks-title;
+}
 .timeline-area {
   @extend %reks-card-box;
+
   padding: 0.9rem;
   overflow: hidden;
   min-height: 580px;
@@ -221,7 +236,6 @@ const activities = ref<ActivityItem[]>([
   min-height: 580px;
 }
 
-
 .activity-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -243,7 +257,7 @@ const activities = ref<ActivityItem[]>([
 }
 
 @media (max-width: 680px) {
-  .announcement-panel {
+  .notif {
     padding: 0.85rem;
   }
 
