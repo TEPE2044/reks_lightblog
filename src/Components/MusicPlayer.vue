@@ -274,7 +274,7 @@ onUnmounted(() => {
       </template>
       <template #default>
         <div class="scroll-list">
-          <div v-for="song in playQueue" :key="`reks${song}`"
+          <div v-for="song in playQueue" :key="`reks${song}`" :class="{'border border-danger': currentIndex === playQueue.indexOf(song)}"
             class="list-item position-relative p-3 border rounded-1 mt-3 d-flex justify-content-between align-items-center shadow-sm">
             <div class="meta d-flex flex-row align-items-center justify-content-center position-absolute">
               <div class="btns d-flex flex-row align-items-center justify-content-center gap-4">
