@@ -72,6 +72,14 @@ export const query_blog_by_id = async (id: number) => {
   return res.data;
 };
 
+export const query_draft_by_id = async (id: number) => {
+  const res = await reapi({
+    url: `/blog/draft/${id}`,
+    method: "GET",
+  });
+  return res.data;
+};
+
 export const query_blog_by_user_id = async (rid: number) => {
   const res = await reapi({
     url: `/blog/user/${rid}`,

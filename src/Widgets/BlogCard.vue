@@ -28,7 +28,7 @@ const blogProps = withDefaults(defineProps<{
   showFavorite?: boolean;
   showEdit?:boolean;
   showActions?: boolean;
-  enableVisit?:boolean;
+  visitRouteName?: string;
 }>(), {
   liked: false,
   likeReady: true,
@@ -40,7 +40,7 @@ const blogProps = withDefaults(defineProps<{
   showFavorite: true,
   showEdit:false,
   showActions: true,
-  enableVisit:true
+  visitRouteName: "blog",
 });
 // 子传父
 // 当子组件触发 favorite-toggle 事件时，调用 handleFavoriteToggle 方法 @favorite-toggle="handleFavoriteToggle"
@@ -78,9 +78,13 @@ const handleFavorite = async () => {
 
 const readBlog = async (id: number) => {
   try {
-    const target = `/blog/${id}`;
+    const target = router.resolve({
+      name: blogProps.visitRouteName,
+      params: { id: String(id) },
+    }).fullPath;
     if (router.currentRoute.value.fullPath === target) return;
-    await router.push({ name: "blog", params: { id: String(id) } });
+
+    await router.push({ name: blogProps.visitRouteName, params: { id: String(id) } });
   } catch (e) {
     // 忽略导航失败（例如重复导航）
     console.warn("导航到博客页失败:", e);
@@ -215,7 +219,11 @@ const casePlay = () => {
       </div>
     </div>
 
-    <div class="rs-card-content mt-4" v-skeleton-item @click="readBlog(b.id)" v-if="blogProps.enableVisit === true">
+    <div
+      class="rs-card-content mt-4"
+      v-skeleton-item
+      @click="readBlog(b.id)"
+    >
       <div class="rs-title h5" :title="b.title">
         <strong>{{ b.title }}</strong>
       </div>
@@ -335,6 +343,8 @@ const casePlay = () => {
 .rs-card-content {
   // max-width: $card-max-width;
 
+  cursor: pointer;
+
   .rs-title {
     width: 270px;
     white-space: nowrap;
@@ -346,5 +356,6 @@ const casePlay = () => {
       text-decoration: underline;
     }
   }
+
 }
 </style>
