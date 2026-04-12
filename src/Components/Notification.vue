@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted } from "vue";
 import { BButton, BButtonGroup } from "bootstrap-vue-next";
 import { storeToRefs } from "pinia";
 import dayjs from "dayjs";
@@ -13,14 +13,14 @@ interface TimelineItem {
   detail: string;
 }
 
-interface ActivityItem {
-  id: number;
-  title: string;
-  summary: string;
-  meta: string;
-  badge: string;
-  tone: "warm" | "sky";
-}
+// interface ActivityItem {
+//   id: number;
+//   title: string;
+//   summary: string;
+//   meta: string;
+//   badge: string;
+//   tone: "warm" | "sky";
+// }
 
 const { subscribeList } = storeToRefs(substore());
 const { initSubscribeList, removeallMessage } = substore();
