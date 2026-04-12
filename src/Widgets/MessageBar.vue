@@ -43,7 +43,7 @@ const pageToRtalk = () => {
       <BDropdownItem class="text-center" @click="user.userLogout">退出登录</BDropdownItem>
     </BDropdown>
 
-    <BButton title="博客" class="position-relative" variant="light" @click="pageToUpload()" v-if="user.isLoggedIn">
+    <BButton pill title="博客" class="position-relative" variant="light" @click="pageToUpload()" v-if="user.isLoggedIn">
       <i-bi-upload /> &nbsp;发布博客
     </BButton>
   </div>

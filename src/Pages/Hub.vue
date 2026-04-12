@@ -1,7 +1,9 @@
 <template>
   <div class="hub">
     <HubHeader />
-
+    <div class="hub-recommand mt-4">
+      <Recommand />
+    </div>
     <section class="hub-shell mt-4 mb-4">
       <article class="hub-main overflow-hidden">
         <div class="hang">
@@ -15,14 +17,9 @@
         </div>
 
         <ul class="entry-list" aria-label="热门标签">
-          <li
-            v-for="entry in entries"
-            :key="entry.name"
-            class="entry-item"
-            :class="getTagWeightClass(entry.count)"
-          >
-            
-            <p class="entry-title"><i-bi-tag/>{{ entry.name }}</p>
+          <li v-for="entry in entries" :key="entry.name" class="entry-item" :class="getTagWeightClass(entry.count)">
+
+            <p class="entry-title"><i-bi-tag />{{ entry.name }}</p>
           </li>
         </ul>
 
@@ -31,10 +28,6 @@
         </BButton>
       </aside>
     </section>
-
-    <div class="hub-recommand">
-      <Recommand />
-    </div>
   </div>
 </template>
 
@@ -42,14 +35,14 @@
 import { computed, onMounted, ref } from 'vue';
 import { get_hot_tags } from '../Hooks/Blog';
 
-interface TagResponse{
-  name:string,
-  count:number
+interface TagResponse {
+  name: string,
+  count: number
 }
 
 const entries = ref<TagResponse[]>([])
 
-onMounted(async() => {
+onMounted(async () => {
   try {
     entries.value = await get_hot_tags()
   } catch {
@@ -87,12 +80,13 @@ const getTagWeightClass = (count: number) => {
 }
 
 .hub-main,
-.hub-side{
+.hub-side {
   @extend %reks-card-box;
 }
 
 .hub-main {
   padding-top: 0;
+
   .hang {
     border-bottom: 1px solid rgba(30, 50, 38, 0.08);
   }
@@ -192,8 +186,8 @@ const getTagWeightClass = (count: number) => {
         }
       }
 
-      &:first-child{
-        &::before{
+      &:first-child {
+        &::before {
           content: '🔥';
         }
       }
@@ -221,8 +215,9 @@ const getTagWeightClass = (count: number) => {
       color: #24352a;
       font-size: 0.85rem;
     }
-    &:hover{
-      transition: transform 0.1s ease ;
+
+    &:hover {
+      transition: transform 0.1s ease;
       transform: scale(1.03);
     }
   }
@@ -266,6 +261,7 @@ const getTagWeightClass = (count: number) => {
     }
 
     .entry-item {
+
       &.weight-xl,
       &.weight-lg,
       &.weight-md {

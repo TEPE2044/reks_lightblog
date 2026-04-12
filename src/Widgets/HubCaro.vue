@@ -30,6 +30,7 @@
 @use "../Asset/CustomStyle/global.scss";
 
 .hub-caro {
+    @extend %reks-card-box; 
     .inner {
         height: 300px;
         overflow: hidden;
