@@ -124,7 +124,8 @@ const activities = ref<ActivityItem[]>([
 
       <section class="activity-area">
         <h5 class="header-h5">活动板块</h5>
-        <div class="activity-grid">
+        <Empty title="暂未开放"/>
+        <!-- <div class="activity-grid">
           <ActivityCard
             v-for="item in activities"
             :key="item.id"
@@ -134,7 +135,7 @@ const activities = ref<ActivityItem[]>([
             :badge="item.badge"
             :tone="item.tone"
           />
-        </div>
+        </div> -->
       </section>
     </main>
   </div>
