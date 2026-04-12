@@ -14,6 +14,12 @@ const router = createRouter({
       component: () => import("../Pages/Blog.vue"),
     },
     {
+      path: "/draft/:id",
+      name: "blog-draft",
+      component: () => import("../Pages/Blog.vue"),
+      meta: { source: "draft" },
+    },
+    {
       path: "/subscribe",
       name: "subscribe",
       component: () => import("../Pages/Subscribe.vue"),

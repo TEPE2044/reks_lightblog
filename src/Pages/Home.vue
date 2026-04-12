@@ -51,26 +51,10 @@ onMounted(async () => {
     <BContainer class="home-hotlist mt-4">
       <HotList />
     </BContainer>
+    <!-- <BContainer class="home-cross mt-4 mb-4">
+      <Gallery/>
+    </BContainer> -->
     <BContainer class="home-lens mt-4 mb-4">
-      <article class="home-timeline p-3">
-        <h5>网站动态</h5>
-        <div class="timeline">
-          <ul>
-            <li
-              v-for="item in timeline"
-              :key="item.date + item.event"
-              class="d-flex align-items-center"
-            >
-              <div class="fw-bolder" v-if="item?.big">{{ item?.big }}</div>
-              <span class="date" v-else>
-                {{ item.date }}
-              </span>
-              <p>{{ item.event }}</p>
-            </li>
-          </ul>
-        </div>
-      </article>
-
       <article class="home-describe p-3">
         <h5>关于ReKindlers</h5>
         <div class="focus-list mt-3 d-grid gap-2">
@@ -89,10 +73,32 @@ onMounted(async () => {
               <p class="title mb-0 h4 fw-semibold">{{ hot.title }}</p>
             </div>
             <div class="text-swap position-relative mt-3">
-              <span class="desc-layer desc-origin d-block lh-base">{{ hot.desc }}</span>
-              <span class="desc-layer desc-hint d-block lh-base">{{ hot.hint || hot.desc }}</span>
+              <span class="desc-layer desc-origin d-block lh-base">{{
+                hot.desc
+              }}</span>
+              <span class="desc-layer desc-hint d-block lh-base">{{
+                hot.hint || hot.desc
+              }}</span>
             </div>
           </div>
+        </div>
+      </article>
+      <article class="home-timeline p-3">
+        <h5>网站动态</h5>
+        <div class="timeline">
+          <ul>
+            <li
+              v-for="item in timeline"
+              :key="item.date + item.event"
+              class="d-flex align-items-center"
+            >
+              <div class="fw-bolder" v-if="item?.big">{{ item?.big }}</div>
+              <span class="date" v-else>
+                {{ item.date }}
+              </span>
+              <p>{{ item.event }}</p>
+            </li>
+          </ul>
         </div>
       </article>
     </BContainer>
@@ -126,7 +132,7 @@ onMounted(async () => {
 
   .home-lens {
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-template-columns: 1.6fr 1fr;
     gap: 1rem;
 
     h5 {
@@ -183,7 +189,9 @@ onMounted(async () => {
           box-shadow:
             inset 0 0 0 1px rgba(255, 255, 255, 0.44),
             0 8px 16px rgba(122, 39, 39, 0.1);
-          transition: transform 0.25s ease, box-shadow 0.25s ease;
+          transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
           outline: none;
 
           &:hover {

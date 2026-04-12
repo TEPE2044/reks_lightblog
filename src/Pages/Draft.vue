@@ -60,7 +60,7 @@ useInfiniteScroll(
             :show-actions="false"
             :show-like="false"
             :show-favorite="false"
-            :enable-visit="false"
+            visit-route-name="blog-draft"
         />
         <div v-if="loadingMore" class="load-more-tip">加载中...</div>
     </div>

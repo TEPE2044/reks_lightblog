@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { useToast } from "bootstrap-vue-next";
-import { delete_blog, query_blog_by_id } from "../Hooks/Blog";
+import { delete_blog, query_blog_by_id, query_draft_by_id } from "../Hooks/Blog";
 import {
   hasFavoriteAuthSession,
   queryLikeCount,
@@ -48,12 +48,15 @@ const authorRid = computed(() => Number(response.value?.user_id));
 const isOwnBlog = computed(() => authorRid.value === Number(userInfo.value?.reks_id));
 const subscribed = computed(() => follow.isSubscribed(authorRid.value));
 const subscribePending = computed(() => follow.isFollowPending(authorRid.value));
+const isDraftMode = computed(() => route.name === "blog-draft" || route.meta.source === "draft");
 
 const syncSubscribeState = async () => {
+  if (isDraftMode.value) return;
   await follow.syncSubscribeStateByRid(authorRid.value, !isOwnBlog.value);
 };
 
 const toggleSubscribe = () => {
+  if (isDraftMode.value) return;
   void follow.toggleSubscribeByRid({
     rid: authorRid.value,
     canFollow: !isOwnBlog.value,
@@ -191,6 +194,7 @@ const handleDelete = async (id: number) => {
 };
 
 const handleFavorite = async () => {
+  if (isDraftMode.value) return;
   const blogId = Number(route.params.id);
   if (Number.isNaN(blogId) || favoritePending.value || !favoriteReady.value)
     return;
@@ -225,6 +229,7 @@ const handleFavorite = async () => {
 };
 
 const handleLike = async () => {
+  if (isDraftMode.value) return;
   const blogId = Number(route.params.id);
   if (Number.isNaN(blogId) || likePending.value || !likeReady.value) return;
 
@@ -272,19 +277,29 @@ const loadBlog = async (id: number | string) => {
   const numId = Number(id);
   if (isNaN(numId)) return;
 
-  const res = await query_blog_by_id(numId);
+  const res = isDraftMode.value
+    ? await query_draft_by_id(numId)
+    : await query_blog_by_id(numId);
   response.value = res;
-  await syncLikeCount(numId);
-  await syncLikeStatus(numId);
-  await syncFavoriteStatus(numId);
-  await syncSubscribeState();
+  if (isDraftMode.value) {
+    likeCount.value = 0;
+    isLiked.value = false;
+    likeReady.value = true;
+    isFavorited.value = false;
+    favoriteReady.value = true;
+  } else {
+    await syncLikeCount(numId);
+    await syncLikeStatus(numId);
+    await syncFavoriteStatus(numId);
+    await syncSubscribeState();
+  }
   console.log(response.value);
 };
 
 // 监听路由参数变化（浏览器地址栏输入新ID时会触发）
 watch(
-  () => route.params.id,
-  (newId) => {
+  () => [route.params.id, isDraftMode.value],
+  ([newId]) => {
     loadBlog(Number(newId));
   },
   { immediate: true }, // 立即执行，替代 onMounted
@@ -339,12 +354,13 @@ const toTagTheme = () => {
 
     <!-- 右侧用户卡片侧边栏 -->
     <aside class="author-sidebar">
-      <!-- TODO 关联歌曲组 -->
+      <!--  关联歌曲组 -->
 
       <div class="author-card">
         <BAvatar size="80" :src="response?.avatar || ''" />
         <div class="author-name" @click="toAuthorSpace()">{{ response?.author }}</div>
         <BButton
+          v-if="!isDraftMode"
           variant="outline-secondary"
           size="sm"
           :disabled="subscribePending || isOwnBlog"
@@ -355,34 +371,40 @@ const toTagTheme = () => {
       </div>
 
       <!-- 互动按钮组 -->
-      <div class="action-buttons">
-        <BButton
-          class="action-btn"
-          :class="{ active: isLiked, disabled: !likeReady || likePending }"
-          :disabled="!likeReady || likePending"
-          @click="handleLike"
+      <div
+        class="action-buttons"
+        v-if="!isDraftMode || response?.user_id === userInfo?.reks_id"
+      >
+        <template v-if="!isDraftMode">
+          <BButton
+            class="action-btn"
+            :class="{ active: isLiked, disabled: !likeReady || likePending }"
+            :disabled="!likeReady || likePending"
+            @click="handleLike"
+          >
+            <i-bi-hand-thumbs-up />
+            <span>{{ likePending ? "处理中" : `点赞 ${likeCount}` }}</span>
+          </BButton>
+          <BButton
+            class="action-btn"
+            :class="{
+              active: isFavorited,
+              disabled: !favoriteReady || favoritePending,
+            }"
+            :disabled="!favoriteReady || favoritePending"
+            @click="handleFavorite"
+          >
+            <i-bi-heart />
+            <span>{{ favoritePending ? "处理中" : "收藏" }}</span>
+          </BButton>
+        </template>
+
+        <BPopover
+          placement="bottom"
+          v-if="response?.user_id === userInfo?.reks_id"
         >
-          <i-bi-hand-thumbs-up />
-          <span>{{ likePending ? "处理中" : `点赞 ${likeCount}` }}</span>
-        </BButton>
-        <BButton
-          class="action-btn"
-          :class="{
-            active: isFavorited,
-            disabled: !favoriteReady || favoritePending,
-          }"
-          :disabled="!favoriteReady || favoritePending"
-          @click="handleFavorite"
-        >
-          <i-bi-heart />
-          <span>{{ favoritePending ? "处理中" : "收藏" }}</span>
-        </BButton>
-        <BPopover placement="bottom">
           <template #target>
-            <BButton
-              class="action-btn"
-              v-if="response?.user_id === userInfo?.reks_id"
-            >
+            <BButton class="action-btn">
               <i-bi-gear />
               <span>编辑</span>
             </BButton>

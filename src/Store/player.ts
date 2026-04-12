@@ -44,28 +44,35 @@ export const playerStore = defineStore("player", () => {
   const addIntoPlayQueue = (data: QueueItem, currentIndex: number) => {
     // 没法用included，includes比较的是对象引用，而data每次都是新创建的对象（即使内容一样），引用地址不同
     let isExisted = playQueue.value.some(
-      (song) => song.songURL === data.songURL
+      (song) => song.songURL === data.songURL,
     );
 
     console.log(`列表是否存在这首歌？ ${isExisted}`);
     // 这里isExisted仅判断原来的状态，无需更新
-    if (isExisted === false) {
-      if (playQueueLength.value === 0) {
-        playQueue.value.push(data);
-        player?.unload();
-        createPlayer();
+    try {
+      if (isExisted === false) {
+        if (playQueueLength.value === 0) {
+          playQueue.value.push(data);
+          player?.unload();
+          createPlayer();
+          return true;
+        }
+        if (currentIndex === playQueueLength.value - 1) {
+          playQueue.value.push(data);
+        } else {
+          playQueue.value.splice(currentIndex + 1, 0, data);
+        }
+        // console.log(playQueue.value);
+        console.warn("经过操作已插入列表");
+        // 完毕返回true
         return true;
       }
-      if (currentIndex === playQueueLength.value - 1) {
-        playQueue.value.push(data);
-      } else {
-        playQueue.value.splice(currentIndex + 1, 0, data);
-      }
-      // console.log(playQueue.value);
-      console.warn("经过操作已插入列表");
-      return isExisted;
+      return false;
+    } catch (e) {
+      player?.unload()
+      console.error(e);
+      return false;
     }
-    return isExisted;
   };
   // 删除
   const removeFromPlayQueue = (idx: number) => {
@@ -84,7 +91,7 @@ export const playerStore = defineStore("player", () => {
       }
     }
     playQueue.value = playQueue.value.filter(
-      (song) => song !== playQueue.value[idx]
+      (song) => song !== playQueue.value[idx],
     );
     if (playQueueLength.value === 0) {
       player?.pause();
@@ -113,7 +120,7 @@ export const playerStore = defineStore("player", () => {
   /*声音控制组*/
   // 是否静音
   const muted = ref<boolean>(false);
-  // 音量 TODO:默认是40，后面存入localstorage，保存用户的设定
+  // 音量 默认是40
   const volume = ref<number>(40);
   // 保存按钮
   const tempVolume = ref<number>(0);
@@ -223,7 +230,7 @@ export const playerStore = defineStore("player", () => {
     console.log(currentIndex.value);
   };
 
-  //TODO:点击播放分成两种
+  // 点击播放分成两种
   // 一种是列表里的点击播放，一种是别的地方点击播放，第一种点击播放非常好办，只需要获取idx就行；
 
   const selectFromList = (idx: number) => {
@@ -238,8 +245,9 @@ export const playerStore = defineStore("player", () => {
   const selectOutSide = (data: QueueItem) => {
     console.log(`当前歌曲位置${currentIndex.value}`);
     // 该行为无论如何都会将这首曲子加入到播放队列中
-    const isExisted = addIntoPlayQueue(data, currentIndex.value);
-    console.warn(`该歌曲存在播放列表中? ${isExisted}`);
+    //const isExisted = addIntoPlayQueue(data, currentIndex.value);
+    addIntoPlayQueue(data, currentIndex.value);
+    // console.warn(`该歌曲存在播放列表中? ${isExisted}`);
     try {
       // 无需判断播放器为0的情况,addIntoPlayQueue已经处理，但是currentIndex要变化
       if (playQueueLength.value === 0) {
@@ -247,7 +255,7 @@ export const playerStore = defineStore("player", () => {
         return;
       }
       let songIdx = playQueue.value.findIndex(
-        (item) => item.songURL === data.songURL
+        (item) => item.songURL === data.songURL,
       );
       console.error(songIdx);
       if (currentIndex.value !== songIdx || playQueueLength.value <= 1) {
