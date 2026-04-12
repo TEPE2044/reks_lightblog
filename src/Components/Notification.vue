@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import ActivityCard from "../Widgets/ActivityCard.vue";
 import { BButton, BButtonGroup } from "bootstrap-vue-next";
 import { storeToRefs } from "pinia";
 import dayjs from "dayjs";
@@ -49,40 +48,40 @@ onMounted(() => {
   initSubscribeList();
 });
 
-const activities = ref<ActivityItem[]>([
-  {
-    id: 1,
-    title: "了个关注大冒险积分冲刺",
-    summary: "教程视频、打卡挑战和加分项正在开放，速来参与。",
-    meta: "进行中",
-    badge: "精选",
-    tone: "sky",
-  },
-  {
-    id: 2,
-    title: "话题周：春日创作计划",
-    summary: "发布指定标签内容可获得额外曝光推荐。",
-    meta: "今日截止",
-    badge: "推荐",
-    tone: "warm",
-  },
-  {
-    id: 3,
-    title: "互动任务：评论接力",
-    summary: "完成三次高质量互动可领取徽章与头像框。",
-    meta: "剩余 2 天",
-    badge: "任务",
-    tone: "sky",
-  },
-  {
-    id: 4,
-    title: "创作者加速营",
-    summary: "连续更新可进入加速营名单，获得专题位。",
-    meta: "即将开始",
-    badge: "预告",
-    tone: "warm",
-  },
-]);
+// const activities = ref<ActivityItem[]>([
+//   {
+//     id: 1,
+//     title: "了个关注大冒险积分冲刺",
+//     summary: "教程视频、打卡挑战和加分项正在开放，速来参与。",
+//     meta: "进行中",
+//     badge: "精选",
+//     tone: "sky",
+//   },
+//   {
+//     id: 2,
+//     title: "话题周：春日创作计划",
+//     summary: "发布指定标签内容可获得额外曝光推荐。",
+//     meta: "今日截止",
+//     badge: "推荐",
+//     tone: "warm",
+//   },
+//   {
+//     id: 3,
+//     title: "互动任务：评论接力",
+//     summary: "完成三次高质量互动可领取徽章与头像框。",
+//     meta: "剩余 2 天",
+//     badge: "任务",
+//     tone: "sky",
+//   },
+//   {
+//     id: 4,
+//     title: "创作者加速营",
+//     summary: "连续更新可进入加速营名单，获得专题位。",
+//     meta: "即将开始",
+//     badge: "预告",
+//     tone: "warm",
+//   },
+// ]);
 </script>
 
 <template>
