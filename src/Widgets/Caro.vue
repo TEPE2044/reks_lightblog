@@ -2,9 +2,9 @@
 import { ref } from "vue";
 
 const imageList = ref<string[]>([
-  "/imagePlaceholder.webp",
-  "/lh.webp",
-  "/pm.webp",
+  "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1507838153414-b4b713384a76?auto=format&fit=crop&w=1400&q=80",
 ]);
 
 const currentIndex = ref(0);

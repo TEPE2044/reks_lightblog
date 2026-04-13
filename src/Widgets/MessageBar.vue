@@ -7,22 +7,22 @@ const emd = useToggle("easy-login-box");
 const pageToUpload = () => {
   router.push('/upload')
 }
-const pageToRtalk = () => {
-  router.push('/rtalk')
-}
+// const pageToRtalk = () => {
+//   router.push('/rtalk')
+// }
 </script>
 <template>
   <div class="message-bar rounded d-flex justify-content-around align-items-center p-2 gap-2">
-    <BButton @click="pageToRtalk()" class="position-relative" variant="light" v-if="user.isLoggedIn">
+    <!-- <BButton @click="pageToRtalk()" class="position-relative" variant="light" v-if="user.isLoggedIn">
       <i-bi-bell />
 
       
-    </BButton>
+    </BButton> -->
     <BButton @click="emd.show()" class="position-relative" variant="light" v-if="!user.isLoggedIn">
       <i-bi-person-circle />
     </BButton>
 
-    <BDropdown v-else auto-close="inside" offset="15" variant="light" toggle-class="text-decoration-none"
+    <BDropdown v-else offset="15" variant="light" toggle-class="text-decoration-none"
       class="position-relative " no-caret>
       <template #button-content>
         <i-bi-person-circle />

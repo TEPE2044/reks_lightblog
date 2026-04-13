@@ -96,7 +96,7 @@ onMounted(() => {
             <BButton variant="outline-secondary" @click="handleClear"
               >清空消息</BButton
             >
-            <BButton variant="outline-secondary" @click="handleExport"
+            <BButton :disabled="subscribeList.length === 0" variant="outline-secondary" @click="handleExport"
               >导出</BButton
             >
           </BButtonGroup>
@@ -227,7 +227,7 @@ onMounted(() => {
 .empty-timeline {
   color: #8e7a69;
   font-size: 0.84rem;
-  padding-left: 0.4rem;
+  padding-left: 1rem;
 }
 
 .activity-area {

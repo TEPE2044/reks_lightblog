@@ -3,8 +3,8 @@ import { userStore } from "../Store/user";
 import router from "../Router";
 
 const regql = axios.create({
-    //baseURL: "http://localhost:12404/api/v1/gql",
-    baseURL:'https://v1.rekindlers.top/api/v1/gql',
+    baseURL: "http://localhost:12404/api/v1/gql",
+    //baseURL:'https://v1.rekindlers.top/api/v1/gql',
     timeout: 15000,
     withCredentials: true,
     headers: {

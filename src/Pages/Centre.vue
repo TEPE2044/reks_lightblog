@@ -96,7 +96,7 @@ onMounted(() => {
             </BDropdownItemButton>
           </BDropdown>
 
-          <BDropdown size="sm" variant="outline-secondary" no-caret>
+          <BDropdown size="sm" variant="outline-secondary"  no-caret>
             <template #button-content>
               <span>粉丝：{{ followStats.followerCount }}</span>
             </template>

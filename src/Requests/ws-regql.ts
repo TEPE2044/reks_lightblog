@@ -5,9 +5,9 @@ import router from "../Router";
 
 // 启动 graph-ws
 export const wsClient = createClient({
-  // url: "ws://localhost:12404/api/v1/gql/subql",
+  url: "ws://localhost:12404/api/v1/gql/subql",
   // 正式环境
-  url: "wss://v1.rekindlers.top/api/v1/gql/subql",
+  //url: "wss://v1.rekindlers.top/api/v1/gql/subql",
   shouldRetry: () => true,
   connectionParams: () => getAuthHeaders()
 });

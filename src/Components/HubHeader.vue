@@ -1,26 +1,43 @@
 <template>
   <div class="hub-header p-4 d-flex align-items-center justify-content-center">
     <div class="hub-caro shadow-lg border rounded-3 overflow-hidden">
-      <BImg width="500" src="/melo.webp" class="object-fit-cover" alt="image slot" />
+      <BImg width="500" src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=1400&q=80" class="object-fit-cover" alt="piano" />
       <div class="hub-caro-overlay">
-        <span class="badge bg-danger mb-2">公告</span>
-        <h5 class="text-white m-0">ReKindlers 0.6.0 开发中</h5>
+        <span class="badge bg-danger mb-2">音乐资讯</span>
+        <h5 class="text-white m-0">本周精选：钢琴专场</h5>
       </div>
     </div>
 
     <div class="clover">
-      <div class="clover-box shadow-sm border border-2 rounded hot-content" v-for="tab in 4" :key="`4clover_${tab}`">
-        <img class="clover-img" src="/imagePlaceholder.webp" alt="">
-        <div class="clover-overlay">
+      <div class="clover-box shadow-sm border border-2 rounded hot-content" v-for="(item, index) in cloverImages" :key="`4clover_${index}`">
+        <img class="clover-img" :src="item.src" :alt="item.alt">
+        <!-- <div class="clover-overlay">
           <div class="clover-title">内容标题 {{ tab }}</div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-
+const cloverImages = [
+  {
+    src: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1000&q=80",
+    alt: "vinyl and player"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?auto=format&fit=crop&w=1000&q=80",
+    alt: "drum set"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&w=1000&q=80",
+    alt: "headphones and mixer"
+  },
+  {
+    src: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1000&q=80",
+    alt: "guitar performance"
+  }
+];
 </script>
 
 <style lang="scss" scoped>
