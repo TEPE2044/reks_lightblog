@@ -90,11 +90,11 @@ function useEventSubscription() {
 }
 
 onMounted(() => {
-  const { safeLevel } = storeToRefs(user);
+  const { safeLevel,isLoggedIn } = storeToRefs(user);
   initSubscribeList(resolveCurrentRid());
   useEventSubscription();
   try {
-    if (safeLevel.value === "weak") {
+    if (isLoggedIn.value === true && safeLevel.value === "weak") {
       console.log(safeLevel.value);
       createToast(
         toast,

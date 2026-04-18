@@ -26,9 +26,9 @@
           </li>
         </ul>
 
-        <BButton class="random-entry" variant="outline-info">
+        <!-- <BButton class="random-entry" variant="outline-info">
           <h6>随机词条</h6>
-        </BButton>
+        </BButton> -->
       </aside>
     </section>
 

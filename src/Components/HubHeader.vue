@@ -3,8 +3,8 @@
     <div class="hub-caro shadow-lg border rounded-3 overflow-hidden">
       <BImg width="500" src="https://images.unsplash.com/photo-1520523839897-bd0b52f945a0?auto=format&fit=crop&w=1400&q=80" class="object-fit-cover" alt="piano" />
       <div class="hub-caro-overlay">
-        <span class="badge bg-danger mb-2">音乐资讯</span>
-        <h5 class="text-white m-0">本周精选：钢琴专场</h5>
+        <span class="badge bg-danger mb-2">版本推荐</span>
+        <h5 class="text-white m-0">精选博客：善待自己</h5>
       </div>
     </div>
 
