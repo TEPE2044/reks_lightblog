@@ -19,11 +19,8 @@ import {
 const toast = useToast();
 const user = userStore();
 const { userInfo, rcode, payload } = storeToRefs(user);
-const {
-  initSubscribeList,
-  addSubscribeMessage,
-  markFollowingUpdated,
-} = substore();
+const { initSubscribeList, addSubscribeMessage, markFollowingUpdated } =
+  substore();
 // const notice = noticeStore();
 
 const resolveCurrentRid = () => {
@@ -73,7 +70,12 @@ function useEventSubscription() {
               );
             }
           } else {
-            createToast(toast, resolveEventTitle(res.eventType), detail, "primary");
+            createToast(
+              toast,
+              resolveEventTitle(res.eventType),
+              detail,
+              "primary",
+            );
           }
 
           addSubscribeMessage(
@@ -90,22 +92,24 @@ function useEventSubscription() {
 }
 
 onMounted(() => {
-  const { safeLevel } = storeToRefs(user);
+  const { safeLevel, isLoggedIn } = storeToRefs(user);
+  if (isLoggedIn.value === true) {
+    try {
+      if (safeLevel.value === "weak") {
+        console.log(safeLevel.value);
+        createToast(
+          toast,
+          "账号安全",
+          "当前账号风险较高，请设置密码和邮箱",
+          "danger",
+        );
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
   initSubscribeList(resolveCurrentRid());
   useEventSubscription();
-  try {
-    if (safeLevel.value === "weak") {
-      console.log(safeLevel.value);
-      createToast(
-        toast,
-        "账号安全",
-        "当前账号风险较高，请设置密码和邮箱",
-        "danger",
-      );
-    }
-  } catch (e) {
-    console.error(e);
-  }
 });
 
 onUnmounted(() => {
