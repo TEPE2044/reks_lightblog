@@ -35,6 +35,7 @@ const toolbarConfig: Partial<IToolbarConfig> = {
     },
     "emotion",
     "insertVideo",
+    "musicCard",
     "insertLink",
     "|",
     "bold",
@@ -286,7 +287,7 @@ section {
   }
 
   .editor-content {
-    min-height: 400px;
+    min-height: 600px;
     // max-height: 650px;
     overflow-y: auto;
     border-top: 1px solid $border-color;

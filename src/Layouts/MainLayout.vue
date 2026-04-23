@@ -93,6 +93,7 @@ function useEventSubscription() {
 
 onMounted(() => {
   const { safeLevel, isLoggedIn } = storeToRefs(user);
+  // 游客不弹出
   if (isLoggedIn.value === true) {
     try {
       if (safeLevel.value === "weak") {

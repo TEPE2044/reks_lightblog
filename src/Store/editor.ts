@@ -1,6 +1,8 @@
 import type { IDomEditor } from "@wangeditor-next/editor";
 import { defineStore } from "pinia";
 import { ref, shallowRef, computed } from "vue";
+
+
 export const editorStore = defineStore("editor", () => {
   // 编辑器实例
   const editor = shallowRef<IDomEditor | undefined>();

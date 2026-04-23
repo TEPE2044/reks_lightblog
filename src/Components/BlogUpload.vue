@@ -39,7 +39,7 @@ const { show: showPreview } = useToggle("preview");
 
 // editor
 const toolbarConfig: Partial<IToolbarConfig> = {
-  toolbarKeys: [
+  toolbarKeys: [  
     {
       key: "group-image",
       title: "图片工具",
@@ -49,6 +49,7 @@ const toolbarConfig: Partial<IToolbarConfig> = {
     },
     "emotion",
     "insertVideo",
+    "musicCard",
     "insertLink",
     "|",
     "bold",
@@ -590,8 +591,7 @@ section {
   }
 
   .editor-content {
-    min-height: 301px;
-    max-height: 650px;
+    min-height: 600px;
     overflow-y: auto;
     border-top: 1px solid $border-color;
     border-bottom: 2px solid gainsboro;

@@ -7,6 +7,7 @@ import router from "./Router";
 import { createPinia } from "pinia";
 import { userStore } from "./Store/user";
 import Skeleton from "@x-ui-vue3/skeleton";
+import "./Utils/wangeditor-init";
 
 const pinia = createPinia();
 const app = createApp(App);
