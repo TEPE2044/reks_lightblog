@@ -136,6 +136,8 @@ export const playerStore = defineStore("player", () => {
     player = new Howl({
       src: [playQueue.value[currentIndex.value]?.songURL as string],
       autoplay: false,
+      html5:true,
+      preload:true,
       volume: volume.value / 100,
       onload: () => {
         isReady.value = true;
@@ -158,6 +160,8 @@ export const playerStore = defineStore("player", () => {
         isPlay.value = false;
         console.log("暂停播放");
       },
+      onplayerror:(_id,error) => console.error(error),
+      onloaderror:(_id,error) => console.error("play error",error)
     });
     return player;
   };
@@ -193,11 +197,24 @@ export const playerStore = defineStore("player", () => {
   };
 
   const updateTime = () => {
-    const current = Math.round(player?.seek() as number) as number;
-    const total = Math.round(player?.duration() as number) as number;
-    currentTime.value = formatPlayerTime(current);
-    duration.value = formatPlayerTime(total);
-    progress.value = (current / total) * 100;
+    if (!player) return;
+    const currentRaw = Number(player.seek());
+    const totalRaw = Number(player.duration());
+
+    const current = Number.isFinite(currentRaw) && currentRaw > 0 ? currentRaw : 0;
+    const total = Number.isFinite(totalRaw) && totalRaw > 0 ? totalRaw : 0;
+
+    currentTime.value = formatPlayerTime(Math.round(current));
+    duration.value = formatPlayerTime(Math.round(total));
+
+    if (total <= 0) {
+      // 切歌/弱网/metadata 未就绪时，避免 NaN 导致 range thumb 跳到中间
+      progress.value = 0;
+      return;
+    }
+
+    const p = (current / total) * 100;
+    progress.value = Math.min(100, Math.max(0, Number.isFinite(p) ? p : 0));
     // console.log(total, current);
   };
 
@@ -268,8 +285,14 @@ export const playerStore = defineStore("player", () => {
   };
 
   const handleClickPlay = (value: number) => {
-    const total = Math.round(player?.duration() as number) as number;
-    player?.seek((value / 100) * total);
+    if (!player) return;
+    const totalRaw = Number(player.duration());
+    const total = Number.isFinite(totalRaw) && totalRaw > 0 ? totalRaw : 0;
+    if (total <= 0) return;
+
+    const v = Number(value);
+    const next = (Number.isFinite(v) ? v : 0) / 100;
+    player.seek(next * total);
     updateTime();
   };
 

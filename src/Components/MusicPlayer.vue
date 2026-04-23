@@ -197,34 +197,6 @@ onUnmounted(() => {
         <i-bi-skip-end style="font-size: 1.5rem" />
       </div>
     </div>
-    <div class="controls-2 d-flex gap-3 align-items-center">
-      <div class="mode r-icon" @click.stop="switchMode()">
-        <i-bi-repeat v-if="mode === 'loop'" style="font-size: 1.5rem" />
-        <i-bi-shuffle v-if="mode === 'shuffle'" style="font-size: 1.5rem" />
-        <i-bi-repeat-1 v-if="mode === 'repeat'" style="font-size: 1.5rem" />
-      </div>
-
-      <BPopover class="volume">
-        <template #target>
-          <div class="volume-icons r-icon" @click.stop="handleMuted">
-            <div v-if="!muted">
-              <i-bi-volume-down v-if="volume < 50 && volume > 0" style="font-size: 1.8rem" />
-              <i-bi-volume-up v-if="volume >= 50" style="font-size: 1.8rem" />
-              <i-bi-volume-off v-if="volume == 0" style="font-size: 1.8rem" />
-            </div>
-            <div v-else>
-              <i-bi-volume-mute style="font-size: 1.8rem" />
-            </div>
-          </div>
-        </template>
-        <template #default v-if="!muted">
-          <div class="volume-range">
-            <div class="range text-center">{{ volume }}%</div>
-            <BFormInput v-model="volume" type="range" min="0" max="100" />
-          </div>
-        </template>
-      </BPopover>
-    </div>
 
     <div class="r-progressBar d-flex align-items-center gap-3 user-select-none" @click.stop="">
       <div class="thumbail-album rounded border r-icon" @click.stop="toggleExpand()">
@@ -245,7 +217,53 @@ onUnmounted(() => {
       <div class="music-queue r-icon" @click.stop="toggleMusicList()">
         <i-bi-music-note-list style="font-size: 1.2rem" />
       </div>
-      <BButton size="sm" @click="toggleHidden()">最小化播放器</BButton>
+      <BButton class="minimize-btn" size="sm" @click="toggleHidden()">最小化播放器</BButton>
+
+      <!-- Mobile: collapse non-essential actions into dropdown -->
+      <BDropdown
+        class="mobile-more"
+        auto-close="outside"
+        no-caret
+        no-flip
+        offset="10"
+        placement="top-end"
+        variant="light"
+        size="sm"
+      >
+        <template #button-content>
+          <i-bi-three-dots style="font-size: 1.2rem" />
+        </template>
+        <template #default>
+          <BDropdownItem @click.stop="toggleMusicList()">
+            <i-bi-music-note-list style="font-size: 1rem" />
+            播放列表
+          </BDropdownItem>
+          <BDropdownItem @click.stop="toggleComment()">
+            <i-bi-chat-text style="font-size: 1rem" />
+            评论
+          </BDropdownItem>
+          <BDropdownDivider />
+          <BDropdownItem @click.stop="handleMuted">
+            <i-bi-volume-mute v-if="muted" style="font-size: 1rem" />
+            <i-bi-volume-up v-else style="font-size: 1rem" />
+            {{ muted ? '取消静音' : '静音' }}
+          </BDropdownItem>
+          <div class="px-3 py-2" @click.stop>
+            <div class="small text-secondary mb-1">音量：{{ volume }}%</div>
+            <BFormInput v-model="volume" type="range" min="0" max="100" />
+          </div>
+          <BDropdownItem @click.stop="switchMode()">
+            <i-bi-repeat v-if="mode === 'loop'" style="font-size: 1rem" />
+            <i-bi-shuffle v-else-if="mode === 'shuffle'" style="font-size: 1rem" />
+            <i-bi-repeat-1 v-else style="font-size: 1rem" />
+            切换模式
+          </BDropdownItem>
+          <BDropdownDivider />
+          <BDropdownItem @click.stop="toggleHidden()">
+            最小化播放器
+          </BDropdownItem>
+        </template>
+      </BDropdown>
     </div>
 
     <BOffcanvas width="30rem" body-scrolling lazy no-backdrop shadow="lg" :placement="placement" v-model="isOffc"
@@ -379,7 +397,7 @@ onUnmounted(() => {
             <span>发布者：{{ dauthor || '无名氏' }}</span>
           </div>
           <div class="lyrics d-flex flex-column align-items-start gap-4">
-            <span v-for="ls in lyrics">{{ ls }}</span>
+            <span v-for="(ls, idx) in lyrics" :key="idx">{{ ls }}</span>
           </div>
         </div>
       </div>
@@ -442,6 +460,13 @@ onUnmounted(() => {
   bottom: 20px;
   left: auto;
   right: 30px;
+}
+
+@media (max-width: 768px) {
+  .hidden-player {
+    right: 12px;
+    bottom: 12px;
+  }
 }
 
 .music-player {
@@ -507,6 +532,58 @@ onUnmounted(() => {
     input[type="range"]::-webkit-slider-thumb:hover {
       background: rgb(178, 34, 34);
     }
+  }
+
+  /* Always show the "more" dropdown (mode/volume moved inside) */
+  :deep(.controls-3) .mobile-more {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 1280px) {
+  /* 避免按钮在临界宽度被挤到竖排；菜单里仍可操作 */
+  .music-player :deep(.controls-3) .minimize-btn { display: none; }
+}
+
+@media (max-width: 768px) {
+  .music-player {
+    height: auto;
+    flex-wrap: wrap;
+    gap: 0.75rem !important;
+    padding: 0.6rem 0.75rem;
+  }
+
+  /* 第一行：播放控制 + 右侧按钮；第二行：进度条；第三行：模式/音量 */
+  .music-player :deep(.controls-1) {
+    order: 1;
+  }
+  .music-player :deep(.controls-3) {
+    order: 2;
+  }
+  .music-player :deep(.r-progressBar) {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+  /* controls-2 removed; keep rule harmless if re-added later */
+  .music-player :deep(.controls-2) { display: none; }
+
+  .music-player :deep(.r-progressBar) [type="range"] {
+    width: min(92vw, 520px);
+  }
+
+  /* Mobile: keep UI minimal, use "more" dropdown */
+  .music-player :deep(.controls-3) {
+    gap: 0.25rem !important;
+  }
+  .music-player :deep(.controls-3) .like,
+  .music-player :deep(.controls-3) .comment,
+  .music-player :deep(.controls-3) .music-queue,
+  .music-player :deep(.controls-3) .minimize-btn {
+    display: none;
+  }
+  .music-player :deep(.controls-3) .mobile-more {
+    display: inline-flex;
   }
 }
 
