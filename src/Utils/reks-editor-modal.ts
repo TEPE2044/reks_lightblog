@@ -4,13 +4,9 @@ import type {
   SlateNode,
 } from "@wangeditor-next/editor";
 import { searchMusic } from "../Hooks/Search";
+import type { MusicResponse } from "./reks-interface";
 
 export const MUSIC_CARD_MENU_KEY = "musicCard";
-
-export const _searchMusic = async (content: string) => {
-  const { data } = await searchMusic(1, 6, content);
-  return data;
-};
 
 export class MusicCardMenu implements IModalMenu {
   title: string;
@@ -18,6 +14,14 @@ export class MusicCardMenu implements IModalMenu {
   tag: string;
   showModal: boolean;
   modalWidth: number;
+
+  private container?: HTMLDivElement;
+  private input?: HTMLInputElement;
+  private list?: HTMLDivElement;
+  private status?: HTMLDivElement;
+  private selected?: MusicResponse | null;
+  private currentEditor?: IDomEditor;
+  private lastQuery = "";
 
   constructor() {
     this.title = "音乐卡片";
@@ -55,60 +59,174 @@ export class MusicCardMenu implements IModalMenu {
 
   // 定义 modal 内部的 DOM Element
   getModalContentElem(editor: IDomEditor) {
-    // 创建整体容器
-    const container = document.createElement("div");
-    container.style.display = "flex";
-    container.style.flexDirection = "column";
-    container.style.gap = "8px";
-    container.style.minHeight = "300px";
+    this.currentEditor = editor;
 
-    // 创建容器内标题
-    const title = document.createElement("div");
-    title.textContent = "插入音乐卡片";
-    title.style.fontWeight = "600";
-    container.appendChild(title);
+    // 第一次创建，后续复用（避免重复创建 DOM、重复绑定事件）
+    if (!this.container) {
+      this.container = document.createElement("div");
+      this.container.className = "reks-music-modal";
 
-    // 创建容器内输入框
-    const input = document.createElement("input");
-    input.placeholder = "搜索歌曲";
-    input.value = "";
-    input.style.width = "100%";
-    input.type = "search";
-    input.style.padding = "6px 10px";
-    input.style.boxSizing = "border-box";
-    input.style.borderRadius = "6px";
-    input.style.border = "1px solid #ccc";
-    input.style.outline = "none";
-    input.style.fontSize = "14px";
-    input.style.transition = "all 0.3s ease";
-    input.style.cursor = "pointer";
-    input.addEventListener("blur", () => {
-      alert("blur");
-    });
-    input.addEventListener("keydown", async (e) => {
-      const data = await _searchMusic(input.value);
-      if (data) {
-        for(let d in data){
-            const dc = document.createElement('div')
-            dc.style.height = '100px'
-            dc.textContent = d
-        } 
-      }
-    });
-    container.appendChild(input);
+      // 用 styleTag 管理样式，别把 style 写满一屏
+      const style = document.createElement("style");
+      style.textContent = `
+        .reks-music-modal{display:flex;flex-direction:column;gap:10px;min-height:300px;padding:4px 2px;}
+        .reks-music-modal__title{font-weight:600;}
+        .reks-music-modal__row{display:flex;gap:8px;align-items:center;}
+        .reks-music-modal__input{flex:1;padding:6px 10px;border:1px solid #ccc;border-radius:6px;font-size:14px;outline:none;}
+        .reks-music-modal__btn{padding:6px 10px;border:1px solid #ccc;border-radius:6px;background:#fff;}
+        .reks-music-modal__btn:disabled{opacity:.5;cursor:not-allowed;}
+        .reks-music-modal__status{font-size:12px;color:#666;min-height:18px;}
+        .reks-music-modal__list{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow:auto;padding-right:4px;}
+        .reks-music-modal__item{border:1px solid #eee;border-radius:8px;padding:8px;cursor:pointer;line-height:1.2;}
+        .reks-music-modal__item:hover{background:#fafafa;}
+        .reks-music-modal__item.is-active{border-color:#8ab4ff;background:#f3f8ff;}
+        .reks-music-modal__name{font-weight:600;font-size:13px;}
+        .reks-music-modal__meta{margin-top:4px;font-size:12px;color:#666;display:flex;justify-content:space-between;gap:8px;}
+        .reks-music-modal__btng{display:flex;flex-direction:column;gap:20px;}
+      `.trim();
+      this.container.appendChild(style);
 
-    // 创建容器内按钮
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = "插入";
-    btn.style.padding = "6px 10px";
-    // btn.addEventListener("click", () => {
-    //   const id = (input.value || "").trim();
-    //   if (!id) return;
-    //   editor.insertText(`[music:${id}]`);
-    // });
-    container.appendChild(btn);
+      const title = document.createElement("div");
+      title.className = "reks-music-modal__title";
+      title.textContent = "搜索并插入音乐卡片";
+      this.container.appendChild(title);
 
-    return container as any;
+      const row = document.createElement("div");
+      row.className = "reks-music-modal__row";
+        
+      this.input = document.createElement("input");
+      this.input.className = "reks-music-modal__input";
+      this.input.type = "search";
+      this.input.placeholder = "输入关键字，回车搜索";
+      row.appendChild(this.input);
+
+      const btnGroup = document.createElement("div")
+      btnGroup.className = "reks-music-modal__btng"
+      row.appendChild(btnGroup)
+
+      const searchBtn = document.createElement("button");
+      searchBtn.className = "reks-music-modal__btn";
+      searchBtn.type = "button";
+      searchBtn.textContent = "搜索";
+      btnGroup.appendChild(searchBtn);
+
+      const insertBtn = document.createElement("button");
+      insertBtn.className = "reks-music-modal__btn";
+      insertBtn.type = "button";
+      insertBtn.textContent = "插入";
+      insertBtn.disabled = true;
+      btnGroup.appendChild(insertBtn);
+
+      this.container.appendChild(row);
+
+      this.status = document.createElement("div");
+      this.status.className = "reks-music-modal__status";
+      this.status.textContent = "请输入关键字后回车或点“搜索”。";
+      this.container.appendChild(this.status);
+
+      this.list = document.createElement("div");
+      this.list.className = "reks-music-modal__list";
+      this.container.appendChild(this.list);
+
+      const setLoading = (loading: boolean) => {
+        searchBtn.disabled = loading;
+        this.input!.disabled = loading;
+      };
+
+      const setSelected = (m: MusicResponse | null) => {
+        this.selected = m;
+        insertBtn.disabled = !m;
+        // 更新 active 样式
+        const children = Array.from(this.list!.children) as HTMLDivElement[];
+        children.forEach((el) => {
+          const id = Number(el.dataset["id"]);
+          el.classList.toggle("is-active", Boolean(m && id === m.id));
+        });
+      };
+
+      const renderList = (rows: MusicResponse[]) => {
+        this.list!.innerHTML = "";
+        setSelected(null);
+        if (!rows.length) {
+          const empty = document.createElement("div");
+          empty.className = "reks-music-modal__status";
+          empty.textContent = "没有搜到结果，换个关键字试试。";
+          this.list!.appendChild(empty);
+          return;
+        }
+
+        const frag = document.createDocumentFragment();
+        rows.forEach((m) => {
+          const item = document.createElement("div");
+          item.className = "reks-music-modal__item";
+          item.dataset["id"] = String(m.id);
+
+          const name = document.createElement("div");
+          name.className = "reks-music-modal__name";
+          name.textContent = m.name || `音乐 #${m.id}`;
+          item.appendChild(name);
+
+          const meta = document.createElement("div");
+          meta.className = "reks-music-modal__meta";
+
+          const author = document.createElement("span");
+          author.textContent = m.username ? `作者：${m.username}` : "作者：-";
+          meta.appendChild(author);
+
+          const tag = document.createElement("span");
+          tag.textContent = m.original ? "原创" : "搬运/翻唱";
+          meta.appendChild(tag);
+
+          item.appendChild(meta);
+
+          item.addEventListener("click", () => setSelected(m));
+          frag.appendChild(item);
+        });
+        this.list!.appendChild(frag);
+      };
+
+      const doSearch = async () => {
+        const q = (this.input!.value || "").trim();
+        if (!q) {
+          this.status!.textContent = "请输入搜索关键字。";
+          renderList([]);
+          return;
+        }
+        if (q === this.lastQuery && this.list!.children.length) return;
+
+        this.lastQuery = q;
+        this.status!.textContent = "搜索中...";
+        setLoading(true);
+        try {
+          const res = await searchMusic(1, 6, q);
+          const rows = (res?.data ?? []) as MusicResponse[];
+          this.status!.textContent = `共 ${res?.total ?? rows.length} 条，当前展示 ${rows.length} 条。`;
+          renderList(rows);
+        } catch (e) {
+          console.error(e);
+          this.status!.textContent = "搜索失败，请稍后重试。";
+          renderList([]);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      this.input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          void doSearch();
+        }
+      });
+      searchBtn.addEventListener("click", () => void doSearch());
+
+      insertBtn.addEventListener("click", () => {
+        if (!this.selected) return;
+        const ed = this.currentEditor;
+        if (!ed) return;
+        ed.insertText(`[music:${this.selected.id}]`);
+      });
+    }
+
+    return this.container as any;
   }
 }
