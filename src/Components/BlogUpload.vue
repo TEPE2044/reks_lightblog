@@ -10,6 +10,7 @@ import { upload_img } from "../Hooks/Editor";
 import { query_blog_by_id, query_draft_by_id, update_blog, update_draft, upload_blog, upload_mblog } from "../Hooks/Blog";
 import { formatDateTime } from "../Utils/reks-format-time";
 import { createToast } from "../Utils/reks-toast";
+import router from "../Router";
 import { userStore } from "../Store/user";
 import { set } from "@vueuse/core";
 import { searchMusic } from "../Hooks/Search";
@@ -49,6 +50,17 @@ const confirmTitle = computed(() =>
 const submitToastTitle = computed(() =>
   isEditMode.value ? "保存成功" : "发布成功",
 );
+
+const leaveEditorPage = () => {
+  resetEditorState();
+
+  if (window.history.length > 1) {
+    router.back();
+    return;
+  }
+
+  router.push("/");
+};
 
 // 状态管理
 const { editor, valueHTML, pub_tags, pub_title, coverImages, music_id } =
@@ -264,6 +276,9 @@ const handleSubmit = async () => {
 
       if (isEditMode.value) {
         createToast(toast, submitToastTitle.value, "博客内容已更新", "success");
+        setTimeout(() => {
+          leaveEditorPage();
+        }, 500);
       } else {
         createToast(toast, submitToastTitle.value, "发布成功！期待上热门哦", "success");
         set(pub_title, "");
