@@ -167,8 +167,11 @@ export const update_blog = async (
   tags: string[]
 ) => {
   const res = await reapi({
-    url: `/blog/my-blog/${id}`,
+    url: "/blog/my-blog/update",
     method: "POST",
+    params: {
+      blog_id: id,
+    },
     data: {
       title: title,
       content: content,
@@ -176,7 +179,30 @@ export const update_blog = async (
       tags: tags,
     },
   });
-  return res;
+  return res.data;
+};
+
+export const update_draft = async (
+  id: number,
+  title: string,
+  content: string,
+  cover: string[],
+  tags: string[]
+) => {
+  const res = await reapi({
+    url: "/blog/my-draft/update",
+    method: "POST",
+    params: {
+      blog_id: id,
+    },
+    data: {
+      title: title,
+      content: content,
+      cover: cover,
+      tags: tags,
+    },
+  });
+  return res.data;
 };
 
 export const delete_blog = async (blog_id: Number) => {

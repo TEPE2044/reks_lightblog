@@ -75,6 +75,11 @@ const router = createRouter({
           component: () => import("../Components/MBlog.vue"),
         },
         {
+          path: "edit/:id",
+          name: "upload-edit",
+          component: () => import("../Pages/BlogEdit.vue"),
+        },
+        {
           path:"draft",
           name:"draft",
           component:() => import("../Pages/Draft.vue")

@@ -33,6 +33,13 @@ export const editorStore = defineStore("editor", () => {
     valueHTML.value = editorInstance.getHtml();
   };
 
+  const resetEditorState = () => {
+    pub_title.value = "";
+    valueHTML.value = "";
+    pub_tags.value = [];
+    music_id.value = 0;
+  };
+
   return {
     editor,
     valueHTML,
@@ -42,5 +49,6 @@ export const editorStore = defineStore("editor", () => {
     music_id,
     handleCreated,
     handleChange,
+    resetEditorState,
   };
 });

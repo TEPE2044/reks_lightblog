@@ -7,32 +7,53 @@ import type { IEditorConfig, IToolbarConfig } from "@wangeditor-next/editor";
 import { useToast, useToggle } from "bootstrap-vue-next";
 import { editorStore } from "../Store/editor";
 import { upload_img } from "../Hooks/Editor";
-import { upload_blog, upload_mblog } from "../Hooks/Blog";
+import { query_blog_by_id, query_draft_by_id, update_blog, update_draft, upload_blog, upload_mblog } from "../Hooks/Blog";
 import { formatDateTime } from "../Utils/reks-format-time";
 import { createToast } from "../Utils/reks-toast";
-import router from "../Router";
 import { userStore } from "../Store/user";
 import { set } from "@vueuse/core";
 import { searchMusic } from "../Hooks/Search";
-import type { MusicResponse } from "../Utils/reks-interface";
+import type { BlogData, MusicResponse } from "../Utils/reks-interface";
 import { substore } from "../Store/subscribe";
 import { makeSubscribeMessage } from "../Utils/subscribe-log";
 
-withDefaults(defineProps<{ mblog?: boolean; upload: "mblog" | "" }>(), {
-  mblog: false,
-  upload: "",
-});
+const props = withDefaults(
+  defineProps<{
+    mblog?: boolean;
+    upload: "mblog" | "";
+    mode?: "create" | "edit";
+    blogId?: number | string;
+    source?: "blog" | "draft";
+  }>(),
+  {
+    mblog: false,
+    upload: "",
+    mode: "create",
+    source: "blog",
+  },
+);
 
 const toast = useToast();
 const { userInfo } = storeToRefs(userStore());
 const { addSubscribeMessage } = substore();
 
 const resolveCurrentRid = () => userInfo.value?.reks_id ?? "guest";
+const isEditMode = computed(() => props.mode === "edit");
+const tagsSectionTitle = computed(() =>
+  isEditMode.value ? "编辑标签" : "上传标签",
+);
+const submitLabel = computed(() => (isEditMode.value ? "保存修改" : "发布"));
+const confirmTitle = computed(() =>
+  isEditMode.value ? "确认保存修改?" : "确认发布?",
+);
+const submitToastTitle = computed(() =>
+  isEditMode.value ? "保存成功" : "发布成功",
+);
 
 // 状态管理
 const { editor, valueHTML, pub_tags, pub_title, coverImages, music_id } =
   storeToRefs(editorStore());
-const { handleCreated, handleChange } = editorStore();
+const { handleCreated, handleChange, resetEditorState: clearEditorState } = editorStore();
 
 // modal
 const { show: showPreview } = useToggle("preview");
@@ -74,7 +95,6 @@ const editorConfig: Partial<IEditorConfig> = {
       // 成功/失败回调（如果使用服务端上传时启用）
       onSuccess: (insertFn: any, res) => {
         insertFn(res.data.url, res.data.alt || "", res.data.url);
-        router.push("/");
         createToast(toast, "图片上传成功", "标题为空", "success");
       },
       onFailed: () => {
@@ -116,6 +136,58 @@ const handlePreview = () => {
   showPreview();
 };
 
+const resetEditorState = () => {
+  clearEditorState();
+  selectedMusic.value = null;
+  draftMusic.value = null;
+  draftMusicId.value = null;
+};
+
+const resolveBlogDetail = async (id: number) => {
+  if (props.source === "draft") {
+    return await query_draft_by_id(id);
+  }
+
+  return await query_blog_by_id(id);
+};
+
+const fillEditorFromBlog = (blog: BlogData & Record<string, any>) => {
+  set(pub_title, blog?.title || "");
+  set(valueHTML, blog?.content || "");
+  set(pub_tags, Array.isArray(blog?.tags) ? [...blog.tags] : []);
+
+  const song = blog?.song || blog?.music || null;
+  const nextMusicId = Number(song?.id || blog?.music_id || 0);
+
+  set(music_id, nextMusicId);
+  selectedMusic.value = song;
+  draftMusic.value = song;
+  draftMusicId.value = nextMusicId || null;
+};
+
+const initEditor = async () => {
+  if (!isEditMode.value) {
+    resetEditorState();
+    return;
+  }
+
+  const blogId = Number(props.blogId);
+  if (Number.isNaN(blogId) || blogId <= 0) {
+    createToast(toast, "加载失败", "博客编号无效", "danger");
+    return;
+  }
+
+  resetEditorState();
+
+  try {
+    const res = await resolveBlogDetail(blogId);
+    fillEditorFromBlog(res);
+  } catch (error) {
+    console.error("加载编辑内容失败:", error);
+    createToast(toast, "加载失败", "编辑内容读取失败", "danger");
+  }
+};
+
 /** 提交发布 */
 const handleSubmit = async () => {
   // 表单验证
@@ -128,77 +200,91 @@ const handleSubmit = async () => {
     return;
   }
 
-  if (music_id.value !== 0) {
-    try {
-      const res = await upload_mblog(
+  const submitBlog = async () => {
+    if (isEditMode.value) {
+      const blogId = Number(props.blogId);
+      if (Number.isNaN(blogId) || blogId <= 0) {
+        createToast(toast, "提交失败", "博客编号无效", "danger");
+        return;
+      }
+
+      if (props.source === "draft") {
+        return await update_draft(
+          blogId,
+          pub_title.value,
+          valueHTML.value,
+          coverImages.value,
+          pub_tags.value,
+        );
+      }
+
+      return await update_blog(
+        blogId,
+        pub_title.value,
+        valueHTML.value,
+        coverImages.value,
+        pub_tags.value,
+      );
+    }
+
+    if (music_id.value !== 0) {
+      return await upload_mblog(
         pub_title.value,
         valueHTML.value,
         coverImages.value,
         pub_tags.value,
         music_id.value,
       );
-      console.log("发布成功:", res);
+    }
 
-      if (res?.msg) {
+    return await upload_blog(
+      pub_title.value,
+      valueHTML.value,
+      coverImages.value,
+      pub_tags.value,
+    );
+  };
+
+  try {
+    const res = await submitBlog();
+    console.log("发布成功:", res);
+
+    if (res?.msg) {
+      if (!isEditMode.value) {
         addSubscribeMessage(
           makeSubscribeMessage(
             "self.blog.published",
-            `你发布了音乐博客《${pub_title.value}》`,
+            music_id.value !== 0
+              ? `你发布了音乐博客《${pub_title.value}》`
+              : `你发布了博客《${pub_title.value}》`,
           ),
           resolveCurrentRid(),
         );
+      }
+
+      if (isEditMode.value) {
+        createToast(toast, submitToastTitle.value, "博客内容已更新", "success");
+      } else {
+        createToast(toast, submitToastTitle.value, "发布成功！期待上热门哦", "success");
         set(pub_title, "");
         set(valueHTML, "");
         set(coverImages, []);
         set(pub_tags, []);
         set(music_id, 0);
-        console.log("发布成功:", res);
-        createToast(toast, "发布成功", "发布成功！期待上热门哦", "success");
-      } else {
-        createToast(toast, "发布失败", "请重新发布", "danger");
       }
-    } catch (error) {
-      console.error("发布失败:", error);
-      alert("发布失败，请重试");
+      return;
     }
-  } else {
-    try {
-      const res = await upload_blog(
-        pub_title.value,
-        valueHTML.value,
-        coverImages.value,
-        pub_tags.value,
-      );
-      if (res?.msg) {
-        addSubscribeMessage(
-          makeSubscribeMessage(
-            "self.blog.published",
-            `你发布了博客《${pub_title.value}》`,
-          ),
-          resolveCurrentRid(),
-        );
-        set(pub_title, "");
-        set(valueHTML, "");
-        set(coverImages, []);
-        set(pub_tags, []);
-        set(music_id, 0);
-        console.log("发布成功:", res);
-        createToast(toast, "发布成功", "发布成功！期待上热门哦", "success");
-      } else {
-        createToast(toast, "发布失败", "请重新发布", "danger");
-      }
 
-      // TODO: 发布成功后跳转到文章详情页或清空表单
-    } catch (error) {
-      console.error("发布失败:", error);
-      alert("发布失败，请重试");
-    }
+    createToast(toast, "提交失败", "请重新提交", "danger");
+  } catch (error) {
+    console.error("发布失败:", error);
+    alert("发布失败，请重试");
   }
 };
 
 // ==================== 生命周期 ====================
 onMounted(() => {
-  valueHTML.value = "";
+  void initEditor();
 });
 
 onBeforeUnmount(() => {
@@ -206,6 +292,7 @@ onBeforeUnmount(() => {
     editor.value.destroy();
     editor.value = undefined as any;
   }
+  resetEditorState();
 });
 
 const sltMusic = useToggle("sltMusic");
@@ -302,6 +389,13 @@ const previewMusic = computed(() => {
   return null;
 });
 
+watch(
+  () => [props.mode, props.blogId, props.source],
+  () => {
+    void initEditor();
+  },
+);
+
 //TODO: 1.表格整理 2.搜索接口接入 3.游标查询 4.ok选择后绑定id 5.取消将id置0
 </script>
 
@@ -376,7 +470,7 @@ const previewMusic = computed(() => {
   </BModal>
 
   <div class="editor-container mx-auto">
-    <section class="audio-secetion mt-2 mb-4" v-if="mblog">
+    <section class="audio-secetion mt-2 mb-4" v-if="mblog && !isEditMode">
       <p class="section-title">选择歌曲</p>
       <div class="bgrp d-flex gap-3">
         <BButton variant="outline-secondary" @click.stop="toggleMsBox()"
@@ -420,7 +514,7 @@ const previewMusic = computed(() => {
     </section>
 
     <section class="tags-section">
-      <p class="section-title">上传标签</p>
+      <p class="section-title">{{ tagsSectionTitle }}</p>
       <BFormTags
         v-model="pub_tags"
         input-id="tags-basic"
@@ -453,10 +547,10 @@ const previewMusic = computed(() => {
     <section class="actions-section">
       <BPopover placement="bottom">
         <template #target>
-          <BButton variant="success" class="float-end">发布</BButton>
+          <BButton variant="success" class="float-end">{{ submitLabel }}</BButton>
         </template>
         <template #title>
-          <strong>确认发布?</strong>
+          <strong>{{ confirmTitle }}</strong>
         </template>
         <BButton
           v-if="upload === 'mblog'"
@@ -466,7 +560,7 @@ const previewMusic = computed(() => {
           class="me-2"
           @click="handleSubmit"
         >
-          <i-bi-send /> 发布
+          <i-bi-send /> {{ submitLabel }}
         </BButton>
         <BButton
           v-else
@@ -476,9 +570,9 @@ const previewMusic = computed(() => {
           class="me-2"
           @click="handleSubmit"
         >
-          <i-bi-send /> 发布
+          <i-bi-send /> {{ submitLabel }}
         </BButton>
-        <BButton size="sm" variant="primary"> <i-bi-box /> 暂存 </BButton>
+        <!-- <BButton size="sm" variant="primary"> <i-bi-box /> 暂存 </BButton> -->
       </BPopover>
       <BButton variant="primary" class="float-end me-2" @click="handlePreview">
         预览
@@ -505,7 +599,7 @@ const previewMusic = computed(() => {
       </div>
       
       <hr />
-      <article v-if="music_id !== 0" class="music-box preview-music-box mb-3">
+      <article v-if="music_id !== 0 && !isEditMode" class="music-box preview-music-box mb-3">
         <div class="music-cover">
           <img
             :src="previewMusic?.cover || '/a_huayu.webp'"

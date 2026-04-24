@@ -313,6 +313,17 @@ const toTagTheme = () => {
   console.log("你好")
 }
 
+const toEditBlog = () => {
+  const blogId = Number(route.params.id);
+  if (Number.isNaN(blogId) || blogId <= 0) return;
+
+  router.push({
+    name: "upload-edit",
+    params: { id: blogId },
+    query: isDraftMode.value ? { source: "draft" } : { source: "blog" },
+  });
+};
+
 </script>
 
 <template>
@@ -409,7 +420,7 @@ const toTagTheme = () => {
               <span>编辑</span>
             </BButton>
           </template>
-          <BButton class="me-2" variant="primary" title="编辑">
+          <BButton class="me-2" variant="primary" title="编辑" @click.stop="toEditBlog">
             <i-bi-pen /> 编辑
           </BButton>
           <BPopover placement="bottom">
