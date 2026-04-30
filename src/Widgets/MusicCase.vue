@@ -167,7 +167,7 @@ const handleDelete = async (id: number) => {
   aspect-ratio: 4 / 3;
   width: 100%;
   max-width: 450px;
-  min-width: 400px;
+  min-width: 0;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
 
@@ -264,6 +264,7 @@ const handleDelete = async (id: number) => {
 @media (max-width: 576px) {
   .music-card {
     aspect-ratio: 1 / 1;
+    max-width: 100%;
   }
 
   .title {

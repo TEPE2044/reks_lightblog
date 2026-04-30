@@ -154,51 +154,23 @@ const casePlay = () => {
 <template>
   <BCard class="blog-card mb-2">
     <template #header v-if="b.type === 0">
-      <!-- 长方形容器 -->
-      <div style="
-          display: flex;
-          align-items: center;
-          height: 80px;
-          padding: 8px 12px;
-          background: #fff;
-          border-radius: 6px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-        ">
-        <!-- 左侧封面 -->
-          <div style="
-            position: relative;
-            width: 64px;
-            height: 64px;
-            border-radius: 4px;
-            overflow: hidden;
-            cursor: pointer;
-          ">
-          <img :src="b.music?.cover || '/ai.webp'" style="width: 100%; height: 100%; object-fit: cover" alt="album" />
-          <!-- 播放按钮 -->
-          <div class="play-btn" style="
-              position: absolute;
-              inset: 0;
-              background: rgba(0, 0, 0, 0.45);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              opacity: 0;
-              transition: opacity 0.2s;
-            " @click.stop="casePlay">
+      <div class="d-flex align-items-center p-2 px-3 bg-white rounded shadow-sm music-header">
+        <div class="position-relative rounded overflow-hidden flex-shrink-0 music-cover">
+          <img :src="b.music?.cover || '/ai.webp'" class="w-100 h-100 object-fit-cover" alt="album" />
+          <div class="play-btn" @click.stop="casePlay">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff">
               <path d="M8 5v14l11-7z" />
             </svg>
           </div>
         </div>
 
-        <!-- 右侧歌曲信息 -->
-        <div style="margin-left: 12px; flex: 1">
-          <div style="font-size: 15px; font-weight: 600; color: #111">
+        <div class="ms-3 flex-grow-1">
+          <div class="fs-6 fw-semibold text-dark">
             {{ b.music?.name || "未绑定音乐" }}
           </div>
-          <div style="font-size: 13px; color: #666; margin-top: 4px; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+          <div class="d-flex align-items-center justify-content-between gap-2 mt-1 text-secondary small">
             <span>{{ b.music?.username || "未知作者" }}</span>
-            <div style="display: inline-flex; gap: 6px">
+            <div class="d-inline-flex gap-1">
               <BButton size="sm" variant="light" @click.stop="casePlay">
                 <i-bi-play-circle-fill class="fs-5" />
               </BButton>
@@ -340,13 +312,37 @@ const casePlay = () => {
   opacity: 1 !important;
 }
 
+.music-header {
+  height: 80px;
+}
+
+.music-cover {
+  width: 64px;
+  height: 64px;
+  cursor: pointer;
+}
+
+.play-btn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.45);
+  transition: opacity 0.2s;
+}
+
 .rs-card-content {
   // max-width: $card-max-width;
 
   cursor: pointer;
+  width: 100%;
 
   .rs-title {
-    width: 270px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
