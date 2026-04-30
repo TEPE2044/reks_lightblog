@@ -7,10 +7,9 @@ import { reactive, ref, shallowRef, watchEffect } from "vue";
 import Vcode from "vue3-puzzle-vcode";
 import { useCountdown } from "@vueuse/core";
 import { userStore } from "../Store/user";
-import type { RNext } from "../Utils/reks-next-job";
 import { substore } from "../Store/subscribe";
 import { makeSubscribeMessage } from "../Utils/subscribe-log";
-
+import { puzzleStore } from "../Store/puzzle";
 const props = withDefaults(defineProps<{ showTrigger?: boolean }>(), {
   showTrigger: true,
 });
@@ -24,39 +23,16 @@ const toast = useToast();
 // 验证码锁
 const codeActive = ref(false);
 
-//TODO:后续人机交互设计：同时按下按键处理/Canvas WebGL处理
-/*
-puzzle
-# var
-- isShow 控制puzzle显示变量
-- rnext 存储下一个函数
-# func
-- onShow 控制puzzle显示的函数
-- openPuzzle 处理异步事件的函数
-- onSuccess puzzle验证成功时执行的函数
-*/
-const isShow = ref(false);
-// rnext是下个要执行的函数，可能是异步的
-let rnext: RNext | null = null;
-const openPuzzle = (job: RNext) => {
-  rnext = job;
-  isShow.value = true;
-};
+// 滑动模块
+const {isShow} = storeToRefs(puzzleStore())
+const {openPuzzle,onCancel,onSuccess} = puzzleStore()
 
 const cancelLogin = () => {
-  rnext = null;
-  isShow.value = false;
-  codeActive.value = false;
-};
+  onCancel()
+  codeActive.value = false
+}
 
-const onSuccess = () => {
-  isShow.value = false;
-  if (rnext) {
-    rnext();
-    rnext = null;
-  }
-};
-// 加一个loading动画
+
 /*
 login-methods
 - phoneLogin 手机号登录（验证码登录）
@@ -150,6 +126,8 @@ import {
   loginbyAccount,
   loginbyPhone,
 } from "../Hooks/Auth";
+import { storeToRefs } from "pinia";
+
 const submitPhoneData = useDebounceFn(async () => {
   if (phoneData.iaccept === false) {
     createToast(toast, "登录失败", "请同意用户协议和隐私政策", "warning");
@@ -304,11 +282,10 @@ watchEffect(() => {
       </div>
 
       <div class="box box-show w-75 mx-auto" v-if="isShow">
-        <!-- TODO:后续要单独封装，使用pinia管理 -->
-        <Vcode :show="isShow" type="inside" @success="onSuccess" />
+        <Vcode :show="isShow" type="inside" @success="onSuccess()" />
         <BButton
           class="d-flex justify-content-center align-items-center mt-4"
-          @click="cancelLogin"
+          @click="cancelLogin()"
           >取消登录</BButton
         >
       </div>
