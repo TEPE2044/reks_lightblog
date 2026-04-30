@@ -92,6 +92,7 @@ const toolbarConfig: Partial<IToolbarConfig> = {
     "|",
     "numberedList",
     "divider",
+    "codeBlock",
     "|",
     "justifyLeft",
     "justifyCenter",

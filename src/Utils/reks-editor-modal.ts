@@ -3,6 +3,8 @@ import type {
   IModalMenu,
   SlateNode,
 } from "@wangeditor-next/editor";
+import { createApp, defineComponent, h, ref } from "vue";
+import type { Ref } from "vue";
 import { searchMusic } from "../Hooks/Search";
 import type { MusicResponse } from "./reks-interface";
 
@@ -16,12 +18,7 @@ export class MusicCardMenu implements IModalMenu {
   modalWidth: number;
 
   private container?: HTMLDivElement;
-  private input?: HTMLInputElement;
-  private list?: HTMLDivElement;
-  private status?: HTMLDivElement;
-  private selected?: MusicResponse | null;
-  private currentEditor?: IDomEditor;
-  private lastQuery = "";
+  private editorRef?: Ref<IDomEditor | null>;
 
   constructor() {
     this.title = "音乐卡片";
@@ -59,172 +56,166 @@ export class MusicCardMenu implements IModalMenu {
 
   // 定义 modal 内部的 DOM Element
   getModalContentElem(editor: IDomEditor) {
-    this.currentEditor = editor;
-
     // 第一次创建，后续复用（避免重复创建 DOM、重复绑定事件）
     if (!this.container) {
+      const menu = this;
       this.container = document.createElement("div");
       this.container.className = "reks-music-modal";
-
-      // 用 styleTag 管理样式，别把 style 写满一屏
-      const style = document.createElement("style");
-      style.textContent = `
-        .reks-music-modal{display:flex;flex-direction:column;gap:10px;min-height:300px;padding:4px 2px;}
-        .reks-music-modal__title{font-weight:600;}
-        .reks-music-modal__row{display:flex;gap:8px;align-items:center;}
-        .reks-music-modal__input{flex:1;padding:6px 10px;border:1px solid #ccc;border-radius:6px;font-size:14px;outline:none;}
-        .reks-music-modal__btn{padding:6px 10px;border:1px solid #ccc;border-radius:6px;background:#fff;}
-        .reks-music-modal__btn:disabled{opacity:.5;cursor:not-allowed;}
-        .reks-music-modal__status{font-size:12px;color:#666;min-height:18px;}
-        .reks-music-modal__list{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow:auto;padding-right:4px;}
-        .reks-music-modal__item{border:1px solid #eee;border-radius:8px;padding:8px;cursor:pointer;line-height:1.2;}
-        .reks-music-modal__item:hover{background:#fafafa;}
-        .reks-music-modal__item.is-active{border-color:#8ab4ff;background:#f3f8ff;}
-        .reks-music-modal__name{font-weight:600;font-size:13px;}
-        .reks-music-modal__meta{margin-top:4px;font-size:12px;color:#666;display:flex;justify-content:space-between;gap:8px;}
-        .reks-music-modal__btng{display:flex;flex-direction:column;gap:20px;}
-      `.trim();
-      this.container.appendChild(style);
-
-      const title = document.createElement("div");
-      title.className = "reks-music-modal__title";
-      title.textContent = "搜索并插入音乐卡片";
-      this.container.appendChild(title);
-
-      const row = document.createElement("div");
-      row.className = "reks-music-modal__row";
-        
-      this.input = document.createElement("input");
-      this.input.className = "reks-music-modal__input";
-      this.input.type = "search";
-      this.input.placeholder = "输入关键字，回车搜索";
-      row.appendChild(this.input);
-
-      const btnGroup = document.createElement("div")
-      btnGroup.className = "reks-music-modal__btng"
-      row.appendChild(btnGroup)
-
-      const searchBtn = document.createElement("button");
-      searchBtn.className = "reks-music-modal__btn";
-      searchBtn.type = "button";
-      searchBtn.textContent = "搜索";
-      btnGroup.appendChild(searchBtn);
-
-      const insertBtn = document.createElement("button");
-      insertBtn.className = "reks-music-modal__btn";
-      insertBtn.type = "button";
-      insertBtn.textContent = "插入";
-      insertBtn.disabled = true;
-      btnGroup.appendChild(insertBtn);
-
-      this.container.appendChild(row);
-
-      this.status = document.createElement("div");
-      this.status.className = "reks-music-modal__status";
-      this.status.textContent = "请输入关键字后回车或点“搜索”。";
-      this.container.appendChild(this.status);
-
-      this.list = document.createElement("div");
-      this.list.className = "reks-music-modal__list";
-      this.container.appendChild(this.list);
-
-      const setLoading = (loading: boolean) => {
-        searchBtn.disabled = loading;
-        this.input!.disabled = loading;
-      };
-
-      const setSelected = (m: MusicResponse | null) => {
-        this.selected = m;
-        insertBtn.disabled = !m;
-        // 更新 active 样式
-        const children = Array.from(this.list!.children) as HTMLDivElement[];
-        children.forEach((el) => {
-          const id = Number(el.dataset["id"]);
-          el.classList.toggle("is-active", Boolean(m && id === m.id));
-        });
-      };
-
-      const renderList = (rows: MusicResponse[]) => {
-        this.list!.innerHTML = "";
-        setSelected(null);
-        if (!rows.length) {
-          const empty = document.createElement("div");
-          empty.className = "reks-music-modal__status";
-          empty.textContent = "没有搜到结果，换个关键字试试。";
-          this.list!.appendChild(empty);
-          return;
-        }
-
-        const frag = document.createDocumentFragment();
-        rows.forEach((m) => {
-          const item = document.createElement("div");
-          item.className = "reks-music-modal__item";
-          item.dataset["id"] = String(m.id);
-
-          const name = document.createElement("div");
-          name.className = "reks-music-modal__name";
-          name.textContent = m.name || `音乐 #${m.id}`;
-          item.appendChild(name);
-
-          const meta = document.createElement("div");
-          meta.className = "reks-music-modal__meta";
-
-          const author = document.createElement("span");
-          author.textContent = m.username ? `作者：${m.username}` : "作者：-";
-          meta.appendChild(author);
-
-          const tag = document.createElement("span");
-          tag.textContent = m.original ? "原创" : "搬运/翻唱";
-          meta.appendChild(tag);
-
-          item.appendChild(meta);
-
-          item.addEventListener("click", () => setSelected(m));
-          frag.appendChild(item);
-        });
-        this.list!.appendChild(frag);
-      };
+      this.editorRef = ref<IDomEditor | null>(editor);
+      const queryRef = ref("");
+      const statusRef = ref("请输入关键字后回车或点“搜索”。");
+      const loadingRef = ref(false);
+      const selectedRef = ref<MusicResponse | null>(null);
+      const listRef = ref<MusicResponse[]>([]);
+      const lastQueryRef = ref("");
 
       const doSearch = async () => {
-        const q = (this.input!.value || "").trim();
+        const q = queryRef.value.trim();
         if (!q) {
-          this.status!.textContent = "请输入搜索关键字。";
-          renderList([]);
+          statusRef.value = "请输入搜索关键字。";
+          listRef.value = [];
+          selectedRef.value = null;
           return;
         }
-        if (q === this.lastQuery && this.list!.children.length) return;
+        if (q === lastQueryRef.value && listRef.value.length) return;
 
-        this.lastQuery = q;
-        this.status!.textContent = "搜索中...";
-        setLoading(true);
+        lastQueryRef.value = q;
+        statusRef.value = "搜索中...";
+        loadingRef.value = true;
         try {
           const res = await searchMusic(1, 6, q);
           const rows = (res?.data ?? []) as MusicResponse[];
-          this.status!.textContent = `共 ${res?.total ?? rows.length} 条，当前展示 ${rows.length} 条。`;
-          renderList(rows);
+          statusRef.value = `共 ${res?.total ?? rows.length} 条，当前展示 ${rows.length} 条。`;
+          listRef.value = rows;
+          selectedRef.value = null;
         } catch (e) {
           console.error(e);
-          this.status!.textContent = "搜索失败，请稍后重试。";
-          renderList([]);
+          statusRef.value = "搜索失败，请稍后重试。";
+          listRef.value = [];
+          selectedRef.value = null;
         } finally {
-          setLoading(false);
+          loadingRef.value = false;
         }
       };
 
-      this.input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          void doSearch();
-        }
-      });
-      searchBtn.addEventListener("click", () => void doSearch());
+      const MusicModal = defineComponent({
+        name: "MusicModal",
+        setup() {
+          const listContainerStyle = {
+            maxHeight: "240px",
+          };
 
-      insertBtn.addEventListener("click", () => {
-        if (!this.selected) return;
-        const ed = this.currentEditor;
-        if (!ed) return;
-        ed.insertText(`[music:${this.selected.id}]`);
+          return () =>
+            h("div", { class: "d-flex flex-column gap-2 p-2", style: { minHeight: "300px" } }, [
+              h("div", { class: "fw-semibold" }, "搜索并插入音乐卡片"),
+              h("div", { class: "d-flex align-items-start gap-2" }, [
+                h("input", {
+                  class: "form-control form-control-sm p-2",
+                  type: "search",
+                  placeholder: "输入关键字，回车搜索",
+                  value: queryRef.value,
+                  disabled: loadingRef.value,
+                  onInput: (event: Event) => {
+                    queryRef.value = (event.target as HTMLInputElement).value;
+                  },
+                  onKeydown: (event: KeyboardEvent) => {
+                    if (event.key !== "Enter") return;
+                    event.preventDefault();
+                    void doSearch();
+                  },
+                }),
+                h("div", { class: "d-flex flex-column gap-2" }, [
+                  h(
+                    "button",
+                    {
+                      class: "btn btn-sm btn-outline-secondary",
+                      type: "button",
+                      disabled: loadingRef.value,
+                      onClick: () => void doSearch(),
+                    },
+                    "搜索",
+                  ),
+                  h(
+                    "button",
+                    {
+                      class: "btn btn-sm btn-primary",
+                      type: "button",
+                      disabled: !selectedRef.value,
+                      onClick: () => {
+                        const selected = selectedRef.value;
+                        const currentEditor = menu.editorRef?.value;
+                        if (!selected || !currentEditor) return;
+                        currentEditor.insertText(`[music:${selected.id}]`);
+                      },
+                    },
+                    "插入",
+                  ),
+                ]),
+              ]),
+              h("div", { class: "small text-secondary" }, statusRef.value),
+              h(
+                "div",
+                {
+                  class: "d-flex flex-column gap-2 overflow-auto pe-1",
+                  style: listContainerStyle,
+                },
+                listRef.value.length
+                  ? listRef.value.map((music) =>
+                      h(
+                        "div",
+                        {
+                          key: music.id,
+                          class: [
+                            "border rounded p-2 lh-sm",
+                            {
+                              "border-primary bg-primary-subtle": selectedRef.value?.id === music.id,
+                            },
+                          ],
+                          style: { cursor: "pointer" },
+                          onClick: () => {
+                            selectedRef.value = music;
+                          },
+                        },
+                        [
+                          h(
+                            "div",
+                            { class: "fw-semibold small" },
+                            music.name || `音乐 #${music.id}`,
+                          ),
+                          h("div", { class: "mt-1 small text-secondary d-flex justify-content-between gap-2" }, [
+                            h(
+                              "span",
+                              null,
+                              music.username ? `作者：${music.username}` : "作者：-",
+                            ),
+                            h(
+                              "span",
+                              null,
+                              music.original ? "原创" : "搬运/翻唱",
+                            ),
+                          ]),
+                        ],
+                      ),
+                    )
+                  : [
+                      h(
+                        "div",
+                        { class: "small text-secondary" },
+                        lastQueryRef.value
+                          ? "没有搜到结果，换个关键字试试。"
+                          : "输入关键字后回车或点击搜索。",
+                      ),
+                    ],
+              ),
+            ]);
+        },
       });
+
+      createApp(MusicModal).mount(this.container);
+    }
+
+    if (this.editorRef) {
+      this.editorRef.value = editor;
     }
 
     return this.container as any;
