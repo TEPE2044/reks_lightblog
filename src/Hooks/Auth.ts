@@ -15,12 +15,13 @@ export const getCode = async (phone: string, codeActive: boolean) => {
 };
 // 手机号登录
 export const loginbyPhone = async (data: PhoneData) => {
+  let tempcode = data.code?.join('')
   const res = await reapi({
     method: "POST",
     url: "/auth/login-by-phone",
     data: {
       phone: data.phone,
-      code: data.code,
+      code: tempcode,
       iaccept: data.iaccept,
     },
   });

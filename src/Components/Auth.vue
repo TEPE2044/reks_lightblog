@@ -24,14 +24,13 @@ const toast = useToast();
 const codeActive = ref(false);
 
 // 滑动模块
-const {isShow} = storeToRefs(puzzleStore())
-const {openPuzzle,onCancel,onSuccess} = puzzleStore()
+const { isShow } = storeToRefs(puzzleStore());
+const { openPuzzle, onCancel, onSuccess } = puzzleStore();
 
 const cancelLogin = () => {
-  onCancel()
-  codeActive.value = false
-}
-
+  onCancel();
+  codeActive.value = false;
+};
 
 /*
 login-methods
@@ -39,7 +38,7 @@ login-methods
 */
 const phoneData = reactive<PhoneData>({
   phone: "",
-  code: "",
+  code: [],
   iaccept: false,
 });
 
@@ -48,7 +47,7 @@ const reset = () => {
   // accountData.account = "";
   // accountData.password = "";
   phoneData.phone = "";
-  phoneData.code = "";
+  phoneData.code = [];
   phoneData.iaccept = false;
 };
 
@@ -128,7 +127,7 @@ import {
 } from "../Hooks/Auth";
 import { storeToRefs } from "pinia";
 
-const submitPhoneData = useDebounceFn(async () => {
+const submitPhoneData = async () => {
   if (phoneData.iaccept === false) {
     createToast(toast, "登录失败", "请同意用户协议和隐私政策", "warning");
     return;
@@ -161,8 +160,13 @@ const submitPhoneData = useDebounceFn(async () => {
       emd.hide();
       reset();
 
-      if(login_res?.sign === 'new'){
-        createToast(toast,"安全提醒","当前账号安全等级低，请前往个人中心设置邮箱、密码","warning")
+      if (login_res?.sign === "new") {
+        createToast(
+          toast,
+          "安全提醒",
+          "当前账号安全等级低，请前往个人中心设置邮箱、密码",
+          "warning",
+        );
       }
     } else {
       createToast(toast, "登录失败", login_res.msg, "danger");
@@ -170,11 +174,11 @@ const submitPhoneData = useDebounceFn(async () => {
   } catch (e) {
     loading.value = false;
     console.error("登录失败:", e);
-    createToast(toast, "登录失败",(e as any)?.response.data.detail, "danger");
-  }finally{
+    createToast(toast, "登录失败", (e as any)?.response.data.detail, "danger");
+  } finally {
     loading.value = false;
   }
-}, 1300);
+};
 
 /*
 login-methods
@@ -355,7 +359,7 @@ watchEffect(() => {
 
         <BTab title="短信登录" ref="message">
           <div class="form w-75 mx-auto">
-            <BForm class="mx-auto" validated>
+            <BForm class="mx-auto">
               <BFormFloatingLabel
                 class="mt-4 mb-2"
                 label="手机号"
@@ -372,8 +376,21 @@ watchEffect(() => {
                 <div class="invalid-feedback">请输入手机号</div>
               </BFormFloatingLabel>
 
-              <BInputGroup class="mb-2">
-                <BFormFloatingLabel label="验证码" label-for="user-code">
+              <div class="mb-2 mt-2 d-flex flex-row justify-content-between">
+                <BFormOtp
+                  type="text"
+                  id="user-code"
+                  :length="4"
+                  size="lg"
+                  :disabled="phoneData.phone.length === 0"
+                  v-model="phoneData.code"
+                  required
+                  is-valid
+                  @complete="submitPhoneData"
+                >
+                </BFormOtp>
+
+                <!-- <BFormFloatingLabel label="验证码" label-for="user-code">
                   <BFormInput
                     type="text"
                     id="user-code"
@@ -382,7 +399,7 @@ watchEffect(() => {
                     :disabled="phoneData.phone.length === 0"
                     required
                   />
-                </BFormFloatingLabel>
+                </BFormFloatingLabel> -->
 
                 <BButton
                   v-if="!codeActive"
@@ -395,7 +412,7 @@ watchEffect(() => {
                 <BButton v-else text="button" :disabled="true" variant="primary"
                   >{{ remaining }}s</BButton
                 >
-              </BInputGroup>
+              </div>
             </BForm>
             <BFormCheckbox
               v-model="phoneData.iaccept"

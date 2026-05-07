@@ -1,6 +1,6 @@
 export interface PhoneData {
   phone: string;
-  code: string;
+  code: string[];
   iaccept: boolean;
 }
 
