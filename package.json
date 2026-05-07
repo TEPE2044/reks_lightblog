@@ -16,7 +16,7 @@
     "@x-ui-vue3/skeleton": "^1.0.2",
     "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
-    "bootstrap-vue-next": "^0.41.0",
+    "bootstrap-vue-next": "^0.45.1",
     "dayjs": "^1.11.19",
     "dompdf.js": "^1.2.0",
     "fast-sha256": "^1.3.0",

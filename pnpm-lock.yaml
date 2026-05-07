@@ -30,8 +30,8 @@ importers:
         specifier: ^5.3.8
         version: 5.3.8(@popperjs/core@2.11.8)
       bootstrap-vue-next:
-        specifier: ^0.41.0
-        version: 0.41.0(@vueuse/core@14.1.0(vue@3.5.25(typescript@5.9.3)))(vue-router@4.6.4(vue@3.5.25(typescript@5.9.3)))(vue@3.5.25(typescript@5.9.3))
+        specifier: ^0.45.1
+        version: 0.45.1(@vueuse/core@14.1.0(vue@3.5.25(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@4.6.4(vue@3.5.25(typescript@5.9.3)))(vue@3.5.25(typescript@5.9.3))
       dayjs:
         specifier: ^1.11.19
         version: 1.11.19
@@ -284,6 +284,12 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@floating-ui/core@1.7.5':
+    resolution: {integrity: sha512-1Ih4WTWyw0+lKyFMcBHGbb5U5FtuHJuujoyyr5zTaWS5EYMeT6Jb2AuDeftsCsEuchO+mM2ij5+q9crhydzLhQ==}
+
+  '@floating-ui/utils@0.2.11':
+    resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
 
   '@iconify-json/bi@1.2.7':
     resolution: {integrity: sha512-IPz8WNxmLkH1I9msl+0Q4OnmjjvP4uU0Z61a4i4sqonB6vKSbMGUWuGn8/YuuszlReVj8rf+3gNv5JU8Xoljyg==}
@@ -803,17 +809,30 @@ packages:
   birpc@2.9.0:
     resolution: {integrity: sha512-KrayHS5pBi69Xi9JmvoqrIgYGDkD6mcSe/i6YKi3w5kekCLzrX4+nawcXqrj2tIp50Kw/mT/s3p+GVK0A0sKxw==}
 
-  bootstrap-vue-next@0.41.0:
-    resolution: {integrity: sha512-anYJ0eekk631Rc5cbdFjvQTK1kydDjG6ELvaS24ewgNKcFEt8O2J1+h8kZoaz9lBQan+DPh/c17EGPo1vYFBFA==}
+  bootstrap-vue-next@0.45.1:
+    resolution: {integrity: sha512-PLdivOxShTHglcnvyEAi8sfgxrbFdJsy9avaXbyLmv6OWvzwAFONI79cCrT/t9/lH2oXtMmZpXJfeHxcZcpA1Q==}
     peerDependencies:
       '@floating-ui/vue': '*'
+      '@internationalized/date': '*'
       '@vueuse/core': '*'
+      '@vueuse/integrations': '*'
+      bootstrap: ^5.3.0
+      focus-trap: '*'
+      reka-ui: '*'
       vue: ^3.5.13
       vue-router: '*'
     peerDependenciesMeta:
       '@floating-ui/vue':
         optional: true
+      '@internationalized/date':
+        optional: true
       '@vueuse/core':
+        optional: true
+      '@vueuse/integrations':
+        optional: true
+      focus-trap:
+        optional: true
+      reka-ui:
         optional: true
       vue-router:
         optional: true
@@ -1608,6 +1627,12 @@ snapshots:
   '@esbuild/win32-x64@0.25.12':
     optional: true
 
+  '@floating-ui/core@1.7.5':
+    dependencies:
+      '@floating-ui/utils': 0.2.11
+
+  '@floating-ui/utils@0.2.11': {}
+
   '@iconify-json/bi@1.2.7':
     dependencies:
       '@iconify/types': 2.0.0
@@ -2119,8 +2144,10 @@ snapshots:
 
   birpc@2.9.0: {}
 
-  bootstrap-vue-next@0.41.0(@vueuse/core@14.1.0(vue@3.5.25(typescript@5.9.3)))(vue-router@4.6.4(vue@3.5.25(typescript@5.9.3)))(vue@3.5.25(typescript@5.9.3)):
+  bootstrap-vue-next@0.45.1(@vueuse/core@14.1.0(vue@3.5.25(typescript@5.9.3)))(bootstrap@5.3.8(@popperjs/core@2.11.8))(vue-router@4.6.4(vue@3.5.25(typescript@5.9.3)))(vue@3.5.25(typescript@5.9.3)):
     dependencies:
+      '@floating-ui/core': 1.7.5
+      bootstrap: 5.3.8(@popperjs/core@2.11.8)
       vue: 3.5.25(typescript@5.9.3)
     optionalDependencies:
       '@vueuse/core': 14.1.0(vue@3.5.25(typescript@5.9.3))
