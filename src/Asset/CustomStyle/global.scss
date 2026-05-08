@@ -1,10 +1,11 @@
+// $r-background:;
 $caro-height: 280px;
 
 //测量所用的临时border
 %test-shape {
   border: 1px solid #000000;
 }
-//reks卡片盒子
+// 卡片盒子
 %reks-card-box {
   border-radius: 12px;
   background-color: #fafafa;
@@ -17,16 +18,52 @@ $caro-height: 280px;
   cursor: pointer;
 }
 
-%reks-section-title{
-  border-left: 2px solid firebrick;
+%reks-section-title {
   padding-left: 8px;
+  border-left: 2px solid firebrick;
 }
 
-%reks-title{
-  padding-left: .3rem;
-  border-left: .5rem solid indianred;
+%reks-title {
+  padding-left: 0.3rem;
+  border-left: 0.5rem solid indianred;
+}
+// 居中flex
+@mixin flex-center($diretion){
+  display: flex;
+  flex-direction: $diretion;
+  justify-content: center;
+  align-items: center;
 }
 
+// 自定义flex
+@mixin flex-diy($diretion,$jc,$al,$gap){
+  display: flex;
+  flex-direction: $diretion;
+  justify-content: $jc;
+  align-items: $al;
+  gap: $gap;
+}
+
+// 长宽
+@mixin wnh($width,$height){
+  width: $width;
+  height: $height;
+}
+
+// 溢出控制
+@mixin overflows($x,$y){
+  overflow-x: $x;
+  overflow-y: $y;
+}
+
+// absolute
+@mixin positions($p,$t,$b,$l,$r){
+  position: $p;
+  top: $t;
+  left: $l;
+  right: $r;
+  bottom: $b;
+}
 
 @mixin rks_fadeIn {
   opacity: 0;

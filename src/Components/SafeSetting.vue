@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useToast, useToggle } from "bootstrap-vue-next";
-import { ref, computed, reactive } from "vue";
+import { BFormRadioGroup, useToast, useToggle } from "bootstrap-vue-next";
+import { ref, computed, reactive, watch } from "vue";
 import type { PasswordGroup } from "../Utils/reks-interface";
 import { createToast } from "../Utils/reks-toast";
 import { setEmailSafety, setPasswordSafety } from "../Hooks/SafeSetting";
@@ -10,11 +10,12 @@ const pswGroup = reactive<PasswordGroup>({
   auth_psw: "",
 });
 const nemail = ref();
-const new_phone = ref<string>()
+const new_phone = ref<string>();
 
 const espw = useToggle("easy-set-password");
 const ese = useToggle("easy-set-email");
 const ecp = useToggle("easy-change-phone");
+const uc = useToggle("user-control");
 
 const pswVisible = ref(false);
 const eyes = computed(() => (pswVisible.value ? "text" : "password"));
@@ -69,6 +70,52 @@ const setEmail = async (email: string) => {
   }
 };
 
+const visibilityOptions = ["所有人可见", "仅关注可见", "不可见"];
+
+const controll_options = [
+  { title: "我的主页", options: visibilityOptions },
+  { title: "我的发布", options: visibilityOptions },
+  { title: "我的收藏", options: visibilityOptions },
+];
+
+// First-level default visibility; when changed (and not '自定义') it will propagate
+const defaultVisibility = ref<string>(visibilityOptions[0]);
+
+// Per-item visibility (second-level). Initialized with the default.
+const itemVisibility = reactive<Record<string, string>>({});
+controll_options.forEach((ct) => {
+  itemVisibility[ct.title] = defaultVisibility.value;
+});
+
+const isCustom = ref(false);
+
+// When user changes the global/default visibility, propagate to all items
+watch(defaultVisibility, (v) => {
+  if (v === "自定义") return;
+  controll_options.forEach((ct) => {
+    itemVisibility[ct.title] = v;
+  });
+  isCustom.value = false;
+});
+
+// If any item differs from the default, mark default as '自定义'
+watch(
+  () => Object.values(itemVisibility),
+  (vals) => {
+    if (vals.every((val) => val === defaultVisibility.value)) {
+      // all match default
+      if (defaultVisibility.value === "自定义") {
+        // revert to the first matching option if possible
+        defaultVisibility.value = vals[0] ?? visibilityOptions[0];
+      }
+      isCustom.value = false;
+    } else {
+      if (defaultVisibility.value !== "自定义") defaultVisibility.value = "自定义";
+      isCustom.value = true;
+    }
+  },
+  { deep: true },
+);
 </script>
 <template>
   <div class="safe-settings p-3">
@@ -96,7 +143,9 @@ const setEmail = async (email: string) => {
       <BCol
         class="safe-box d-flex align-items-center justify-content-center gap-3 offset-1"
         ><i-bi-telephone style="font-size: 1.5rem" />
-        <BButton variant="outline-primary" @click="ecp.toggle()">更换手机号</BButton>
+        <BButton variant="outline-primary" @click="ecp.toggle()"
+          >更换手机号</BButton
+        >
       </BCol>
     </BRow>
 
@@ -105,7 +154,9 @@ const setEmail = async (email: string) => {
       <BCol
         class="safe-box d-flex align-items-center justify-content-center gap-4"
         ><i-bi-person-gear style="font-size: 1.5rem" />
-        <BButton variant="outline-secondary">访问控制</BButton>
+        <BButton variant="outline-secondary" @click="uc.toggle()"
+          >访问控制</BButton
+        >
       </BCol>
       <BCol
         class="safe-box d-flex align-items-center justify-content-center gap-4 offset-1"
@@ -172,12 +223,34 @@ const setEmail = async (email: string) => {
   </BModal>
 
   <BModal id="easy-change-phone" title="更换手机号" no-footer>
-    <BAlert show variant="warning">
-      更换手机号码后，您需要重新登录
-    </BAlert>
+    <BAlert show variant="warning"> 更换手机号码后，您需要重新登录 </BAlert>
     <BInputGroup>
-      <BFormInput v-model="new_phone" type="tel" placeholder="更换您的手机号码" />
+      <BFormInput
+        v-model="new_phone"
+        type="tel"
+        placeholder="更换您的手机号码"
+      />
     </BInputGroup>
+  </BModal>
+
+  <BModal id="user-control" title="用户控制" no-close-on-backdrop ok-title="保存设置" cancel-title="取消" @ok="" @cancel="" @close="">
+    <div class="parent-panel visit mb-3 border rounded-2">
+      <div class="title h5 fw-bold text-center">谁能访问我</div>
+      <BFormRadioGroup class="d-flex flex-row mt-3" v-model="defaultVisibility">
+        <BFormRadio v-for="opt in visibilityOptions" :key="opt" :value="opt" class="parent-radio">{{ opt }}</BFormRadio>
+        <BFormRadio value="自定义" class="parent-radio">自定义</BFormRadio>
+      </BFormRadioGroup>
+    </div>
+
+
+    <section id="controll" v-for="ct in controll_options" :key="ct.title">
+      <template v-if="defaultVisibility === '自定义'">
+        <div class="title h6 fw-bold ps-2 border-start border-3 border-danger">{{ ct.title }}</div>
+        <BFormRadioGroup class="d-flex flex-row radio-row ps-5 gap-2" v-model="itemVisibility[ct.title]">
+          <BFormRadio v-for="c in ct.options" :key="`ct-${ct.title}-${c}`" :value="c">{{ c }}</BFormRadio>
+        </BFormRadioGroup>
+      </template>
+    </section>
   </BModal>
 </template>
 
@@ -190,5 +263,35 @@ const setEmail = async (email: string) => {
   @extend %reks-card-box;
   height: 120px;
   border: 1px solid rgba(0, 0, 0, 0.274);
+}
+
+/* Parent (first-level) concise styling */
+.parent-panel {
+  padding: 1rem;
+}
+.parent-radio-row {
+  align-items: center;
+  gap: 0.6rem;
+}
+.parent-radio .form-check-label {
+  font-weight: 600;
+  color: #0d6efd;
+}
+
+/* Child (second-level) smaller, indented styling */
+.child-radio-row {
+  gap: 0.5rem;
+  padding-left: 2rem;
+}
+.child-radio-row .form-check-label {
+  font-size: 0.88rem;
+  color: #374151;
+}
+.child-radio-row .form-check {
+  padding: 0.08rem 0.35rem;
+}
+
+#user-control section#controll {
+  padding: 0.25rem 0.4rem;
 }
 </style>

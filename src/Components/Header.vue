@@ -56,8 +56,6 @@
 </template>
 
 <style scoped lang="scss">
-@use "../Asset/CustomStyle/open-font.scss";
-
 .logo-font {
   font-family: 'Alibaba-PuHuiTi-Medium', sans-serif;
   font-style: oblique;
