@@ -7,7 +7,9 @@ export const userStore = defineStore("user", () => {
   const userInfo = ref<any>(null);
   const tempAvatar = ref<File | null>(null);
   const safeLevel = ref<"weak" | "fine" | "strong">("weak");
-  const isLoggedIn = ref(!!localStorage.getItem("token"));
+  const isLoggedIn = ref(
+    !!localStorage.getItem("rcode") && !!localStorage.getItem("payload"),
+  );
 
   const checkUserSafety = async () => {
     safeLevel.value = await checkSafe();
@@ -55,7 +57,7 @@ export const userStore = defineStore("user", () => {
     try {
       await updateUserInfo();
     } catch (e) {
-      console.warn("更新个人信息失败")
+      console.warn("更新个人信息失败");
     }
     const storedRcode = localStorage.getItem("rcode");
     const storedPayload = localStorage.getItem("payload");
@@ -68,7 +70,7 @@ export const userStore = defineStore("user", () => {
       try {
         await checkUserSafety();
       } catch (e) {
-        console.warn("检测安全等级失败")
+        console.warn("检测安全等级失败");
       }
     } else {
       await userLogout();
