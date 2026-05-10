@@ -376,7 +376,7 @@ watchEffect(() => {
           </div>
         </BTab>
 
-        <BTab title="短信登录" ref="message">
+        <BTab title="手机号登录" ref="message">
           <div class="form w-75 mx-auto">
             <BForm class="mx-auto" validated>
               <BFormFloatingLabel

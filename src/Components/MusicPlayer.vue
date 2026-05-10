@@ -121,7 +121,7 @@ const toggleMusicList = () => {
 const comments = useToggle("comment-area")
 // 暂未开放
 const toggleComment = () => {
-  createToast(toast,"暂未开放","前面的世界，以后再来探索吧",'warning')
+  createToast(toast, "暂未开放", "前面的世界，以后再来探索吧", 'warning')
   return
   comments.toggle()
 }
@@ -274,7 +274,8 @@ onUnmounted(() => {
       </template>
       <template #default>
         <div class="scroll-list">
-          <div v-for="song in playQueue" :key="`reks${song}`" :class="{'border border-danger': currentIndex === playQueue.indexOf(song)}"
+          <div v-for="song in playQueue" :key="`reks${song}`"
+            :class="{ 'border border-danger': currentIndex === playQueue.indexOf(song) }"
             class="list-item position-relative p-3 border rounded-1 mt-3 d-flex justify-content-between align-items-center shadow-sm">
             <div class="meta d-flex flex-row align-items-center justify-content-center position-absolute">
               <div class="btns d-flex flex-row align-items-center justify-content-center gap-4">
@@ -532,8 +533,9 @@ onUnmounted(() => {
   overflow: hidden;
   border-radius: 8px;
 }
+
 .rs-controls-1 .cover img,
-.rs-controls-1 .cover > img,
+.rs-controls-1 .cover>img,
 .rs-controls-1 .cover .b-img,
 .rs-controls-1 .cover b-img {
   width: 100%;
@@ -603,7 +605,7 @@ onUnmounted(() => {
 /* 黑胶 / 转盘 样式（嵌套） */
 .rs-controls-1 {
   .cover {
-      .turntable {
+    .turntable {
       position: relative;
       width: 100%;
       height: 100%;
@@ -656,7 +658,7 @@ onUnmounted(() => {
         animation: tide-wave-outer 3.4s ease-in-out infinite;
       }
 
-  
+
 
       .disc {
         position: relative;
@@ -684,7 +686,16 @@ onUnmounted(() => {
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    .cover { height: 200px; .turntable { .disc { max-width: 200px; } } }
+
+    .cover {
+      height: 200px;
+
+      .turntable {
+        .disc {
+          max-width: 200px;
+        }
+      }
+    }
   }
 }
 
@@ -695,12 +706,14 @@ onUnmounted(() => {
       0 0 0 0 rgba(23, 71, 145, 0.28),
       0 0 12px rgba(23, 71, 145, 0.16);
   }
+
   50% {
     transform: translate(-50%, -50%) scale(1.02);
     box-shadow:
       0 0 0 3px rgba(23, 71, 145, 0.1),
       0 0 16px rgba(23, 71, 145, 0.2);
   }
+
   100% {
     transform: translate(-50%, -50%) scale(0.98);
     box-shadow:
@@ -716,12 +729,14 @@ onUnmounted(() => {
       0 0 0 0 rgba(23, 71, 145, 0.2),
       0 0 12px rgba(23, 71, 145, 0.1);
   }
+
   50% {
     transform: translate(-50%, -50%) scale(1.03);
     box-shadow:
       0 0 0 4px rgba(23, 71, 145, 0.06),
       0 0 18px rgba(23, 71, 145, 0.16);
   }
+
   100% {
     transform: translate(-50%, -50%) scale(1);
     box-shadow:
@@ -729,5 +744,4 @@ onUnmounted(() => {
       0 0 12px rgba(23, 71, 145, 0.1);
   }
 }
-
 </style>
