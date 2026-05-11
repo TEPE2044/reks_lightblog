@@ -68,23 +68,35 @@ export class MusicCardMenu implements IModalMenu {
       const selectedRef = ref<MusicResponse | null>(null);
       const listRef = ref<MusicResponse[]>([]);
       const lastQueryRef = ref("");
+      const pageRef = ref(1);
+      const pageSize = 4;
+      const totalRef = ref<number | null>(null);
 
-      const doSearch = async () => {
+      const doSearch = async (targetPage = 1) => {
         const q = queryRef.value.trim();
         if (!q) {
           statusRef.value = "请输入搜索关键字。";
           listRef.value = [];
           selectedRef.value = null;
+          totalRef.value = null;
           return;
         }
-        if (q === lastQueryRef.value && listRef.value.length) return;
+        if (
+          q === lastQueryRef.value &&
+          listRef.value.length &&
+          targetPage === pageRef.value
+        ) {
+          return;
+        }
 
         lastQueryRef.value = q;
         statusRef.value = "搜索中...";
         loadingRef.value = true;
         try {
-          const res = await searchMusic(1, 6, q);
+          const res = await searchMusic(targetPage, pageSize, q);
           const rows = (res?.data ?? []) as MusicResponse[];
+          totalRef.value = typeof res?.total === "number" ? res.total : null;
+          pageRef.value = targetPage;
           statusRef.value = `共 ${res?.total ?? rows.length} 条，当前展示 ${rows.length} 条。`;
           listRef.value = rows;
           selectedRef.value = null;
@@ -93,6 +105,7 @@ export class MusicCardMenu implements IModalMenu {
           statusRef.value = "搜索失败，请稍后重试。";
           listRef.value = [];
           selectedRef.value = null;
+          totalRef.value = null;
         } finally {
           loadingRef.value = false;
         }
@@ -106,108 +119,160 @@ export class MusicCardMenu implements IModalMenu {
           };
 
           return () =>
-            h("div", { class: "d-flex flex-column gap-2 p-2", style: { minHeight: "300px" } }, [
-              h("div", { class: "fw-semibold" }, "搜索并插入音乐卡片"),
-              h("div", { class: "d-flex align-items-start gap-2" }, [
-                h("input", {
-                  class: "form-control form-control-sm p-2",
-                  type: "search",
-                  placeholder: "输入关键字，回车搜索",
-                  value: queryRef.value,
-                  disabled: loadingRef.value,
-                  onInput: (event: Event) => {
-                    queryRef.value = (event.target as HTMLInputElement).value;
-                  },
-                  onKeydown: (event: KeyboardEvent) => {
-                    if (event.key !== "Enter") return;
-                    event.preventDefault();
-                    void doSearch();
-                  },
-                }),
-                h("div", { class: "d-flex flex-column gap-2" }, [
+            h(
+              "div",
+              {
+                class: "d-flex flex-column gap-2 p-2",
+                style: { minHeight: "300px" },
+              },
+              [
+                h("div", { class: "fw-semibold" }, "搜索并插入音乐卡片"),
+                h("div", { class: "d-flex align-items-start gap-2" }, [
+                  h("input", {
+                    class: "form-control form-control-sm p-2",
+                    type: "search",
+                    placeholder: "输入关键字，回车搜索",
+                    value: queryRef.value,
+                    disabled: loadingRef.value,
+                    onInput: (event: Event) => {
+                      queryRef.value = (event.target as HTMLInputElement).value;
+                    },
+                    onKeydown: (event: KeyboardEvent) => {
+                      if (event.key !== "Enter") return;
+                      event.preventDefault();
+                      pageRef.value = 1;
+                      void doSearch(1);
+                    },
+                  }),
+                  
+                  h("div", { class: "d-flex flex-column gap-2" }, [
+                    h(
+                      "button",
+                      {
+                        class: "btn btn-sm btn-outline-secondary",
+                        type: "button",
+                        disabled: loadingRef.value,
+                        onClick: () => {
+                          pageRef.value = 1;
+                          void doSearch(1);
+                        },
+                      },
+                      "搜索",
+                    ),
+                    h(
+                      "button",
+                      {
+                        class: "btn btn-sm btn-primary",
+                        type: "button",
+                        disabled: !selectedRef.value,
+                        onClick: () => {
+                          const selected = selectedRef.value;
+                          const currentEditor = menu.editorRef?.value;
+                          if (!selected || !currentEditor) return;
+                          currentEditor.insertText(`[music:${selected.id}]`);
+                        },
+                      },
+                      "插入",
+                    ),
+                  ]),
+                ]),
+                h("div", { class: "small text-secondary" }, statusRef.value),
+                                h("div", { class: "border-0 d-flex flex-row gap-2 p-0" }, [
                   h(
                     "button",
                     {
                       class: "btn btn-sm btn-outline-secondary",
                       type: "button",
-                      disabled: loadingRef.value,
-                      onClick: () => void doSearch(),
+                      disabled:
+                        loadingRef.value ||
+                        listRef.value.length <= 0 ||
+                        pageRef.value <= 1,
+                      onClick: () => void doSearch(pageRef.value - 1),
                     },
-                    "搜索",
+                    "<",
                   ),
                   h(
                     "button",
                     {
-                      class: "btn btn-sm btn-primary",
+                      class: "btn btn-sm btn-outline-secondary",
                       type: "button",
-                      disabled: !selectedRef.value,
-                      onClick: () => {
-                        const selected = selectedRef.value;
-                        const currentEditor = menu.editorRef?.value;
-                        if (!selected || !currentEditor) return;
-                        currentEditor.insertText(`[music:${selected.id}]`);
-                      },
+                      disabled:
+                        loadingRef.value ||
+                        listRef.value.length <= 0 ||
+                        (totalRef.value !== null
+                          ? pageRef.value * pageSize >= totalRef.value
+                          : listRef.value.length < pageSize),
+                      onClick: () => void doSearch(pageRef.value + 1),
                     },
-                    "插入",
+                    ">",
                   ),
                 ]),
-              ]),
-              h("div", { class: "small text-secondary" }, statusRef.value),
-              h(
-                "div",
-                {
-                  class: "d-flex flex-column gap-2 overflow-auto pe-1",
-                  style: listContainerStyle,
-                },
-                listRef.value.length
-                  ? listRef.value.map((music) =>
-                      h(
-                        "div",
-                        {
-                          key: music.id,
-                          class: [
-                            "border rounded p-2 lh-sm",
-                            {
-                              "border-primary bg-primary-subtle": selectedRef.value?.id === music.id,
+                h(
+                  "div",
+                  {
+                    class: "d-flex flex-column gap-2 overflow-auto pe-1",
+                    style: listContainerStyle,
+                  },
+                  listRef.value.length
+                    ? listRef.value.map((music) =>
+                        h(
+                          "div",
+                          {
+                            key: music.id,
+                            class: [
+                              "border rounded p-2 lh-sm",
+                              {
+                                "border-primary bg-primary-subtle":
+                                  selectedRef.value?.id === music.id,
+                              },
+                            ],
+                            style: { cursor: "pointer" },
+                            onClick: () => {
+                              selectedRef.value = music;
                             },
-                          ],
-                          style: { cursor: "pointer" },
-                          onClick: () => {
-                            selectedRef.value = music;
                           },
-                        },
-                        [
-                          h(
-                            "div",
-                            { class: "fw-semibold small" },
-                            music.name || `音乐 #${music.id}`,
-                          ),
-                          h("div", { class: "mt-1 small text-secondary d-flex justify-content-between gap-2" }, [
+                          [
                             h(
-                              "span",
-                              null,
-                              music.username ? `作者：${music.username}` : "作者：-",
+                              "div",
+                              { class: "fw-semibold small" },
+                              music.name || `音乐 #${music.id}`,
                             ),
                             h(
-                              "span",
-                              null,
-                              music.original ? "原创" : "搬运/翻唱",
+                              "div",
+                              {
+                                class:
+                                  "mt-1 small text-secondary d-flex justify-content-between gap-2",
+                              },
+                              [
+                                h(
+                                  "span",
+                                  null,
+                                  music.username
+                                    ? `作者：${music.username}`
+                                    : "作者：-",
+                                ),
+                                h(
+                                  "span",
+                                  null,
+                                  music.original ? "原创" : "搬运/翻唱",
+                                ),
+                              ],
                             ),
-                          ]),
-                        ],
-                      ),
-                    )
-                  : [
-                      h(
-                        "div",
-                        { class: "small text-secondary" },
-                        lastQueryRef.value
-                          ? "没有搜到结果，换个关键字试试。"
-                          : "输入关键字后回车或点击搜索。",
-                      ),
-                    ],
-              ),
-            ]);
+                          ],
+                        ),
+                      )
+                    : [
+                        h(
+                          "div",
+                          { class: "small text-secondary" },
+                          lastQueryRef.value
+                            ? "没有搜到结果，换个关键字试试。"
+                            : "输入关键字后回车或点击搜索。",
+                        ),
+                      ],
+                )
+              ],
+            );
         },
       });
 
