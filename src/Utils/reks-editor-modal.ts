@@ -115,7 +115,7 @@ export class MusicCardMenu implements IModalMenu {
         name: "MusicModal",
         setup() {
           const listContainerStyle = {
-            maxHeight: "240px",
+            maxHeight: "240px"
           };
 
           return () =>
@@ -140,7 +140,6 @@ export class MusicCardMenu implements IModalMenu {
                     onKeydown: (event: KeyboardEvent) => {
                       if (event.key !== "Enter") return;
                       event.preventDefault();
-                      pageRef.value = 1;
                       void doSearch(1);
                     },
                   }),
@@ -153,7 +152,6 @@ export class MusicCardMenu implements IModalMenu {
                         type: "button",
                         disabled: loadingRef.value,
                         onClick: () => {
-                          pageRef.value = 1;
                           void doSearch(1);
                         },
                       },
@@ -183,6 +181,7 @@ export class MusicCardMenu implements IModalMenu {
                     {
                       class: "btn btn-sm btn-outline-secondary",
                       type: "button",
+                      title: "上一页",
                       disabled:
                         loadingRef.value ||
                         listRef.value.length <= 0 ||
@@ -196,6 +195,7 @@ export class MusicCardMenu implements IModalMenu {
                     {
                       class: "btn btn-sm btn-outline-secondary",
                       type: "button",
+                      title: "下一页",
                       disabled:
                         loadingRef.value ||
                         listRef.value.length <= 0 ||
