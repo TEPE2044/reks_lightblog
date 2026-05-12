@@ -1,16 +1,7 @@
 <template>
   <div class="hub">
     <HubHeader />
-    <div class="hub-recommand mt-4">
-      <Recommand />
-    </div>
     <section class="hub-shell mt-4 mb-4">
-      <article class="hub-main overflow-hidden">
-        <div class="hang">
-          <HubCaro />
-        </div>
-      </article>
-
       <aside class="hub-side p-3">
         <div class="side-head">
           <h5>热门标签</h5>
@@ -28,6 +19,9 @@
         </BButton>
       </aside>
     </section>
+    <div class="hub-recommand mt-4">
+      <Recommand />
+    </div>
   </div>
 </template>
 

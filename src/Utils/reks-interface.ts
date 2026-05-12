@@ -60,6 +60,9 @@ export interface BlogData {
   created_at: Date;
   type: number;
   music?: BlogMusicMeta | null;
+  author: string;
+  avatar: string;
+  user_id: number;
 }
 
 export interface HotBlogItem extends BlogData {

@@ -91,6 +91,15 @@ const readBlog = async (id: number) => {
   }
 };
 
+const visitAuthor = (id?: number) => {
+  if (id == null) {
+    createToast(toast, "无法跳转", "缺少作者 ID", "warning");
+    return;
+  }
+
+  router.push({ name: "guest-centre", params: { id: String(id) } });
+};
+
 const caseAdd = () => {
   if (!b.music?.audio) {
     createToast(toast, "添加失败", "当前音乐缺少音频链接", "danger");
@@ -152,7 +161,7 @@ const casePlay = () => {
 </script>
 
 <template>
-  <BCard class="blog-card mb-2">
+  <BCard class="blog-card border border-secondary-subtle bg-light-subtle shadow-sm mb-4 ">
     <template #header v-if="b.type === 0">
       <div class="d-flex align-items-center p-2 px-3 bg-white rounded shadow-sm music-header">
         <div class="position-relative rounded overflow-hidden flex-shrink-0 music-cover">
@@ -199,6 +208,10 @@ const casePlay = () => {
       <div class="rs-title h5" :title="b.title">
         <strong>{{ b.title }}</strong>
       </div>
+      <div class="rs-author border rounded-3 p-1 d-flex align-items-center flex-row gap-3" @click.stop="visitAuthor(b.user_id)">
+        <BAvatar size="sm" :src="b.avatar || ''"></BAvatar>
+        <div class="name fw-bold">{{ b.author }}</div>
+      </div> 
       <div class="rs-time mt-2">发布于{{ formatDateTime(b.created_at) }}</div>
     </div>
     <template #footer v-if="blogProps.showActions">
