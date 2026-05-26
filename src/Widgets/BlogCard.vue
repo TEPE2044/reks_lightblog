@@ -78,13 +78,13 @@ const handleFavorite = async () => {
 
 const readBlog = async (id: number) => {
   try {
-    const target = router.resolve({
+    const route = router.resolve({
       name: blogProps.visitRouteName,
       params: { id: String(id) },
-    }).fullPath;
-    if (router.currentRoute.value.fullPath === target) return;
+    });
+    if (router.currentRoute.value.fullPath === route.fullPath) return;
 
-    await router.push({ name: blogProps.visitRouteName, params: { id: String(id) } });
+    window.open(route.href, "_blank");
   } catch (e) {
     // 忽略导航失败（例如重复导航）
     console.warn("导航到博客页失败:", e);
