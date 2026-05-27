@@ -58,7 +58,7 @@ onMounted(async () => {
         :key="`hot-blog-${item.id}`"
       >
         <div class="like-badge" v-if="item?.like_count >= 10">热门</div>
-        <BlogCard :blog="item" :show-actions="false" />
+        <BlogCard :blog="item" :show-actions="false"/>
       </div>
     </div>
     <div
