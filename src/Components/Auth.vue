@@ -144,9 +144,11 @@ const submitPhoneData = async () => {
     console.log("登录成功:", login_res);
     if (login_res.tokens) {
       // 存储token
+      emd.hide();
       loading.value = false;
       user.userLogin(login_res.tokens);
       createToast(toast, "登录成功", "欢迎回来", "success");
+      reset();
       const user_info = await getUserProfile();
       user.storeUserInfo(user_info.data);
       addSubscribeMessage(
@@ -157,8 +159,6 @@ const submitPhoneData = async () => {
         user_info?.data?.reks_id ?? "guest",
       );
       console.log("用户信息:", user_info);
-      emd.hide();
-      reset();
 
       if (login_res?.sign === "new") {
         createToast(
@@ -224,8 +224,10 @@ const sumbitAccountData = useDebounceFn(() => {
         if (login_res.tokens) {
           // 存储token
           loading.value = false;
+          emd.hide();
           user.userLogin(login_res.tokens);
           createToast(toast, "登录成功", "欢迎回来", "success");
+          reset();
           const user_info = await getUserProfile();
           user.storeUserInfo(user_info.data);
           addSubscribeMessage(
@@ -236,8 +238,6 @@ const sumbitAccountData = useDebounceFn(() => {
             user_info?.data?.reks_id ?? "guest",
           );
           console.log("用户信息:", user_info);
-          emd.hide();
-          reset();
         }
       } catch (e) {
         loading.value = false;
