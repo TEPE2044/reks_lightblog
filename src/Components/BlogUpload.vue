@@ -51,9 +51,10 @@ const submitToastTitle = computed(() =>
   isEditMode.value ? "保存成功" : "发布成功",
 );
 
+
 const leaveEditorPage = () => {
   resetEditorState();
-
+  
   if (window.history.length > 1) {
     router.back();
     return;
@@ -100,6 +101,74 @@ const toolbarConfig: Partial<IToolbarConfig> = {
   ],
 };
 
+const PLACEHOLDER_IMAGE = "/imagePlaceholder.webp";
+const MAX_IMAGE_RETRIES = 5;
+const BASE_RETRY_DELAY_MS = 400;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// 不带缓存访问
+const withCacheBuster = (url: string, attempt: number) => {
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}t=${Date.now()}-${attempt}`;
+};
+
+const waitForImageReady = async (url: string) => {
+  for (let attempt = 0; attempt < MAX_IMAGE_RETRIES; attempt += 1) {
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error("load failed"));
+        img.src = withCacheBuster(url, attempt);
+      });
+      return true;
+    } catch {
+      await sleep(BASE_RETRY_DELAY_MS * Math.pow(2, attempt));
+    }
+  }
+
+  return false;
+};
+
+// 替换占位图为OSS新图
+const replaceEditorImage = (fromSrc: string, toSrc: string) => {
+  const html = editor.value?.getHtml?.();
+  if (!html || !html.includes(fromSrc)) return;
+  editor.value?.setHtml(html.replace(fromSrc, toSrc));
+};
+
+const insertImageWithRetry = async (
+  insertFn: (src: string, alt: string, href: string) => void,
+  url: string,
+  alt?: string,
+) => {
+  // 非网络连接，直接下线
+  if (navigator.onLine === false) {
+    createToast(toast, "网络不可用", "图片稍后会自动加载", "warning");
+    return;
+  }
+
+  const token = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const placeholderSrc = `${PLACEHOLDER_IMAGE}?temp=${token}`;
+  // 插入占位图
+  insertFn(placeholderSrc, alt || "", placeholderSrc);
+
+  const ready = await waitForImageReady(url);
+  // ready后替换
+  if (ready) {
+    replaceEditorImage(placeholderSrc, url);
+    return;
+  }
+
+  createToast(toast, "图片加载延迟", "稍后会自动加载", "warning");
+  setTimeout(() => {
+    if (navigator.onLine !== false) {
+      replaceEditorImage(placeholderSrc, url);
+    }
+  }, 5000);
+};
+
 const editorConfig: Partial<IEditorConfig> = {
   placeholder: "请输入内容...",
   MENU_CONF: {
@@ -107,14 +176,14 @@ const editorConfig: Partial<IEditorConfig> = {
       metaWithUrl: false,
       // 成功/失败回调（如果使用服务端上传时启用）
       onSuccess: (insertFn: any, res) => {
-        insertFn(res.data.url, res.data.alt || "", res.data.url);
+        void insertImageWithRetry(insertFn, res.data.url, res.data.alt);
         createToast(toast, "图片上传成功", "标题为空", "success");
       },
       onFailed: () => {
-        createToast(toast, "图片上传失败", "占位信息", "danger");
+        createToast(toast, "图片上传失败", "网络问题，请重新上传", "danger");
       },
       onError: () => {
-        createToast(toast, "图片上传失败", "占位信息", "danger");
+        createToast(toast, "图片上传失败", "网络问题，请重新上传", "danger");
       },
       base64LimitSize: 0,
       // 自定义上传
@@ -125,7 +194,7 @@ const editorConfig: Partial<IEditorConfig> = {
         try {
           const res = await upload_img(form);
           if (res.errno === 0) {
-            insertFn(res.data.url, res.data.alt || "", res.data.url);
+            void insertImageWithRetry(insertFn, res.data.url, res.data.alt);
             createToast(toast, "上传成功", "图片上传成功", "success");
           } else {
             alert(res.message || "上传失败");
@@ -411,7 +480,6 @@ watch(
     void initEditor();
   },
 );
-
 //TODO: 1.表格整理 2.搜索接口接入 3.游标查询 4.ok选择后绑定id 5.取消将id置0
 </script>
 
