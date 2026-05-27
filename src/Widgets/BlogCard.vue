@@ -9,39 +9,41 @@ import { detailStore } from "../Store/detail";
 import { formatDateTime } from "../Utils/reks-format-time";
 import { createToast } from "../Utils/reks-toast";
 
-
 type FavoriteTogglePayload = {
   id: number;
   next: boolean;
 };
 // const props = withDefaults(defineProps<{key?:type}>(),{*key:default value*})
 // type 0是音乐博客，1普通博客
-const blogProps = withDefaults(defineProps<{
-  blog: BlogData;
-  liked?: boolean;
-  likeReady?: boolean;
-  likeDisabled?: boolean;
-  favorited?: boolean;
-  favoriteReady?: boolean;
-  favoriteDisabled?: boolean;
-  showLike?: boolean;
-  showFavorite?: boolean;
-  showEdit?:boolean;
-  showActions?: boolean;
-  visitRouteName?: string;
-}>(), {
-  liked: false,
-  likeReady: true,
-  likeDisabled: false,
-  favorited: false,
-  favoriteReady: true,
-  favoriteDisabled: false,
-  showLike: true,
-  showFavorite: true,
-  showEdit:false,
-  showActions: true,
-  visitRouteName: "blog",
-});
+const blogProps = withDefaults(
+  defineProps<{
+    blog: BlogData;
+    liked?: boolean;
+    likeReady?: boolean;
+    likeDisabled?: boolean;
+    favorited?: boolean;
+    favoriteReady?: boolean;
+    favoriteDisabled?: boolean;
+    showLike?: boolean;
+    showFavorite?: boolean;
+    showEdit?: boolean;
+    showActions?: boolean;
+    visitRouteName?: string;
+  }>(),
+  {
+    liked: false,
+    likeReady: true,
+    likeDisabled: false,
+    favorited: false,
+    favoriteReady: true,
+    favoriteDisabled: false,
+    showLike: true,
+    showFavorite: true,
+    showEdit: false,
+    showActions: true,
+    visitRouteName: "blog",
+  },
+);
 // 子传父
 // 当子组件触发 favorite-toggle 事件时，调用 handleFavoriteToggle 方法 @favorite-toggle="handleFavoriteToggle"
 // const emit = defineEmit<{(e:*"event"*,payload:*data*):type;}>()
@@ -151,21 +153,35 @@ const casePlay = () => {
       cover: b.music.cover,
     });
 
-    createToast(toast, "播放成功", `正在播放 ${b.music.username} - ${b.music.name}`, "success");
+    createToast(
+      toast,
+      "播放成功",
+      `正在播放 ${b.music.username} - ${b.music.name}`,
+      "success",
+    );
   } catch (e) {
     createToast(toast, "播放失败", "未知原因", "danger");
     console.error(e);
   }
 };
-
 </script>
 
 <template>
-  <BCard class="blog-card border border-secondary-subtle bg-light-subtle shadow-sm mb-4 ">
-    <template #header v-if="b.type === 0">
-      <div class="d-flex align-items-center p-2 px-3 bg-white rounded shadow-sm music-header">
-        <div class="position-relative rounded overflow-hidden flex-shrink-0 music-cover">
-          <img :src="b.music?.cover || '/ai.webp'" class="w-100 h-100 object-fit-cover" alt="album" />
+  <BCard
+    class="blog-card border border-secondary-subtle bg-light-subtle shadow-sm mb-4"
+  >
+    <!-- <template #header v-if="b.type === 0">
+      <div
+        class="d-flex align-items-center p-2 px-3 bg-white rounded shadow-sm music-header"
+      >
+        <div
+          class="position-relative rounded overflow-hidden flex-shrink-0 music-cover"
+        >
+          <img
+            :src="b.music?.cover || '/ai.webp'"
+            class="w-100 h-100 object-fit-cover"
+            alt="album"
+          />
           <div class="play-btn" @click.stop="casePlay">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff">
               <path d="M8 5v14l11-7z" />
@@ -177,7 +193,9 @@ const casePlay = () => {
           <div class="fs-6 fw-semibold text-dark">
             {{ b.music?.name || "未绑定音乐" }}
           </div>
-          <div class="d-flex align-items-center justify-content-between gap-2 mt-1 text-secondary small">
+          <div
+            class="d-flex align-items-center justify-content-between gap-2 mt-1 text-secondary small"
+          >
             <span>{{ b.music?.username || "未知作者" }}</span>
             <div class="d-inline-flex gap-1">
               <BButton size="sm" variant="light" @click.stop="casePlay">
@@ -190,31 +208,65 @@ const casePlay = () => {
           </div>
         </div>
       </div>
-    </template>
+    </template> -->
 
     <div class="rs-body">
       <div class="rs-card-img-list" v-skeleton-item>
-        <div v-for="(img, idx) in b.cover" :key="idx" class="rs-img-wrapper" v-skeleton="!imgLoaded[idx]">
-          <img class="rs-img" :src="img" :alt="`alt+${img}`" @load="imgLoaded[idx] = true" v-show="imgLoaded[idx]" />
+        <div
+          v-for="(img, idx) in b.cover"
+          :key="idx"
+          class="rs-img-wrapper"
+          v-skeleton="!imgLoaded[idx]"
+        >
+          <img
+            class="rs-img"
+            :src="img"
+            :alt="`alt+${img}`"
+            @load="imgLoaded[idx] = true"
+            v-show="imgLoaded[idx]"
+          />
         </div>
       </div>
-    </div>
-
-    <div
-      class="rs-card-content mt-4"
-      v-skeleton-item
-      @click="readBlog(b.id)"
-    >
-      <div class="rs-title h5" :title="b.title">
-        <strong>{{ b.title }}</strong>
+      <div class="rs-card-content mt-2" v-skeleton-item @click="readBlog(b.id)">
+        <div
+          class="rs-title fw-bold h6"
+          :class="{'mt-3': b.cover.length !== 0}"
+          :title="b.title"
+        >
+          {{ b.title }}
+        </div>
       </div>
-      <div class="rs-author border rounded-3 p-1 d-flex align-items-center flex-row gap-3" @click.stop="visitAuthor(b.user_id)">
-        <BAvatar size="sm" :src="b.avatar || ''"></BAvatar>
-        <div class="name fw-bold">{{ b.author }}</div>
-      </div> 
       <div class="rs-time mt-2">发布于{{ formatDateTime(b.created_at) }}</div>
     </div>
-    <template #footer v-if="blogProps.showActions">
+
+    <template #footer>
+      <div
+        class="rs-new-footer d-flex flex-row align-items-center justify-content-center gap-2"
+      >
+        <BPopover>
+          <template #target>
+            <BAvatar class="border" :src="b.avatar || ''"></BAvatar>
+            <div
+              class="rs-author p-2 d-flex align-items-center flex-row gap-3"
+              @click.stop="visitAuthor(b.user_id)"
+            >
+              <div class="name rs-title">{{ b.author }}</div>
+            </div>
+          </template>
+          <div class="d-flex flex-column align-items-center p-2">
+            <BAvatar size="lg" :src="b.avatar || ''"></BAvatar>
+            <div
+              class="rs-author p-2 d-flex align-items-center flex-row gap-3"
+              @click.stop="visitAuthor(b.user_id)"
+            >
+              <div class="name fw-bold rs-title">{{ b.author }}</div>
+            </div>
+            <BButton size="sm">+ 关注</BButton>
+          </div>
+        </BPopover>
+      </div>
+    </template>
+    <!-- <template #footer v-if="blogProps.showActions">
       <div class="controls d-inline-flex align-items-center gap-3">
         <div
           v-if="blogProps.showLike"
@@ -238,7 +290,7 @@ const casePlay = () => {
 
         
       </div>
-    </template>
+    </template> -->
   </BCard>
 </template>
 
@@ -256,7 +308,10 @@ const casePlay = () => {
 
 .cion {
   cursor: pointer;
-  transition: color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.2s ease;
 
   &:hover {
     transform: scale(1.05);
@@ -274,7 +329,8 @@ const casePlay = () => {
 
 .blog-card {
   break-inside: avoid;
-  max-width: 300px;
+  max-width: 600px;
+  width: fit-content;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -345,26 +401,23 @@ const casePlay = () => {
   background: rgba(0, 0, 0, 0.45);
   transition: opacity 0.2s;
 }
+.rs-title {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
 .rs-card-content {
   // max-width: $card-max-width;
 
   cursor: pointer;
   width: 100%;
-
-  .rs-title {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    &:hover {
-      cursor: pointer;
-      text-decoration: underline;
-    }
-  }
-
 }
 </style>
