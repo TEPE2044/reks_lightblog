@@ -31,7 +31,7 @@ reapi.interceptors.response.use(
       router.replace("/");
     }
     if (err.response?.status === 429) {
-      alert("请求次数已达上限！请勿重复请求");
+      alert("本月可设置次数已达上限！请勿重复请求");
     }
     return Promise.reject(err);
   },
