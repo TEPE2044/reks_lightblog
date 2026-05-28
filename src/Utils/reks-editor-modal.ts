@@ -1,3 +1,4 @@
+import { SlateTransforms } from "@wangeditor-next/editor";
 import type {
   IDomEditor,
   IModalMenu,
@@ -7,6 +8,7 @@ import { createApp, defineComponent, h, ref } from "vue";
 import type { Ref } from "vue";
 import { searchMusic } from "../Hooks/Search";
 import type { MusicResponse } from "./reks-interface";
+import { buildMusicCardElem } from "./reks-music-card-module";
 
 export const MUSIC_CARD_MENU_KEY = "musicCard";
 
@@ -72,6 +74,17 @@ export class MusicCardMenu implements IModalMenu {
       const pageSize = 4;
       const totalRef = ref<number | null>(null);
 
+      const insertMusicCard = (currentEditor: IDomEditor, music: MusicResponse) => {
+        currentEditor.restoreSelection();
+        currentEditor.focus(true);
+
+        const card = buildMusicCardElem(music);
+        const paragraph = { type: "paragraph", children: [{ text: "" }] };
+
+        // 一次性插入卡片和空段落，光标落到段落里
+        SlateTransforms.insertNodes(currentEditor, [card, paragraph], { select: true });
+      };
+
       const doSearch = async (targetPage = 1) => {
         const q = queryRef.value.trim();
         if (!q) {
@@ -99,10 +112,10 @@ export class MusicCardMenu implements IModalMenu {
           pageRef.value = targetPage;
           statusRef.value = `共 ${res?.total ?? rows.length} 条，当前展示 ${rows.length} 条。`;
           listRef.value = rows;
-          selectedRef.value = null;
-        } catch (e) {
-          console.error(e);
-          statusRef.value = "搜索失败，请稍后重试。";
+          const selected = selectedRef.value;
+          const currentEditor = menu.editorRef?.value;
+          if (!selected || !currentEditor) return;
+          insertMusicCard(currentEditor, selected);
           listRef.value = [];
           selectedRef.value = null;
           totalRef.value = null;
@@ -111,11 +124,19 @@ export class MusicCardMenu implements IModalMenu {
         }
       };
 
+      const insertIntoEditor = () => {
+        const editor = menu.editorRef?.value;
+        const music = selectedRef.value;
+        if (!editor || !music) return;
+
+        insertMusicCard(editor, music);
+      };
+
       const MusicModal = defineComponent({
         name: "MusicModal",
         setup() {
           const listContainerStyle = {
-            maxHeight: "240px"
+            maxHeight: "240px",
           };
 
           return () =>
@@ -143,7 +164,7 @@ export class MusicCardMenu implements IModalMenu {
                       void doSearch(1);
                     },
                   }),
-                  
+
                   h("div", { class: "d-flex flex-column gap-2" }, [
                     h(
                       "button",
@@ -164,10 +185,7 @@ export class MusicCardMenu implements IModalMenu {
                         type: "button",
                         disabled: !selectedRef.value,
                         onClick: () => {
-                          const selected = selectedRef.value;
-                          const currentEditor = menu.editorRef?.value;
-                          if (!selected || !currentEditor) return;
-                          currentEditor.insertText(`[music:${selected.id}]`);
+                          insertIntoEditor();
                         },
                       },
                       "插入",
@@ -175,7 +193,7 @@ export class MusicCardMenu implements IModalMenu {
                   ]),
                 ]),
                 h("div", { class: "small text-secondary" }, statusRef.value),
-                                h("div", { class: "border-0 d-flex flex-row gap-2 p-0" }, [
+                h("div", { class: "border-0 d-flex flex-row gap-2 p-0" }, [
                   h(
                     "button",
                     {
@@ -270,7 +288,7 @@ export class MusicCardMenu implements IModalMenu {
                             : "输入关键字后回车或点击搜索。",
                         ),
                       ],
-                )
+                ),
               ],
             );
         },
