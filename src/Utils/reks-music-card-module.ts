@@ -13,6 +13,7 @@ import { h } from "snabbdom";
 import type { MusicResponse } from "./reks-interface";
 import { playerStore } from "../Store/player";
 
+// 数据类型约束
 export type MusicCardElement = {
   type: "musicCard";
   id: number;
@@ -53,6 +54,7 @@ const renderMusicCard = (
   const node = elemNode as MusicCardElement;
   const name = node.name || "未命名";
   const author = node.author || "未知作者";
+  // 选中状态
   const selected = DomEditor.isNodeSelected(editor, elemNode);
   const store = playerStore();
 

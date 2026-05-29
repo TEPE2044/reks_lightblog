@@ -770,7 +770,7 @@ section {
 
   .editor-content {
     min-height: 600px;
-    overflow-y: auto;
+    overflow: visible;
     border-top: 1px solid $border-color;
     border-bottom: 2px solid gainsboro;
     border-bottom-left-radius: $border-radius;
@@ -781,6 +781,10 @@ section {
   :deep(.w-e-toolbar),
   :deep(.w-e-text-container) {
     width: 100%;
+  }
+
+  :deep(.w-e-modal) {
+    z-index: 1000;
   }
 }
 
