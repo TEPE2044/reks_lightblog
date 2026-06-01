@@ -64,8 +64,25 @@ const toggleSubscribe = () => {
   });
 };
 
-const caseAddMusic = () => {
-  const m = response.value.song;
+type MusicPayload = {
+  audio?: string;
+  cover?: string;
+  name?: string;
+  username?: string;
+};
+
+const resolveMusicPayload = (payload?: MusicPayload) => {
+  const fallback = response.value?.song || {};
+  return {
+    audio: payload?.audio || fallback.audio,
+    cover: payload?.cover || fallback.cover,
+    name: payload?.name || fallback.name,
+    username: payload?.username || fallback.username,
+  };
+};
+
+const caseAddMusic = (payload?: MusicPayload) => {
+  const m = resolveMusicPayload(payload);
   if (!m?.audio) {
     createToast(toast, "添加失败", "当前音乐缺少音频链接", "danger");
     return;
@@ -87,8 +104,8 @@ const caseAddMusic = () => {
   }
 };
 
-const casePlayMusic = () => {
-  const m = response.value?.song;
+const casePlayMusic = (payload?: MusicPayload) => {
+  const m = resolveMusicPayload(payload);
   if (!m?.audio) {
     createToast(toast, "播放失败", "当前音乐缺少音频链接", "danger");
     return;
@@ -106,6 +123,38 @@ const casePlayMusic = () => {
   } catch (e) {
     createToast(toast, "播放失败", "未知原因", "danger");
     console.error(e);
+  }
+};
+
+const handleContentAction = (event: MouseEvent) => {
+  const target = event.target as HTMLElement | null;
+  if (!target) return;
+
+  const actionEl = target.closest("[data-action]") as HTMLElement | null;
+  if (!actionEl) return;
+
+  const action = actionEl.getAttribute("data-action");
+  if (!action) return;
+
+  const cardEl = actionEl.closest("[data-music-card]") as HTMLElement | null;
+  const payload: MusicPayload | undefined = cardEl
+    ? {
+        audio: cardEl.getAttribute("data-audio") || undefined,
+        cover: cardEl.getAttribute("data-cover") || undefined,
+        name: cardEl.getAttribute("data-name") || undefined,
+        username: cardEl.getAttribute("data-artist") || undefined,
+      }
+    : undefined;
+
+  event.preventDefault();
+
+  if (action === "play") {
+    casePlayMusic(payload);
+    return;
+  }
+
+  if (action === "queue") {
+    caseAddMusic(payload);
   }
 };
 // 同步点赞状态
@@ -348,10 +397,10 @@ const toEditBlog = () => {
             <span>{{ response.song?.username || response?.author }}</span>
           </div>
           <div class="embed-actions mt-3 d-flex align-items-center gap-2">
-            <BButton variant="dark" size="sm" @click.stop="casePlayMusic">
+            <BButton variant="dark" size="sm" @click.stop="void casePlayMusic">
               <i-bi-play-circle-fill class="me-1" /> 播放
             </BButton>
-            <BButton variant="outline-secondary" size="sm" @click.stop="caseAddMusic">
+            <BButton variant="outline-secondary" size="sm" @click.stop="void caseAddMusic">
               <i-bi-plus-circle class="me-1" /> 添加队列
             </BButton>
           </div>
@@ -360,7 +409,7 @@ const toEditBlog = () => {
 
       <hr />
 
-      <div class="blog-body" v-html="response?.content"></div>
+      <div class="blog-body" v-html="response?.content" @click="handleContentAction"></div>
     </div>
 
     <!-- 右侧用户卡片侧边栏 -->
