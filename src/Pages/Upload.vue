@@ -23,8 +23,7 @@ interface Selection {
 
 const selections = ref<Selection[]>([
   { name: "随心写", iconKey: "blog", path: "/upload/blog" },
-  { name: "音频", iconKey: "audio", path: "/upload/music" },
-  { name: "音乐博客", iconKey: "mblog", path: "/upload/mblog" },
+  { name: "音频", iconKey: "audio", path: "/upload/music" }
 ]);
 
 const switchPost = (rpath: string) => {
@@ -51,7 +50,7 @@ const toDraft = () => {
           <component :is="uploadIconMap[s.iconKey]" style="font-size: 1.4rem" />
         </BButton>
 
-        <!-- <div class="h5 mt-3">草稿</div>
+        <div class="h5 mt-3">草稿</div>
         <BButton
           @click="toDraft()"
           :class="{ slt: curPath === '/upload/draft' }"
@@ -59,7 +58,7 @@ const toDraft = () => {
         >
           <div class="sname">草稿箱</div>
           <i-bi-file-earmark-post />
-        </BButton> -->
+        </BButton>
       </div>
     </div>
 

@@ -84,9 +84,9 @@ const toDraft = () => {
     <Empty title="您还没有发布过博客哦~" />
   </div>
   <div class="myblog-container" >
-    <!-- <div class="draft pe-3 pt-2 d-flex justify-content-end" v-if="blogs.length > 0">
+    <div class="draft pe-3 pt-2 d-flex justify-content-end" v-if="blogs.length > 0">
       <BButton variant="outline-secondary" @click="toDraft">草稿箱</BButton>
-    </div> -->
+    </div>
     <div class="myblog" v-if="blogs.length > 0">
       <BlogCard
         v-for="blog in blogs"

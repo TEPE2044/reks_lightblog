@@ -12,6 +12,12 @@ export interface HotBlogResponse {
   blogs: HotBlogItem[];
 }
 
+export interface SaveBlogResponse {
+  msg: boolean;
+  blog_id: number;
+  state: number;
+}
+
 export const query_my_blog = async () => {
   const res = await reapi({
     url: "/blog/my-blog",
@@ -140,23 +146,38 @@ export const upload_mblog = async (
 };
 
 // blog_id是0表示新建博客，非0表示编辑博客
+export const save_blog = async (
+  data: {
+    title: string;
+    content: string;
+    cover: string[];
+    tags: string[];
+  },
+  options?: {
+    blog_id?: number;
+    state?: number;
+  }
+) => {
+  const res = await reapi({
+    url: "/blog/my-blog/save",
+    method: "POST",
+    params: {
+      blog_id: options?.blog_id,
+      state: options?.state ?? 0,
+      type_: 1,
+    },
+    data,
+  });
+  return res.data as SaveBlogResponse;
+};
+
 export const upload_blog = async (
   title: string,
   content: string,
   cover: string[],
   tags: string[]
 ) => {
-  const res = await reapi({
-    url: "/blog/my-blog/new",
-    method: "POST",
-    data: {
-      title: title,
-      content: content,
-      cover: cover,
-      tags: tags,
-    },
-  });
-  return res.data;
+  return await save_blog({ title, content, cover, tags }, { state: 1 });
 };
 
 export const update_blog = async (
@@ -166,20 +187,10 @@ export const update_blog = async (
   cover: string[],
   tags: string[]
 ) => {
-  const res = await reapi({
-    url: "/blog/my-blog/update",
-    method: "POST",
-    params: {
-      blog_id: id,
-    },
-    data: {
-      title: title,
-      content: content,
-      cover: cover,
-      tags: tags,
-    },
-  });
-  return res.data;
+  return await save_blog(
+    { title, content, cover, tags },
+    { blog_id: id, state: 1 }
+  );
 };
 
 export const update_draft = async (
@@ -189,20 +200,10 @@ export const update_draft = async (
   cover: string[],
   tags: string[]
 ) => {
-  const res = await reapi({
-    url: "/blog/my-draft/update",
-    method: "POST",
-    params: {
-      blog_id: id,
-    },
-    data: {
-      title: title,
-      content: content,
-      cover: cover,
-      tags: tags,
-    },
-  });
-  return res.data;
+  return await save_blog(
+    { title, content, cover, tags },
+    { blog_id: id, state: 0 }
+  );
 };
 
 export const delete_blog = async (blog_id: Number) => {

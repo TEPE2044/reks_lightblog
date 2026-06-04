@@ -7,7 +7,7 @@ import type { IEditorConfig, IToolbarConfig } from "@wangeditor-next/editor";
 import { useToast, useToggle } from "bootstrap-vue-next";
 import { editorStore } from "../Store/editor";
 import { upload_img } from "../Hooks/Editor";
-import { query_blog_by_id, query_draft_by_id, update_blog, update_draft, upload_blog, upload_mblog } from "../Hooks/Blog";
+import { query_blog_by_id, query_draft_by_id, save_blog, upload_mblog } from "../Hooks/Blog";
 import { formatDateTime } from "../Utils/reks-format-time";
 import { createToast } from "../Utils/reks-toast";
 import router from "../Router";
@@ -21,7 +21,6 @@ import { makeSubscribeMessage } from "../Utils/subscribe-log";
 const props = withDefaults(
   defineProps<{
     mblog?: boolean;
-    upload: "mblog" | "";
     mode?: "create" | "edit";
     blogId?: number | string;
     source?: "blog" | "draft";
@@ -290,22 +289,18 @@ const handleSubmit = async () => {
         return;
       }
 
-      if (props.source === "draft") {
-        return await update_draft(
-          blogId,
-          pub_title.value,
-          valueHTML.value,
-          coverImages.value,
-          pub_tags.value,
-        );
-      }
-
-      return await update_blog(
-        blogId,
-        pub_title.value,
-        valueHTML.value,
-        coverImages.value,
-        pub_tags.value,
+      const isDraft = props.source === "draft";
+      return await save_blog(
+        {
+          title: pub_title.value,
+          content: valueHTML.value,
+          cover: coverImages.value,
+          tags: pub_tags.value,
+        },
+        {
+          blog_id: blogId,
+          state: isDraft ? 0 : 1,
+        },
       );
     }
 
@@ -319,11 +314,17 @@ const handleSubmit = async () => {
       );
     }
 
-    return await upload_blog(
-      pub_title.value,
-      valueHTML.value,
-      coverImages.value,
-      pub_tags.value,
+    const isDraft = props.source === "draft";
+    return await save_blog(
+      {
+        title: pub_title.value,
+        content: valueHTML.value,
+        cover: coverImages.value,
+        tags: pub_tags.value,
+      },
+      {
+        state: isDraft ? 0 : 1,
+      },
     );
   };
 
@@ -637,17 +638,6 @@ watch(
           <strong>{{ confirmTitle }}</strong>
         </template>
         <BButton
-          v-if="upload === 'mblog'"
-          title="音乐博客"
-          size="sm"
-          variant="success"
-          class="me-2"
-          @click="handleSubmit"
-        >
-          <i-bi-send /> {{ submitLabel }}
-        </BButton>
-        <BButton
-          v-else
           title="普通博客"
           size="sm"
           variant="success"

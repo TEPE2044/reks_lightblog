@@ -28,7 +28,7 @@ const goBack = () => {
       <BButton variant="outline-secondary" @click="goBack">返回</BButton>
     </div>
 
-    <BlogUpload :mode="'edit'" :blog-id="blogId" :source="source" upload="" />
+    <BlogUpload :mode="'edit'" :blog-id="blogId" :source="source" />
   </div>
 </template>
 
