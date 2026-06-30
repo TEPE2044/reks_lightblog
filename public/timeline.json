@@ -1,4 +1,9 @@
 [
+  { "date": "2026-06-30", "event": "ReKindlers 完全停止开发" },
+  { "date": "2026-05-21", "event": "ReKindlers 进入Serverless时期" },
+  { "date": "2026-04-20", "event": "ReKindlers 即将重构" },
+  { "date": "2026-04-20", "event": "ReKindlers 因不可抗力因素停止开发" },
+  { "date": "2026-03-31", "event": "V0.6.0 开发陷入停滞" },
   { "date": "2026-03-27", "event": "V0.6.0 开发中" },
   { "date": "2026-03-16", "event": "V0.5.5 开发完成" },
   { "date": "2026-03-14", "event": "完成 站内信" },
